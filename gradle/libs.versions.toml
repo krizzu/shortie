@@ -1,0 +1,48 @@
+[versions]
+kotlin = "2.2.20"
+ktor = "3.3.2"
+logback = "1.5.13"
+exposed = "1.0.0-rc-4"
+postgresql = "42.7.3"
+hikari = "7.0.2"
+
+[libraries]
+ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
+ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
+ktor-server-di = { module = "io.ktor:ktor-server-di", version.ref = "ktor" }
+ktor-server-config-yaml = { module = "io.ktor:ktor-server-config-yaml", version.ref = "ktor" }
+ktor-server-test-host = { module = "io.ktor:ktor-server-test-host", version.ref = "ktor" }
+exposed-bom = { module = "org.jetbrains.exposed:exposed-bom", version.ref = "exposed" }
+exposed-core = { module = "org.jetbrains.exposed:exposed-core" }
+exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc" }
+exposed-db-postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
+exposed-migration-jdbc = { module = "org.jetbrains.exposed:exposed-migration-jdbc" }
+exposed-migration-core = { module = "org.jetbrains.exposed:exposed-migration-core" }
+exposed-extension-datetime = { module = "org.jetbrains.exposed:exposed-kotlin-datetime" }
+exposed-connection-hikari = { module = "com.zaxxer:HikariCP", version.ref = "hikari" }
+
+logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
+
+
+[bundles]
+exposed = [
+    "exposed-core",
+    "exposed-jdbc",
+    "exposed-db-postgresql",
+    "exposed-migration-core",
+    "exposed-migration-jdbc",
+    "exposed-extension-datetime",
+    "exposed-connection-hikari"
+]
+
+ktor = [
+    "ktor-server-core",
+    "ktor-server-netty",
+    "ktor-server-config-yaml",
+    "ktor-server-di"
+]

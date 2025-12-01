@@ -1,0 +1,13 @@
+ktor:
+  application:
+    modules:
+      - com.kborowy.shortie.ApplicationKt.app
+    dependencies:
+      - com.kborowy.shortie.database.ConnectionKt.provideDatabase
+  deployment:
+    port: 8080
+
+database:
+  url: ${APP_DB_URL}
+  user: ${APP_DB_USER}
+  password: ${APP_DB_PASSWORD}
