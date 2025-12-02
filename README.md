@@ -8,9 +8,23 @@ todo
 
 ## Local development
 
-1. Copy content from .env-example into .env and edit accordingly
-2. Run docker-compose's db service
-3. Run application via gradle, sourcing .env file
+### Prepare .env file
+
+Copy content from .env-example into .env and edit accordingly
+
+### Running migrations
+
+- Source .env file
+
+```shell
+set -a; source .env; set +a
+```
+
+- Run migrations script. Pass in a migration name like "vNUMBER__MIGRATION_NAME"
+
+```shell
+./gradlew :app:generateMigrations -PmigrationName="v0__initial"
+```
 
 ## License
 

@@ -1,4 +1,4 @@
-package com.kborowy.shortie.database
+package com.kborowy.shortie.infra
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
@@ -7,6 +7,8 @@ import io.ktor.util.logging.KtorSimpleLogger
 import org.jetbrains.exposed.v1.jdbc.Database
 
 private val log = KtorSimpleLogger("DatabaseConnection")
+
+const val MIGRATIONS_DIRECTORY = "src/main/resources/migrations"
 
 @Suppress("unused") // DI provider
 fun provideDatabase(

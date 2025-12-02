@@ -5,8 +5,10 @@ logback = "1.5.13"
 exposed = "1.0.0-rc-4"
 postgresql = "42.7.3"
 hikari = "7.0.2"
+kotlin-datetime = "0.7.1"
 
 [libraries]
+kotlin-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlin-datetime" }
 ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
 ktor-server-di = { module = "io.ktor:ktor-server-di", version.ref = "ktor" }
@@ -20,6 +22,7 @@ exposed-migration-jdbc = { module = "org.jetbrains.exposed:exposed-migration-jdb
 exposed-migration-core = { module = "org.jetbrains.exposed:exposed-migration-core" }
 exposed-extension-datetime = { module = "org.jetbrains.exposed:exposed-kotlin-datetime" }
 exposed-connection-hikari = { module = "com.zaxxer:HikariCP", version.ref = "hikari" }
+hash-argon2 = { module = "de.mkammerer:argon2-jvm", version = "2.12" }
 
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
@@ -40,9 +43,14 @@ exposed = [
     "exposed-connection-hikari"
 ]
 
-ktor = [
+ktor-app = [
     "ktor-server-core",
     "ktor-server-netty",
     "ktor-server-config-yaml",
     "ktor-server-di"
+]
+
+ktor-test = [
+    "ktor-server-test-host",
+    "kotlin-test-junit"
 ]
