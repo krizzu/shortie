@@ -7,6 +7,7 @@ postgresql = "42.7.3"
 hikari = "7.0.2"
 kotlin-datetime = "0.7.1"
 flyway = "10.0.0"
+koin = "4.1.1"
 
 [libraries]
 kotlin-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlin-datetime" }
@@ -25,7 +26,12 @@ exposed-migration-flyway = { module = "org.flywaydb:flyway-core", version.ref = 
 exposed-migration-flywayPostgresql = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flyway" }
 exposed-extension-datetime = { module = "org.jetbrains.exposed:exposed-kotlin-datetime" }
 exposed-connection-hikari = { module = "com.zaxxer:HikariCP", version.ref = "hikari" }
-hash-argon2 = { module = "de.mkammerer:argon2-jvm", version = "2.12" }
+
+koin-ktor = { module = "io.insert-koin:koin-ktor", version.ref = "koin" }
+koin-ktorLogging = { module = "io.insert-koin:koin-logger-slf4j", version.ref = "koin" }
+
+utils-hashing-argon2 = { module = "de.mkammerer:argon2-jvm", version = "2.12" }
+utils-validation-urlValidator = { module = "commons-validator:commons-validator", version = "1.10.1" }
 
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
@@ -45,6 +51,11 @@ exposed = [
     "exposed-connection-hikari",
     "exposed-migration-flyway",
     "exposed-migration-flywayPostgresql"
+]
+
+koin-ktor = [
+    "koin-ktor",
+    "koin-ktorLogging"
 ]
 
 ktor-app = [
