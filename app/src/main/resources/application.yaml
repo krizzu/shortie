@@ -3,7 +3,8 @@ ktor:
     modules:
       - com.kborowy.shortie.ApplicationKt.app
     dependencies:
-      - com.kborowy.shortie.database.ConnectionKt.provideDatabase
+      - com.kborowy.shortie.infra.DatabaseMigrationsKt.provideMigration
+      - com.kborowy.shortie.infra.DatabaseConnectionKt.provideDatabase
   deployment:
     port: 8080
 

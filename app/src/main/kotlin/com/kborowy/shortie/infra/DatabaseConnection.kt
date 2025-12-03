@@ -8,9 +8,9 @@ import org.jetbrains.exposed.v1.jdbc.Database
 
 private val log = KtorSimpleLogger("DatabaseConnection")
 
-const val MIGRATIONS_DIRECTORY = "src/main/resources/migrations"
 
-@Suppress("unused") // DI provider
+
+@Suppress("unused") // DI provider via application.yaml
 fun provideDatabase(
     @Property("database.url") url: String,
     @Property("database.user") user: String,

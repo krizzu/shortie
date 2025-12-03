@@ -20,10 +20,10 @@ Copy content from .env-example into .env and edit accordingly
 set -a; source .env; set +a
 ```
 
-- Run migrations script. Pass in a migration name like "vNUMBER__MIGRATION_NAME"
+- Run migrations script. Pass in a migration name like "V<version>__<description>"
 
 ```shell
-./gradlew :app:generateMigrations -PmigrationName="v0__initial"
+./gradlew :app:generateMigrations -PmigrationName="V1__initial"
 ```
 
 ## License
