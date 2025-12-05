@@ -26,7 +26,7 @@ private fun createConnection(url: String, user: String, pass: String): Database 
     return Database.connect(datasource = dbSource)
 }
 
-fun Application.provideDatabaseConnection(): Module {
+fun Application.provideDatabaseDIModule(): Module {
     val url = environment.config.property("database.url").getString()
     val user = environment.config.property("database.user").getString()
     val pass = environment.config.property("database.password").getString()

@@ -12,3 +12,7 @@ database:
   url: ${APP_DB_URL}
   user: ${APP_DB_USER}
   password: ${APP_DB_PASSWORD}
+
+hash:
+  minLength: ${APP_ID_MIN_LENGTH:3}
+  alphabet: ${APP_ID_ALPHABET}

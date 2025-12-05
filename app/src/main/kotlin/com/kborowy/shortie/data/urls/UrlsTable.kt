@@ -11,8 +11,7 @@ private const val MAX_LONG_URL_LENGTH = 2048
 private const val MAX_PASSWORD_LENGTH = 128
 
 object UrlsTable : LongIdTable(name = "urls") {
-
-    val short_code = varchar("short_code", MAX_SHORT_URL_LENGTH).uniqueIndex()
+    val shortCode = varchar("short_code", MAX_SHORT_URL_LENGTH).uniqueIndex()
     val originalUrl = varchar("original_url", MAX_LONG_URL_LENGTH)
     val passwordHash = varchar("password_hash", MAX_PASSWORD_LENGTH).nullable().default(null)
     val expiryDate = datetime("expiry_date").nullable().default(null)

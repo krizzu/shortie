@@ -1,3 +1,5 @@
+package tests.tests.utils
+
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import com.kborowy.shortie.utils.UrlValidator

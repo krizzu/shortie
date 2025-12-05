@@ -9,6 +9,8 @@ version = "0.0.1"
 
 application { mainClass = "io.ktor.server.netty.EngineMain" }
 
+kotlin { compilerOptions { optIn.add("kotlin.time.ExperimentalTime") } }
+
 dependencies {
     implementation(libs.logback.classic)
     implementation(project.dependencies.platform(libs.exposed.bom))
@@ -16,10 +18,12 @@ dependencies {
     implementation(libs.bundles.exposed)
     implementation(libs.bundles.koin.ktor)
     implementation(libs.kotlin.datetime)
+    implementation(libs.kotlin.coroutines.core)
     implementation(libs.utils.hashing.argon2)
     implementation(libs.utils.validation.urlValidator)
+    implementation(libs.utils.idGenerator.sqids)
 
-    testImplementation(libs.bundles.ktor.test)
+    testImplementation(libs.bundles.tests)
 }
 
 tasks.register<JavaExec>("generateMigrations") {

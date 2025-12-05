@@ -3,7 +3,7 @@ package com.kborowy.shortie.utils
 import de.mkammerer.argon2.Argon2Factory
 import de.mkammerer.argon2.Argon2Helper
 
-object Hasher {
+object PasswordHasher {
 
     private val argon2 by lazy { Argon2Factory.create() }
     private val iterations by lazy { Argon2Helper.findIterations(argon2, 1000, 65536, 1) }

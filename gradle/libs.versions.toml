@@ -8,9 +8,12 @@ hikari = "7.0.2"
 kotlin-datetime = "0.7.1"
 flyway = "10.0.0"
 koin = "4.1.1"
+coroutines = "1.10.2"
 
 [libraries]
 kotlin-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlin-datetime" }
+kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
 ktor-server-di = { module = "io.ktor:ktor-server-di", version.ref = "ktor" }
@@ -19,6 +22,7 @@ ktor-server-test-host = { module = "io.ktor:ktor-server-test-host", version.ref 
 exposed-bom = { module = "org.jetbrains.exposed:exposed-bom", version.ref = "exposed" }
 exposed-core = { module = "org.jetbrains.exposed:exposed-core" }
 exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc" }
+exposed-db-h2 = { module = "com.h2database:h2", version = "2.2.224" }
 exposed-db-postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
 exposed-migration-jdbc = { module = "org.jetbrains.exposed:exposed-migration-jdbc" }
 exposed-migration-core = { module = "org.jetbrains.exposed:exposed-migration-core" }
@@ -26,15 +30,14 @@ exposed-migration-flyway = { module = "org.flywaydb:flyway-core", version.ref = 
 exposed-migration-flywayPostgresql = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flyway" }
 exposed-extension-datetime = { module = "org.jetbrains.exposed:exposed-kotlin-datetime" }
 exposed-connection-hikari = { module = "com.zaxxer:HikariCP", version.ref = "hikari" }
-
 koin-ktor = { module = "io.insert-koin:koin-ktor", version.ref = "koin" }
 koin-ktorLogging = { module = "io.insert-koin:koin-logger-slf4j", version.ref = "koin" }
-
 utils-hashing-argon2 = { module = "de.mkammerer:argon2-jvm", version = "2.12" }
 utils-validation-urlValidator = { module = "commons-validator:commons-validator", version = "1.10.1" }
+utils-idGenerator-sqids = { module = "org.sqids:sqids-kotlin", version = "0.1.1" }
 
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
-kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
+tests-kotlin-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -65,7 +68,9 @@ ktor-app = [
     "ktor-server-di"
 ]
 
-ktor-test = [
+tests = [
     "ktor-server-test-host",
-    "kotlin-test-junit"
+    "tests-kotlin-junit",
+    "exposed-db-h2",
+    "kotlin-coroutines-test"
 ]

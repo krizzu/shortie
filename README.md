@@ -2,7 +2,16 @@
 
 A link shortening application build with Ktor.
 
-## Architecture
+## Tech stack
+
+### Libraries
+
+- Ktor
+- Exposed + Hikari
+- Flyway
+- Koin
+
+### Architecture
 
 todo
 
