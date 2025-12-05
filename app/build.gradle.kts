@@ -30,7 +30,7 @@ tasks.register<JavaExec>("generateMigrations") {
     group = "shortie"
     description = "Generate migration scripts"
     classpath = sourceSets.main.get().runtimeClasspath
-    mainClass = "com.kborowy.shortie.migrations.Generate_migrationsKt"
+    mainClass = "Generate_migrationsKt"
 
     doFirst {
         environment["MIGRATION_NAME"] =

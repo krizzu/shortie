@@ -21,7 +21,9 @@ todo
 
 Copy content from .env-example into .env and edit accordingly
 
-### Running migrations
+### Creating migrations
+
+Perform required database changes, then follow steps:
 
 - Source .env file
 

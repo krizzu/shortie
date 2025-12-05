@@ -1,5 +1,3 @@
-package com.kborowy.shortie.migrations
-
 import com.kborowy.shortie.data.urls.UrlsTable
 import com.kborowy.shortie.infra.MIGRATIONS_DIRECTORY
 import org.jetbrains.exposed.v1.core.ExperimentalDatabaseMigrationApi

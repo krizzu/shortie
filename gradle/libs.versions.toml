@@ -19,6 +19,7 @@ ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor"
 ktor-server-di = { module = "io.ktor:ktor-server-di", version.ref = "ktor" }
 ktor-server-config-yaml = { module = "io.ktor:ktor-server-config-yaml", version.ref = "ktor" }
 ktor-server-test-host = { module = "io.ktor:ktor-server-test-host", version.ref = "ktor" }
+ktor-server-plugins-statusPages = { module = "io.ktor:ktor-server-status-pages", version.ref = "ktor" }
 exposed-bom = { module = "org.jetbrains.exposed:exposed-bom", version.ref = "exposed" }
 exposed-core = { module = "org.jetbrains.exposed:exposed-core" }
 exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc" }
@@ -65,7 +66,8 @@ ktor-app = [
     "ktor-server-core",
     "ktor-server-netty",
     "ktor-server-config-yaml",
-    "ktor-server-di"
+    "ktor-server-di",
+    "ktor-server-plugins-statusPages"
 ]
 
 tests = [
