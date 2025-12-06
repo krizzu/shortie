@@ -8,4 +8,6 @@ sealed class AppHttpError(val statusCode: HttpStatusCode, message: String) :
 
 class UnauthorizedHttpError(message: String) : AppHttpError(HttpStatusCode.Unauthorized, message)
 
-class NotFoundHttpErrors(message: String) : AppHttpError(HttpStatusCode.NotFound, message)
+class NotFoundHttpError(message: String) : AppHttpError(HttpStatusCode.NotFound, message)
+
+class GoneHttpError(message: String) : AppHttpError(HttpStatusCode.Gone, message)

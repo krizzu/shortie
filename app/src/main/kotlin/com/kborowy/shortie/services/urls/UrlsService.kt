@@ -8,6 +8,7 @@ import com.kborowy.shortie.models.OriginalUrl
 import com.kborowy.shortie.models.ShortCode
 import com.kborowy.shortie.models.ShortieUrl
 import com.kborowy.shortie.utils.PasswordHasher
+import io.ktor.utils.io.CancellationException
 import kotlinx.datetime.LocalDateTime
 
 fun UrlsService(repo: UrlsRepository, counter: GlobalCounter, generator: IdGenerator): UrlsService =
@@ -22,6 +23,8 @@ interface UrlsService {
     ): ShortieUrl
 
     suspend fun resolveShortCode(code: ShortCode): ShortieUrl?
+
+    suspend fun resolveShortCode(code: String): ShortieUrl?
 
     /** If shortie is protected, check if provided password match */
     suspend fun verifyShortie(shortie: ShortieUrl, password: String): Boolean
@@ -47,7 +50,18 @@ private class RealUrlsService(
     }
 
     override suspend fun resolveShortCode(code: ShortCode): ShortieUrl? {
-        TODO("Not yet implemented")
+        return repo.get(code)
+    }
+
+    override suspend fun resolveShortCode(code: String): ShortieUrl? {
+        try {
+            val shortCode = ShortCode(code)
+            return resolveShortCode(shortCode)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (_: Exception) {
+            return null
+        }
     }
 
     override suspend fun verifyShortie(shortie: ShortieUrl, password: String): Boolean {
