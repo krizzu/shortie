@@ -8,6 +8,7 @@ import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.response.respondText
+import org.slf4j.LoggerFactory
 
 fun Application.setupStatusPages() {
     install(StatusPages) {
@@ -31,7 +32,14 @@ fun Application.setupStatusPages() {
         }
 
         exception<Throwable> { call, cause ->
-            call.respondText("500: ${cause.message}", status = HttpStatusCode.InternalServerError)
+            LoggerFactory.getLogger("SeriousException").let {
+                it.warn("Uncaught error: ${cause.message}")
+            }
+
+            call.respondText(
+                "500: Something went wrong inside :>",
+                status = HttpStatusCode.InternalServerError,
+            )
         }
     }
 }

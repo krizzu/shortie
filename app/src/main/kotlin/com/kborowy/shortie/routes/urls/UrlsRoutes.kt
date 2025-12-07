@@ -70,6 +70,7 @@ fun Application.configureUrlsRouting() {
             }
         }
 
+        // todo: auth only
         route("/urls") {
             post {
                 val service by inject<UrlsService>()
