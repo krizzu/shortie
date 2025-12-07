@@ -4,11 +4,14 @@ import com.kborowy.shortie.errors.BadRequestError
 import com.kborowy.shortie.errors.GoneHttpError
 import com.kborowy.shortie.errors.NotFoundHttpError
 import com.kborowy.shortie.extensions.getOrFail
+import com.kborowy.shortie.models.OriginalUrl
 import com.kborowy.shortie.models.ShortieUrl
 import com.kborowy.shortie.services.urls.UrlsService
+import com.kborowy.shortie.utils.PasswordHasher
 import io.ktor.http.appendPathSegments
 import io.ktor.server.application.Application
 import io.ktor.server.request.receiveNullable
+import io.ktor.server.response.respond
 import io.ktor.server.response.respondRedirect
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.RoutingContext
@@ -64,6 +67,23 @@ fun Application.configureUrlsRouting() {
                         throw NotFoundHttpError("${shortie.shortCode} not found")
                     }
                 }
+            }
+
+            post {
+                val service by inject<UrlsService>()
+                val body =
+                    call.receiveNullable<GenerateShortieDTO>()
+                        ?: throw BadRequestError("missing required body")
+
+                val shortie =
+                    service.generateShortie(
+                        url = OriginalUrl(body.url),
+                        expiry = body.expiryDate,
+                        alias = body.alias,
+                        password = body.password?.let { PasswordHasher.hash(body.password) },
+                    )
+
+                call.respond(GenerateShortieResponseDTO(shortCode = shortie.shortCode.value))
             }
         }
     }

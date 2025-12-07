@@ -20,6 +20,7 @@ dependencies {
     implementation(libs.bundles.koin.ktor)
     implementation(libs.kotlin.datetime)
     implementation(libs.kotlin.coroutines.core)
+    implementation(libs.kotlin.serialization)
     implementation(libs.utils.hashing.argon2)
     implementation(libs.utils.validation.urlValidator)
     implementation(libs.utils.idGenerator.sqids)

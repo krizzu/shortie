@@ -1,5 +1,6 @@
 package com.kborowy.shortie.plugins
 
+import com.kborowy.shortie.errors.AppError
 import com.kborowy.shortie.errors.AppHttpError
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
@@ -15,6 +16,10 @@ fun Application.setupStatusPages() {
                 text = "${cause.statusCode}: ${cause.message}",
                 status = cause.statusCode,
             )
+        }
+
+        exception<AppError> { call, cause ->
+            call.respondText(text = "Request failed: ${cause::class}: ${cause.message}")
         }
 
         status(HttpStatusCode.NotFound) { call, _ ->

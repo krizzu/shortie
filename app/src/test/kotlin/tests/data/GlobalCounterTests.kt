@@ -1,7 +1,7 @@
 package tests.repos
 
 import com.kborowy.shortie.data.urls.UrlsTable
-import com.kborowy.shortie.migrations.com.kborowy.shortie.data.counter.GlobalCounter
+import com.kborowy.shortie.data.counter.GlobalCounter
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals

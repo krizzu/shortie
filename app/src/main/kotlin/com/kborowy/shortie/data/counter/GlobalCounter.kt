@@ -1,5 +1,6 @@
-package com.kborowy.shortie.migrations.com.kborowy.shortie.data.counter
+package com.kborowy.shortie.data.counter
 
+import java.sql.Connection
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.JdbcTransaction
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -23,7 +24,7 @@ private class RealGlobalCounter(private val db: Database) : GlobalCounter {
 }
 
 private fun JdbcTransaction.readNextSequence(name: String): Long {
-    val cnx = connection.connection as java.sql.Connection
+    val cnx = connection.connection as Connection
     val query = cnx.createStatement()
     val result = query.executeQuery("SELECT nextval('$name');")
     result.next()

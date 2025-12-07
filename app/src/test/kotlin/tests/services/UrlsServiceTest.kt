@@ -3,17 +3,21 @@
 package tests.tests.services
 
 import com.kborowy.shortie.data.GlobalClockProvider
+import com.kborowy.shortie.data.counter.GlobalCounter
 import com.kborowy.shortie.data.urls.UrlsRepository
+import com.kborowy.shortie.errors.AliasAlreadyExistsError
+import com.kborowy.shortie.errors.ExpiryInPastError
 import com.kborowy.shortie.extensions.now
 import com.kborowy.shortie.extensions.nowInstant
-import com.kborowy.shortie.migrations.com.kborowy.shortie.data.counter.GlobalCounter
 import com.kborowy.shortie.migrations.com.kborowy.shortie.utils.IdGenerator
 import com.kborowy.shortie.models.OriginalUrl
 import com.kborowy.shortie.services.urls.UrlsService
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 import kotlin.time.Clock
 import kotlin.time.Duration
@@ -98,6 +102,28 @@ class RealUrlsServiceTest {
 
         assertTrue("passwords should match") {
             service.verifyShortCode(shortie.shortCode, password)
+        }
+    }
+
+    @Test
+    fun `reject shortie with same alias`() = runTest {
+        val url = OriginalUrl("https://www.example3.com")
+        val myAlias = "my-short"
+        val shortie = service.generateShortie(url = url, alias = myAlias)
+        assertNotNull(shortie, "shortie not created")
+
+        assertFailsWith(AliasAlreadyExistsError::class) {
+            service.generateShortie(url = url, alias = myAlias)
+        }
+    }
+
+    @Test
+    fun `rejects shortie with time in past`() = runTest {
+        val clock = FakeClock()
+        GlobalClockProvider.replaceClock(clock)
+        val yesterday = LocalDateTime.nowInstant.minus(1.days).toLocalDateTime(TimeZone.UTC)
+        assertFailsWith(ExpiryInPastError::class) {
+            service.generateShortie(url = OriginalUrl("https://ex.com"), expiry = yesterday)
         }
     }
 }
