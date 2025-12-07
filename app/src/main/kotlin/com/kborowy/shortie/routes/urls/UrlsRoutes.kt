@@ -23,8 +23,8 @@ import org.koin.ktor.ext.inject
 
 fun Application.configureUrlsRouting() {
     routing {
-        route("/urls") {
-            get("/{short_code}") {
+        route("/{short_code}") {
+            get {
                 val service by inject<UrlsService>()
                 val shortie = getActiveShortie("short_code", service)
 
@@ -38,7 +38,7 @@ fun Application.configureUrlsRouting() {
                 call.respondRedirect(shortie.originalUrl.value, permanent = false)
             }
 
-            route("/{short_code}/password") {
+            route("/password") {
                 get {
                     val service by inject<UrlsService>()
                     val shortie = getActiveShortie("short_code", service)
@@ -68,7 +68,9 @@ fun Application.configureUrlsRouting() {
                     }
                 }
             }
+        }
 
+        route("/urls") {
             post {
                 val service by inject<UrlsService>()
                 val body =
