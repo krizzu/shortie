@@ -9,6 +9,7 @@ import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.insertAndGetId
+import org.jetbrains.exposed.v1.jdbc.select
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
@@ -23,6 +24,8 @@ interface UrlsRepository {
     suspend fun remove(shortCode: ShortCode): Boolean
 
     suspend fun get(shortCode: ShortCode): ShortieUrl?
+
+    suspend fun getHashForCode(shortCode: ShortCode): String?
 
     // todo: getAll paginated
 }
@@ -62,6 +65,14 @@ private class RealUrlsRepository(private val db: Database) : UrlsRepository {
                 .where { UrlsTable.shortCode eq shortCode.value }
                 .singleOrNull()
                 ?.toShortieUrl()
+        }
+
+    override suspend fun getHashForCode(shortCode: ShortCode): String? =
+        transaction(db) {
+            UrlsTable.select(UrlsTable.passwordHash)
+                .where { UrlsTable.shortCode eq shortCode.value }
+                .singleOrNull()
+                ?.getOrNull(UrlsTable.passwordHash)
         }
 }
 

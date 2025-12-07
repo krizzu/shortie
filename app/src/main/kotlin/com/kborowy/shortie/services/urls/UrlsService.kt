@@ -27,7 +27,7 @@ interface UrlsService {
     suspend fun resolveShortCode(code: String): ShortieUrl?
 
     /** If shortie is protected, check if provided password match */
-    suspend fun verifyShortie(shortie: ShortieUrl, password: String): Boolean
+    suspend fun verifyShortCode(shortCode: ShortCode, password: String): Boolean
 }
 
 private class RealUrlsService(
@@ -64,8 +64,10 @@ private class RealUrlsService(
         }
     }
 
-    override suspend fun verifyShortie(shortie: ShortieUrl, password: String): Boolean {
-        TODO("Not yet implemented")
+    override suspend fun verifyShortCode(shortCode: ShortCode, password: String): Boolean {
+        val shortieHash = repo.getHashForCode(shortCode)
+        requireNotNull(shortieHash) { "${shortCode.value} not found" }
+        return PasswordHasher.verify(password, shortieHash)
     }
 
     private suspend fun createHash(): ShortCode {

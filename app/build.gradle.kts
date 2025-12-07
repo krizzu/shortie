@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ktor)
 }
 
@@ -22,6 +23,10 @@ dependencies {
     implementation(libs.utils.hashing.argon2)
     implementation(libs.utils.validation.urlValidator)
     implementation(libs.utils.idGenerator.sqids)
+    implementation("io.ktor:ktor-server-core:3.3.2")
+    implementation("io.ktor:ktor-server-core:3.3.2")
+    implementation("io.ktor:ktor-serialization-gson:3.3.2")
+    implementation("io.ktor:ktor-server-core:3.3.2")
 
     testImplementation(libs.bundles.tests)
 }

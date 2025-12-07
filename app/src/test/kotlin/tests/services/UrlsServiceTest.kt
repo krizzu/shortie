@@ -85,13 +85,20 @@ class RealUrlsServiceTest {
         )
     }
 
+    @Test
     fun `generates shortie with password`() = runTest {
         val url = OriginalUrl("https://www.example3.com")
         val password = "my_secret"
         val shortie = service.generateShortie(url = url, password = password)
-        service.resolveShortCode()
+        assertTrue(shortie.protected, "shortie had a password so should be protected")
 
+        assertFalse("passwords should not match") {
+            service.verifyShortCode(shortie.shortCode, "my wrong password")
+        }
 
+        assertTrue("passwords should match") {
+            service.verifyShortCode(shortie.shortCode, password)
+        }
     }
 }
 

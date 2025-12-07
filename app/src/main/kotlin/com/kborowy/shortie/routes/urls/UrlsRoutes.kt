@@ -1,5 +1,6 @@
 package com.kborowy.shortie.routes.urls
 
+import com.kborowy.shortie.errors.BadRequestError
 import com.kborowy.shortie.errors.GoneHttpError
 import com.kborowy.shortie.errors.NotFoundHttpError
 import com.kborowy.shortie.extensions.getOrFail
@@ -7,10 +8,12 @@ import com.kborowy.shortie.models.ShortieUrl
 import com.kborowy.shortie.services.urls.UrlsService
 import io.ktor.http.appendPathSegments
 import io.ktor.server.application.Application
+import io.ktor.server.request.receiveNullable
 import io.ktor.server.response.respondRedirect
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.RoutingContext
 import io.ktor.server.routing.get
+import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import org.koin.ktor.ext.inject
@@ -32,13 +35,35 @@ fun Application.configureUrlsRouting() {
                 call.respondRedirect(shortie.originalUrl.value, permanent = false)
             }
 
-            get("/{short_code}/password") {
-                val service by inject<UrlsService>()
-                val shortie = getActiveShortie("short_code", service)
+            route("/{short_code}/password") {
+                get {
+                    val service by inject<UrlsService>()
+                    val shortie = getActiveShortie("short_code", service)
+                    call.respondText(
+                        "todo: response with html page to enter the password for ${shortie.shortCode.value}"
+                    )
+                }
+                post {
+                    val service by inject<UrlsService>()
+                    val shortie = getActiveShortie("short_code", service)
+                    if (!shortie.protected) {
+                        throw NotFoundHttpError("${shortie.shortCode} not found")
+                    }
+                    val body =
+                        call.receiveNullable<ShortiePasswordDTO>()?.let {
+                            if (it.password.isEmpty()) {
+                                null
+                            } else {
+                                it
+                            }
+                        } ?: throw BadRequestError("missing required body")
 
-                call.respondText(
-                    "todo: response with html page to enter the password for ${shortie.shortCode.value}"
-                )
+                    if (service.verifyShortCode(shortie.shortCode, body.password)) {
+                        call.respondRedirect(shortie.originalUrl.value, permanent = false)
+                    } else {
+                        throw NotFoundHttpError("${shortie.shortCode} not found")
+                    }
+                }
             }
         }
     }

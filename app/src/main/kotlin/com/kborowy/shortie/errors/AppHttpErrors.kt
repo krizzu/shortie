@@ -6,8 +6,13 @@ import io.ktor.http.HttpStatusCode
 sealed class AppHttpError(val statusCode: HttpStatusCode, message: String) :
     RuntimeException(message)
 
-class UnauthorizedHttpError(message: String) : AppHttpError(HttpStatusCode.Unauthorized, message)
+class UnauthorizedHttpError(message: String = "unauthorized access") :
+    AppHttpError(HttpStatusCode.Unauthorized, message)
 
-class NotFoundHttpError(message: String) : AppHttpError(HttpStatusCode.NotFound, message)
+class NotFoundHttpError(message: String = "resource not found") :
+    AppHttpError(HttpStatusCode.NotFound, message)
 
-class GoneHttpError(message: String) : AppHttpError(HttpStatusCode.Gone, message)
+class GoneHttpError(message: String = "gone") : AppHttpError(HttpStatusCode.Gone, message)
+
+class BadRequestError(message: String = "bad request") :
+    AppHttpError(HttpStatusCode.BadRequest, message)

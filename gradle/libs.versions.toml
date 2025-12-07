@@ -14,12 +14,16 @@ coroutines = "1.10.2"
 kotlin-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlin-datetime" }
 kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+kotlin-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.9.0" }
 ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
 ktor-server-di = { module = "io.ktor:ktor-server-di", version.ref = "ktor" }
 ktor-server-config-yaml = { module = "io.ktor:ktor-server-config-yaml", version.ref = "ktor" }
 ktor-server-test-host = { module = "io.ktor:ktor-server-test-host", version.ref = "ktor" }
 ktor-server-plugins-statusPages = { module = "io.ktor:ktor-server-status-pages", version.ref = "ktor" }
+ktor-server-plugins-contentNegotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
+ktor-server-plugins-serializationJson = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+
 exposed-bom = { module = "org.jetbrains.exposed:exposed-bom", version.ref = "exposed" }
 exposed-core = { module = "org.jetbrains.exposed:exposed-core" }
 exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc" }
@@ -42,6 +46,7 @@ tests-kotlin-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", versio
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 
 [bundles]
@@ -67,7 +72,9 @@ ktor-app = [
     "ktor-server-netty",
     "ktor-server-config-yaml",
     "ktor-server-di",
-    "ktor-server-plugins-statusPages"
+    "ktor-server-plugins-statusPages",
+    "ktor-server-plugins-contentNegotiation",
+    "ktor-server-plugins-serializationJson"
 ]
 
 tests = [
