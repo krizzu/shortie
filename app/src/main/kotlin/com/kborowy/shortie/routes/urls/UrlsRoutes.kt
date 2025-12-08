@@ -4,8 +4,10 @@ import com.kborowy.shortie.errors.BadRequestError
 import com.kborowy.shortie.errors.GoneHttpError
 import com.kborowy.shortie.errors.NotFoundHttpError
 import com.kborowy.shortie.extensions.getOrFail
+import com.kborowy.shortie.extensions.respondWithTemplate
 import com.kborowy.shortie.models.OriginalUrl
 import com.kborowy.shortie.models.ShortieUrl
+import com.kborowy.shortie.plugins.HtmlTemplates
 import com.kborowy.shortie.services.urls.UrlsService
 import com.kborowy.shortie.utils.PasswordHasher
 import io.ktor.http.appendPathSegments
@@ -13,7 +15,6 @@ import io.ktor.server.application.Application
 import io.ktor.server.request.receiveNullable
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondRedirect
-import io.ktor.server.response.respondText
 import io.ktor.server.routing.RoutingContext
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
@@ -42,8 +43,9 @@ fun Application.configureUrlsRouting() {
                 get {
                     val service by inject<UrlsService>()
                     val shortie = getActiveShortie("short_code", service)
-                    call.respondText(
-                        "todo: response with html page to enter the password for ${shortie.shortCode.value}"
+                    call.respondWithTemplate(
+                        HtmlTemplates.Password,
+                        mapOf("shortCode" to shortie.shortCode.value),
                     )
                 }
                 post {

@@ -1,0 +1,53 @@
+#!/bin/sh
+set -euo pipefail
+
+
+WEBSITE_PROJECT="website"
+WEBSITE_BUILD_COMMAND="yarn build"
+TEMPLATE_DIR="app/src/main/resources/templates"
+ASSETS_DIR="app/src/main/resources/assets"
+
+
+assertRoot() {
+  if [ ! -f "settings.gradle.kts" ]; then
+    echo "Error: Must run this script from the root of the project (settings.gradle.kts not found)."
+    exit 1
+  fi
+}
+
+assertNodeModules() {
+  if [ ! -d "$WEBSITE_PROJECT/node_modules" ]; then
+    echo "Cannot find node_modules in $WEBSITE_PROJECT/node_modules - did you run 'yarn install'?"
+    exit 1
+  fi
+}
+
+
+buildPages() {
+  echo "Building pages..."
+  (
+    cd "$WEBSITE_PROJECT"
+    $WEBSITE_BUILD_COMMAND
+  )
+}
+
+copyPagesToTemplates() {
+  echo "Copying pages to $TEMPLATE_DIR"
+  rm -rf "$TEMPLATE_DIR"
+  mkdir -p "$TEMPLATE_DIR"
+  cp $WEBSITE_PROJECT/dist/pages/*.html "$TEMPLATE_DIR"
+}
+
+copyAssets() {
+  echo "Copying assets to $ASSETS_DIR"
+  rm -rf "$ASSETS_DIR"
+  mkdir -p "$ASSETS_DIR"
+  cp -r "$WEBSITE_PROJECT/dist/assets/." "$ASSETS_DIR"
+}
+
+
+assertRoot
+assertNodeModules
+buildPages
+copyPagesToTemplates
+copyAssets

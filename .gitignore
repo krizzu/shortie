@@ -39,3 +39,7 @@ out/
 
 ### shortie ###
 .env
+
+## Generated from website project
+/app/src/main/resources/assets/
+/app/src/main/resources/templates/

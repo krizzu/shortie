@@ -2,8 +2,10 @@ package com.kborowy.shortie
 
 import com.kborowy.shortie.infra.runDatabaseMigrations
 import com.kborowy.shortie.plugins.configureContentNegotiation
+import com.kborowy.shortie.plugins.configureTemplating
 import com.kborowy.shortie.plugins.setupDI
 import com.kborowy.shortie.plugins.setupStatusPages
+import com.kborowy.shortie.routes.staticcontent.configureStaticContent
 import com.kborowy.shortie.routes.urls.configureUrlsRouting
 import io.ktor.server.application.Application
 import io.ktor.server.netty.EngineMain
@@ -17,7 +19,10 @@ fun Application.app() {
     setupDI()
     setupStatusPages()
     configureContentNegotiation()
+    configureTemplating()
 
     runDatabaseMigrations()
+
+    configureStaticContent()
     configureUrlsRouting()
 }

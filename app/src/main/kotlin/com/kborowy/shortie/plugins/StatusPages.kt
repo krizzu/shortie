@@ -2,7 +2,7 @@ package com.kborowy.shortie.plugins
 
 import com.kborowy.shortie.errors.AppError
 import com.kborowy.shortie.errors.AppHttpError
-import io.ktor.http.ContentType
+import com.kborowy.shortie.extensions.respondWithTemplate
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
@@ -24,17 +24,11 @@ fun Application.setupStatusPages() {
         }
 
         status(HttpStatusCode.NotFound) { call, _ ->
-            call.respondText(
-                "<h1>Page Not Found</h1>",
-                ContentType.Text.Html,
-                HttpStatusCode.NotFound,
-            )
+            call.respondWithTemplate(HtmlTemplates.NotFound)
         }
 
         exception<Throwable> { call, cause ->
-            LoggerFactory.getLogger("SeriousException").let {
-                it.warn("Uncaught error: ${cause.message}")
-            }
+            LoggerFactory.getLogger("SeriousException").warn("Uncaught error: ${cause.message}")
 
             call.respondText(
                 "500: Something went wrong inside :>",
