@@ -9,10 +9,10 @@ import com.kborowy.shortie.models.OriginalUrl
 import com.kborowy.shortie.models.ShortieUrl
 import com.kborowy.shortie.plugins.HtmlTemplates
 import com.kborowy.shortie.services.urls.UrlsService
-import com.kborowy.shortie.utils.PasswordHasher
 import io.ktor.http.appendPathSegments
 import io.ktor.server.application.Application
 import io.ktor.server.request.receiveNullable
+import io.ktor.server.request.receiveParameters
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondRedirect
 import io.ktor.server.routing.RoutingContext
@@ -54,16 +54,10 @@ fun Application.configureUrlsRouting() {
                     if (!shortie.protected) {
                         throw NotFoundHttpError("${shortie.shortCode} not found")
                     }
-                    val body =
-                        call.receiveNullable<ShortiePasswordDTO>()?.let {
-                            if (it.password.isEmpty()) {
-                                null
-                            } else {
-                                it
-                            }
-                        } ?: throw BadRequestError("missing required body")
+                    val form = call.receiveParameters()
+                    val password = form["password"] ?: throw BadRequestError("password missing")
 
-                    if (service.verifyShortCode(shortie.shortCode, body.password)) {
+                    if (service.verifyShortCode(shortie.shortCode, password)) {
                         call.respondRedirect(shortie.originalUrl.value, permanent = false)
                     } else {
                         throw NotFoundHttpError("${shortie.shortCode} not found")
@@ -85,7 +79,7 @@ fun Application.configureUrlsRouting() {
                         url = OriginalUrl(body.url),
                         expiry = body.expiryDate,
                         alias = body.alias,
-                        password = body.password?.let { PasswordHasher.hash(body.password) },
+                        password = body.password,
                     )
 
                 call.respond(GenerateShortieResponseDTO(shortCode = shortie.shortCode.value))

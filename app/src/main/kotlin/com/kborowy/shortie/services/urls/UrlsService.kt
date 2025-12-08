@@ -14,6 +14,7 @@ import com.kborowy.shortie.utils.PasswordHasher
 import io.ktor.utils.io.CancellationException
 import kotlinx.datetime.LocalDateTime
 import org.jetbrains.exposed.v1.exceptions.ExposedSQLException
+import org.slf4j.LoggerFactory
 
 fun UrlsService(repo: UrlsRepository, counter: GlobalCounter, generator: IdGenerator): UrlsService =
     RealUrlsService(repo, counter, generator)
@@ -39,6 +40,8 @@ private class RealUrlsService(
     private val counter: GlobalCounter,
     private val generator: IdGenerator,
 ) : UrlsService {
+    private val log = LoggerFactory.getLogger("UrlsService")
+
     override suspend fun generateShortie(
         url: OriginalUrl,
         expiry: LocalDateTime?,
@@ -47,6 +50,7 @@ private class RealUrlsService(
     ): ShortieUrl {
         expiry?.let {
             if (it.isInPast) {
+                log.warn("expiry date cannot be in the past (provided=$it)")
                 throw ExpiryInPastError("expiry date cannot be in the past (provided=$it)")
             }
         }
@@ -85,7 +89,10 @@ private class RealUrlsService(
     override suspend fun verifyShortCode(shortCode: ShortCode, password: String): Boolean {
         val shortieHash = repo.getHashForCode(shortCode)
         requireNotNull(shortieHash) { "code \"${shortCode.value}\" not found" }
-        return PasswordHasher.verify(password, shortieHash)
+        val result = PasswordHasher.verify(password, shortieHash)
+        log.info("verified password for short code ${shortCode.value} = $result")
+
+        return result
     }
 
     private suspend fun createHash(): ShortCode {

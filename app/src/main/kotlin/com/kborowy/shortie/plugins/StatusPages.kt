@@ -15,10 +15,7 @@ fun Application.setupStatusPages() {
     install(StatusPages) {
         exception<AppHttpError> { call, cause ->
             if (cause is NotFoundHttpError) {
-                call.respondWithTemplate(
-                    HtmlTemplates.NotFound,
-                    HtmlTemplates.NotFound.model(page = call.request.local.uri),
-                )
+                call.respondWithTemplate(HtmlTemplates.NotFound, status = HttpStatusCode.NotFound)
             } else {
                 call.respondText(
                     text = "${cause.statusCode}: ${cause.message}",
@@ -28,21 +25,21 @@ fun Application.setupStatusPages() {
         }
 
         exception<AppError> { call, cause ->
-            call.respondText(text = "Request failed: ${cause::class}: ${cause.message}")
+            call.respondText(
+                text = "Request failed: ${cause::class}: ${cause.message}",
+                status = HttpStatusCode.InternalServerError,
+            )
         }
 
         status(HttpStatusCode.NotFound) { call, _ ->
-            call.respondWithTemplate(
-                HtmlTemplates.NotFound,
-                HtmlTemplates.NotFound.model(page = call.request.local.uri),
-            )
+            call.respondWithTemplate(HtmlTemplates.NotFound, status = HttpStatusCode.NotFound)
         }
 
         exception<Throwable> { call, cause ->
             LoggerFactory.getLogger("SeriousException").warn("Uncaught error: ${cause.message}")
 
-            call.respondText(
-                "500: Something went wrong inside :>",
+            call.respondWithTemplate(
+                HtmlTemplates.ServerError,
                 status = HttpStatusCode.InternalServerError,
             )
         }
