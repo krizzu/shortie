@@ -1,4 +1,4 @@
-import "../styles/shared.css"
+import "../../styles/shared.css"
 import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
 

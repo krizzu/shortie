@@ -11,6 +11,7 @@ export default defineConfig({
         // other pages
         home: "pages/home.html",
         notFound: "pages/404.html",
+        serverError: "pages/500.html",
         password: "pages/password.html",
       },
     },

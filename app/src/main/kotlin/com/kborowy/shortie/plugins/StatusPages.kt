@@ -2,6 +2,7 @@ package com.kborowy.shortie.plugins
 
 import com.kborowy.shortie.errors.AppError
 import com.kborowy.shortie.errors.AppHttpError
+import com.kborowy.shortie.errors.NotFoundHttpError
 import com.kborowy.shortie.extensions.respondWithTemplate
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
@@ -13,10 +14,17 @@ import org.slf4j.LoggerFactory
 fun Application.setupStatusPages() {
     install(StatusPages) {
         exception<AppHttpError> { call, cause ->
-            call.respondText(
-                text = "${cause.statusCode}: ${cause.message}",
-                status = cause.statusCode,
-            )
+            if (cause is NotFoundHttpError) {
+                call.respondWithTemplate(
+                    HtmlTemplates.NotFound,
+                    HtmlTemplates.NotFound.model(page = call.request.local.uri),
+                )
+            } else {
+                call.respondText(
+                    text = "${cause.statusCode}: ${cause.message}",
+                    status = cause.statusCode,
+                )
+            }
         }
 
         exception<AppError> { call, cause ->
@@ -24,7 +32,10 @@ fun Application.setupStatusPages() {
         }
 
         status(HttpStatusCode.NotFound) { call, _ ->
-            call.respondWithTemplate(HtmlTemplates.NotFound)
+            call.respondWithTemplate(
+                HtmlTemplates.NotFound,
+                HtmlTemplates.NotFound.model(page = call.request.local.uri),
+            )
         }
 
         exception<Throwable> { call, cause ->
