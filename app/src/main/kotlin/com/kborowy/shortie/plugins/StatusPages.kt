@@ -36,7 +36,7 @@ fun Application.setupStatusPages() {
         }
 
         exception<Throwable> { call, cause ->
-            LoggerFactory.getLogger("SeriousException").warn("Uncaught error: ${cause.message}")
+            LoggerFactory.getLogger("SeriousException").error("Uncaught exception!", cause)
 
             call.respondWithTemplate(
                 HtmlTemplates.ServerError,

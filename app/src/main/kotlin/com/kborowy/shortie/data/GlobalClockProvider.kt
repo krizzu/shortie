@@ -1,6 +1,9 @@
+@file:OptIn(ExperimentalTime::class)
+
 package com.kborowy.shortie.data
 
 import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 /** Global access to a Clock provider To help with tests */
 object GlobalClockProvider {

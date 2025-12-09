@@ -1,0 +1,102 @@
+{
+    "openapi": "3.1.1",
+    "info": {
+        "title": "Shortie API",
+        "version": "1.0",
+        "description": "Documentation for Shortie API"
+    },
+    "paths": {
+        "/{short_code}": {
+            "get": {
+                "summary": "Decode given short code (\"Shortie\")",
+                "parameters": [
+                    {
+                        "name": "short_code",
+                        "in": "path",
+                        "description": "the short code to decode",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "302": {
+                        "description": "Redirect to resolved URL"
+                    }
+                }
+            }
+        },
+        "/{short_code}/password": {
+            "get": {
+                "summary": "Render HTML page to allow user enter password"
+            },
+            "post": {
+                "parameters": [
+                    {
+                        "name": "short_code",
+                        "in": "path",
+                        "description": "the short code to decode",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "password",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Form data containing password to resolve Shortie",
+                    "content": {
+                        "application/x-www-form-urlencoded": {}
+                    }
+                },
+                "responses": {
+                    "400": {
+                        "description": "Password not found in form data"
+                    },
+                    "404": {
+                        "description": "Shortie is not protected or password is not correct"
+                    },
+                    "302": {
+                        "description": "Redirect to resolved URL"
+                    }
+                }
+            }
+        },
+        "/urls": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenerateShortieResponseDTO"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "GenerateShortieResponseDTO": {
+                "type": "object",
+                "properties": {
+                    "shortCode": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}

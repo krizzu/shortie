@@ -1,3 +1,7 @@
+@file:OptIn(OpenApiPreview::class)
+
+import io.ktor.plugin.OpenApiPreview
+
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.serialization)
@@ -9,6 +13,16 @@ group = "com.kborowy"
 version = "0.0.1"
 
 application { mainClass = "io.ktor.server.netty.EngineMain" }
+
+ktor {
+    openApi {
+        title = "Shortie API"
+        description = "Documentation for Shortie API"
+        version = "1.0"
+        target =
+            project.layout.projectDirectory.file("src/main/resources/openapi/documentation.json")
+    }
+}
 
 kotlin { compilerOptions { optIn.add("kotlin.time.ExperimentalTime") } }
 
@@ -24,10 +38,6 @@ dependencies {
     implementation(libs.utils.hashing.argon2)
     implementation(libs.utils.validation.urlValidator)
     implementation(libs.utils.idGenerator.sqids)
-    implementation("io.ktor:ktor-server-core:3.3.2")
-    implementation("io.ktor:ktor-server-core:3.3.2")
-    implementation("io.ktor:ktor-serialization-gson:3.3.2")
-    implementation("io.ktor:ktor-server-core:3.3.2")
 
     testImplementation(libs.bundles.tests)
 }

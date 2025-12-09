@@ -3,8 +3,6 @@ package com.kborowy.shortie.routes.urls
 import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.Serializable
 
-@Serializable data class ShortiePasswordDTO(val password: String)
-
 @Serializable
 data class GenerateShortieDTO(
     val url: String,

@@ -1,19 +1,16 @@
-package com.kborowy.shortie.routes.urls
+package com.kborowy.shortie.routes
 
 import com.kborowy.shortie.errors.BadRequestError
 import com.kborowy.shortie.errors.GoneHttpError
 import com.kborowy.shortie.errors.NotFoundHttpError
 import com.kborowy.shortie.extensions.getOrFail
 import com.kborowy.shortie.extensions.respondWithTemplate
-import com.kborowy.shortie.models.OriginalUrl
 import com.kborowy.shortie.models.ShortieUrl
 import com.kborowy.shortie.plugins.HtmlTemplates
 import com.kborowy.shortie.services.urls.UrlsService
 import io.ktor.http.appendPathSegments
 import io.ktor.server.application.Application
-import io.ktor.server.request.receiveNullable
 import io.ktor.server.request.receiveParameters
-import io.ktor.server.response.respond
 import io.ktor.server.response.respondRedirect
 import io.ktor.server.routing.RoutingContext
 import io.ktor.server.routing.get
@@ -22,11 +19,20 @@ import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import org.koin.ktor.ext.inject
 
-fun Application.configureUrlsRouting() {
+fun Application.shortCodeRouting() {
     routing {
+        val service by inject<UrlsService>()
+        /** "Shortie" resolving */
         route("/{short_code}") {
+
+            /**
+             * Decode given short code ("Shortie")
+             *
+             * @path short_code the short code to decode
+             * @response 302 Redirect to /password if url is protected
+             * @response 302 Redirect to resolved URL
+             */
             get {
-                val service by inject<UrlsService>()
                 val shortie = getActiveShortie("short_code", service)
 
                 if (shortie.protected) {
@@ -39,17 +45,26 @@ fun Application.configureUrlsRouting() {
                 call.respondRedirect(shortie.originalUrl.value, permanent = false)
             }
 
+            /** Shortie is protected, requires password to access */
             route("/password") {
+
+                /** Render HTML page to allow user enter password */
                 get {
-                    val service by inject<UrlsService>()
                     val shortie = getActiveShortie("short_code", service)
                     call.respondWithTemplate(
                         HtmlTemplates.Password,
                         mapOf("shortCode" to shortie.shortCode.value),
                     )
                 }
+
+                /**
+                 * @path short_code the short code to decode
+                 * @body application/x-www-form-urlencoded Form data containing password to resolve Shortie
+                 * @response 400 Password not found in form data
+                 * @response 404 Shortie is not protected or password is not correct
+                 * @response 302 Redirect to resolved URL
+                 */
                 post {
-                    val service by inject<UrlsService>()
                     val shortie = getActiveShortie("short_code", service)
                     if (!shortie.protected) {
                         throw NotFoundHttpError("${shortie.shortCode} not found")
@@ -63,26 +78,6 @@ fun Application.configureUrlsRouting() {
                         throw NotFoundHttpError("${shortie.shortCode} not found")
                     }
                 }
-            }
-        }
-
-        // todo: auth only
-        route("/urls") {
-            post {
-                val service by inject<UrlsService>()
-                val body =
-                    call.receiveNullable<GenerateShortieDTO>()
-                        ?: throw BadRequestError("missing required body")
-
-                val shortie =
-                    service.generateShortie(
-                        url = OriginalUrl(body.url),
-                        expiry = body.expiryDate,
-                        alias = body.alias,
-                        password = body.password,
-                    )
-
-                call.respond(GenerateShortieResponseDTO(shortCode = shortie.shortCode.value))
             }
         }
     }
