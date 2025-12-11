@@ -8,7 +8,7 @@ import org.jetbrains.exposed.v1.datetime.datetime
 
 private const val MAX_SHORT_URL_LENGTH = 10
 private const val MAX_LONG_URL_LENGTH = 2048
-private const val MAX_PASSWORD_LENGTH = 128
+private const val MAX_PASSWORD_LENGTH = 255
 
 object UrlsTable : LongIdTable(name = "urls") {
     val shortCode = varchar("short_code", MAX_SHORT_URL_LENGTH).uniqueIndex()

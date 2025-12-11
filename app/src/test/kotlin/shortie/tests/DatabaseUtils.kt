@@ -1,4 +1,4 @@
-package tests.tests
+package shortie.tests
 
 import com.kborowy.shortie.data.urls.UrlsTable
 import org.flywaydb.core.Flyway

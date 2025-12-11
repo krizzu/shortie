@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalTime::class)
 
-package tests.tests.services
+package shortie.tests.services
 
 import com.kborowy.shortie.data.GlobalClockProvider
 import com.kborowy.shortie.data.counter.GlobalCounter
@@ -11,7 +11,7 @@ import com.kborowy.shortie.extensions.now
 import com.kborowy.shortie.extensions.nowInstant
 import com.kborowy.shortie.migrations.com.kborowy.shortie.utils.IdGenerator
 import com.kborowy.shortie.models.OriginalUrl
-import com.kborowy.shortie.services.urls.UrlsService
+import com.kborowy.shortie.services.UrlsService
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -19,19 +19,17 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
-import kotlin.time.Clock
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import tests.tests.DatabaseUtils
-import tests.tests.DatabaseUtils.clearDatabase
+import shortie.tests.DatabaseUtils
+import shortie.tests.DatabaseUtils.clearDatabase
+import shortie.tests.FakeClock
 
 class RealUrlsServiceTest {
 
@@ -132,28 +130,4 @@ private class FakeGlobalCounter : GlobalCounter {
     private var id = 1L
 
     override suspend fun getNextId(): Long = ++id
-}
-
-// 1st of December, 2025 at 00:00 UTC
-private const val fakeClockStart = 1_764_547_200_000L
-
-private class FakeClock : Clock {
-
-    var now: Long = fakeClockStart
-
-    override fun now(): Instant {
-        return Instant.fromEpochMilliseconds(now)
-    }
-
-    fun forward(duration: Duration) {
-        now = now().plus(duration).toEpochMilliseconds()
-    }
-
-    fun backward(duration: Duration) {
-        now = now().minus(duration).toEpochMilliseconds()
-    }
-
-    fun reset() {
-        now = fakeClockStart
-    }
 }

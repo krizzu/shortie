@@ -1,4 +1,4 @@
-package tests.tests.utils
+package shortie.tests.utils
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

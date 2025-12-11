@@ -1,8 +1,17 @@
 package com.kborowy.shortie.infra
 
+import com.kborowy.shortie.data.users.DEFAULT_ADMIN_NAME
+import com.kborowy.shortie.data.users.UsersTable
+import com.kborowy.shortie.utils.PasswordHasher
 import io.ktor.server.application.Application
 import io.ktor.server.plugins.di.annotations.Property
 import org.flywaydb.core.Flyway
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.jdbc.Database
+import org.jetbrains.exposed.v1.jdbc.insert
+import org.jetbrains.exposed.v1.jdbc.selectAll
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import org.koin.ktor.ext.inject
 
 const val MIGRATIONS_DIRECTORY = "src/main/resources/migrations"
 
@@ -25,4 +34,23 @@ fun Application.runDatabaseMigrations() {
     val pass = environment.config.property("database.password").getString()
     val flyway = createMigration(url = url, user = user, pass = pass)
     flyway.migrate()
+    seedAdminUser()
+}
+
+// seed in admin with password if it's not existing
+private fun Application.seedAdminUser() {
+    val db by inject<Database>()
+    val password = environment.config.property("admin.password").getString()
+
+    transaction(db) {
+        val exists =
+            UsersTable.selectAll().where { UsersTable.name eq DEFAULT_ADMIN_NAME }.singleOrNull()
+        if (exists == null) {
+            val passwordHash = PasswordHasher.hash(password)
+            UsersTable.insert {
+                it[UsersTable.name] = DEFAULT_ADMIN_NAME
+                it[UsersTable.password] = passwordHash
+            }
+        }
+    }
 }

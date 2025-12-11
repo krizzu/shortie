@@ -1,4 +1,4 @@
-package tests.repos
+package shortie.tests.data
 
 import com.kborowy.shortie.data.urls.UrlsTable
 import com.kborowy.shortie.data.counter.GlobalCounter
@@ -8,7 +8,7 @@ import kotlin.test.assertEquals
 import kotlinx.coroutines.test.runTest
 import org.jetbrains.exposed.v1.jdbc.deleteAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import tests.tests.DatabaseUtils
+import shortie.tests.DatabaseUtils
 
 class GlobalCounterTests {
 

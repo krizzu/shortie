@@ -1,4 +1,4 @@
-package tests.tests.utils
+package shortie.tests.utils
 
 import com.kborowy.shortie.utils.PasswordHasher
 import kotlin.test.Test

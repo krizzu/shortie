@@ -11,7 +11,7 @@ import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.response.respondText
 import org.slf4j.LoggerFactory
 
-fun Application.setupStatusPages() {
+fun Application.configureStatusPages() {
     install(StatusPages) {
         exception<AppHttpError> { call, cause ->
             if (cause is NotFoundHttpError) {

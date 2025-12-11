@@ -1,4 +1,4 @@
-package com.kborowy.shortie.services.urls
+package com.kborowy.shortie.services
 
 import com.kborowy.shortie.data.counter.GlobalCounter
 import com.kborowy.shortie.data.urls.UrlsRepository

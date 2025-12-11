@@ -1,12 +1,14 @@
 package com.kborowy.shortie
 
 import com.kborowy.shortie.infra.runDatabaseMigrations
+import com.kborowy.shortie.plugins.configureAuth
 import com.kborowy.shortie.plugins.configureCallLogging
 import com.kborowy.shortie.plugins.configureContentNegotiation
+import com.kborowy.shortie.plugins.configureDI
+import com.kborowy.shortie.plugins.configureStatusPages
 import com.kborowy.shortie.plugins.configureTemplating
-import com.kborowy.shortie.plugins.setupDI
-import com.kborowy.shortie.plugins.setupStatusPages
 import com.kborowy.shortie.routes.docsRouting
+import com.kborowy.shortie.routes.login.loginRouting
 import com.kborowy.shortie.routes.shortCodeRouting
 import com.kborowy.shortie.routes.staticContentRouting
 import com.kborowy.shortie.routes.urls.urlsRouting
@@ -19,8 +21,9 @@ fun main(args: Array<String>) {
 
 // main scaffold module
 fun Application.app() {
-    setupDI()
-    setupStatusPages()
+    configureDI()
+    configureAuth()
+    configureStatusPages()
     configureContentNegotiation()
     configureTemplating()
     configureCallLogging()
@@ -31,4 +34,5 @@ fun Application.app() {
     docsRouting()
     urlsRouting()
     shortCodeRouting()
+    loginRouting()
 }

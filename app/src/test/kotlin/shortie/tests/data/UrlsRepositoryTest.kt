@@ -1,4 +1,4 @@
-package tests.repos
+package shortie.tests.data
 
 import com.kborowy.shortie.data.urls.UrlsRepository
 import com.kborowy.shortie.extensions.now
@@ -11,8 +11,8 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDateTime
-import tests.tests.DatabaseUtils
-import tests.tests.DatabaseUtils.clearDatabase
+import shortie.tests.DatabaseUtils
+import shortie.tests.DatabaseUtils.clearDatabase
 
 class UrlsRepositoryTest {
 

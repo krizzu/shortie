@@ -16,3 +16,12 @@ database:
 hash:
   minLength: ${APP_ID_MIN_LENGTH:3}
   alphabet: ${APP_ID_ALPHABET}
+
+auth:
+  secret: ${APP_AUTH_SECRET}
+  issuer: ${APP_AUTH_ISSUER:shortie}
+  audience: ${APP_AUTH_AUDIENCE:admin}
+  realm: ${APP_AUTH_REALM:dashboard}
+
+admin:
+  password: ${APP_ADMIN_PASSWORD}

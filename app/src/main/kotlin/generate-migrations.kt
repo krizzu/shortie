@@ -1,4 +1,5 @@
 import com.kborowy.shortie.data.urls.UrlsTable
+import com.kborowy.shortie.data.users.UsersTable
 import com.kborowy.shortie.infra.MIGRATIONS_DIRECTORY
 import org.jetbrains.exposed.v1.core.ExperimentalDatabaseMigrationApi
 import org.jetbrains.exposed.v1.jdbc.Database
@@ -31,6 +32,7 @@ fun main() {
     transaction(db) {
         MigrationUtils.generateMigrationScript(
             UrlsTable,
+            UsersTable,
             scriptDirectory = MIGRATIONS_DIRECTORY,
             scriptName = name,
             withLogs = true,

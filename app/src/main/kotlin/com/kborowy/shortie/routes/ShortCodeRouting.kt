@@ -7,7 +7,7 @@ import com.kborowy.shortie.extensions.getOrFail
 import com.kborowy.shortie.extensions.respondWithTemplate
 import com.kborowy.shortie.models.ShortieUrl
 import com.kborowy.shortie.plugins.HtmlTemplates
-import com.kborowy.shortie.services.urls.UrlsService
+import com.kborowy.shortie.services.UrlsService
 import io.ktor.http.appendPathSegments
 import io.ktor.server.application.Application
 import io.ktor.server.request.receiveParameters
