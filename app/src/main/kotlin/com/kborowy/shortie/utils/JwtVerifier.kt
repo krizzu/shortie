@@ -14,6 +14,7 @@ import com.kborowy.shortie.errors.TokenExpiredError
 import com.kborowy.shortie.errors.TokenVerificationError
 import com.kborowy.shortie.extensions.nowInstant
 import io.ktor.server.auth.jwt.JWTCredential
+import kotlin.io.encoding.Base64
 import kotlin.time.Duration
 import kotlin.time.toJavaInstant
 import kotlinx.datetime.LocalDateTime
@@ -160,7 +161,8 @@ private fun Payload.toPayload(): JwtToken.TokenPayload {
 
 private fun DecodedJWT.toPayload(): JwtToken.TokenPayload? {
     try {
-        val parsed = JWTParser().parsePayload(this.payload)
+        val decoded = Base64.withPadding(Base64.PaddingOption.PRESENT_OPTIONAL).decode(this.payload)
+        val parsed = JWTParser().parsePayload(String(decoded))
         return parsed.toPayload()
     } catch (e: Exception) {
         LoggerFactory.getLogger("JwtVerifier").error("Failed to parse token payload", e)

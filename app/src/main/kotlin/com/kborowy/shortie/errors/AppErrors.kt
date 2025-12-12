@@ -10,8 +10,8 @@ class ExpiryInPastError(message: String = "Expiry date cannot be in the past") :
 class UnexpectedAppError(message: String) : AppError(message)
 
 /** Token validation errors */
-sealed class TokenValidationError(message: String) : AppError(message)
+sealed class TokenError(message: String) : AppError(message)
 
-class TokenExpiredError(message: String = "token has expired") : TokenValidationError(message)
+class TokenExpiredError(message: String = "token has expired") : TokenError(message)
 
-class TokenVerificationError(message: String) : TokenValidationError(message)
+class TokenVerificationError(message: String) : TokenError(message)
