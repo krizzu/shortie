@@ -17,6 +17,12 @@ fun Application.urlsRouting() {
         withAdminAuth {
             val service by inject<UrlsService>()
             route("/urls") {
+
+                /**
+                 * admin only Creates a short url out of provided url and options
+                 *
+                 * @response 400 if no payload is provided
+                 */
                 post {
                     val body =
                         call.receiveNullable<GenerateShortieDTO>()
