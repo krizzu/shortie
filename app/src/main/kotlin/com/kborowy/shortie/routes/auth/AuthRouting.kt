@@ -1,4 +1,4 @@
-package com.kborowy.shortie.routes.login
+package com.kborowy.shortie.routes.auth
 
 import com.kborowy.shortie.data.users.DEFAULT_ADMIN_NAME
 import com.kborowy.shortie.errors.BadRequestError
@@ -12,11 +12,11 @@ import io.ktor.server.routing.routing
 import org.koin.ktor.ext.inject
 import org.slf4j.LoggerFactory
 
-fun Application.loginRouting() {
+fun Application.authRouting() {
     routing {
         val service by inject<UserService>()
-        val log = LoggerFactory.getLogger("LoginRoute")
-        post("/login") {
+        val log = LoggerFactory.getLogger("AuthRoute")
+        post("/auth/login") {
             val request =
                 call.receiveNullable<LoginPayloadDTO>() ?: throw BadRequestError("missing body")
 
@@ -33,7 +33,20 @@ fun Application.loginRouting() {
             log.info("issuing new tokens")
             val tokens = service.issueNewTokens()
             call.respond(
-                LoginResponseDTO(
+                TokenResponseDTO(
+                    accessToken = tokens.access.value,
+                    refreshToken = tokens.refresh.value,
+                )
+            )
+        }
+        post("/auth/refresh") {
+            val request =
+                call.receiveNullable<TokenRefreshPayloadDTO>()
+                    ?: throw BadRequestError("missing body")
+
+            val tokens = service.refreshTokens(request.refreshToken)
+            call.respond(
+                TokenResponseDTO(
                     accessToken = tokens.access.value,
                     refreshToken = tokens.refresh.value,
                 )

@@ -14,10 +14,8 @@ import org.koin.ktor.ext.inject
 
 fun Application.urlsRouting() {
     routing {
-        val service by inject<UrlsService>()
-
-        // todo: auth only
         withAdminAuth {
+            val service by inject<UrlsService>()
             route("/urls") {
                 post {
                     val body =

@@ -44,19 +44,35 @@ interface JwtVerifier : JWTVerifier {
 
     fun issueNewToken(type: JwtToken.TokenType, expiry: Duration): JwtToken
 
-    /** verifies if token is valid, not expired and not tempered with */
+    /**
+     * verifies if token is valid, not expired and not tempered with
+     *
+     * throws [TokenExpiredError] or [TokenVerificationError] when verification fails
+     */
     fun verifyToken(token: JwtToken): JwtToken.TokenPayload
 
-    /** verifies if token is valid, not expired and not tempered with */
+    /**
+     * verifies if token is valid, not expired and not tempered with
+     *
+     * throws [TokenExpiredError] or [TokenVerificationError] when verification fails
+     */
     fun verifyToken(tokenValue: String): JwtToken.TokenPayload
 
-    /** Extra check if token belongs to shortie api and if it's of required type */
+    /**
+     * Extra check if token belongs to shortie api and if it's of required type
+     *
+     * return null if validation fails
+     */
     fun validateCredentials(
         credentials: JWTCredential,
         type: JwtToken.TokenType,
     ): JwtToken.TokenPayload?
 
-    /** Extra check if token belongs to shortie api and if it's of required type */
+    /**
+     * Extra check if token belongs to shortie api and if it's of required type
+     *
+     * return null if validation fails
+     */
     fun validateCredentials(
         payload: JwtToken.TokenPayload,
         type: JwtToken.TokenType,
