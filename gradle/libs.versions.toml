@@ -28,6 +28,7 @@ ktor-server-plugins-swagger = { module = "io.ktor:ktor-server-swagger", version.
 ktor-server-plugins-callLogging = { module = "io.ktor:ktor-server-call-logging", version.ref = "ktor" }
 ktor-server-plugins-auth = { module = "io.ktor:ktor-server-auth", version.ref = "ktor" }
 ktor-server-plugins-authJwt = { module = "io.ktor:ktor-server-auth-jwt", version.ref = "ktor" }
+ktor-server-plugins-cors = { module = "io.ktor:ktor-server-cors", version.ref = "ktor" }
 
 exposed-bom = { module = "org.jetbrains.exposed:exposed-bom", version.ref = "exposed" }
 exposed-core = { module = "org.jetbrains.exposed:exposed-core" }
@@ -84,7 +85,8 @@ ktor-app = [
     "ktor-server-plugins-swagger",
     "ktor-server-plugins-callLogging",
     "ktor-server-plugins-auth",
-    "ktor-server-plugins-authJwt"
+    "ktor-server-plugins-authJwt",
+    "ktor-server-plugins-cors"
 ]
 
 tests = [

@@ -3,7 +3,7 @@ set -euo pipefail
 
 
 WEBSITE_PROJECT="website"
-WEBSITE_BUILD_COMMAND="yarn build"
+WEBSITE_BUILD_COMMAND="yarn build:pages"
 TEMPLATE_DIR="app/src/main/resources/templates"
 ASSETS_DIR="app/src/main/resources/assets"
 
@@ -35,14 +35,14 @@ copyPagesToTemplates() {
   echo "Copying pages to $TEMPLATE_DIR"
   rm -rf "$TEMPLATE_DIR"
   mkdir -p "$TEMPLATE_DIR"
-  cp $WEBSITE_PROJECT/dist/pages/*.html "$TEMPLATE_DIR"
+  cp $WEBSITE_PROJECT/dist-pages/pages/*.html "$TEMPLATE_DIR"
 }
 
 copyAssets() {
   echo "Copying assets to $ASSETS_DIR"
   rm -rf "$ASSETS_DIR"
   mkdir -p "$ASSETS_DIR"
-  cp -r "$WEBSITE_PROJECT/dist/assets/." "$ASSETS_DIR"
+  cp -r "$WEBSITE_PROJECT/dist-pages/assets/." "$ASSETS_DIR"
 }
 
 

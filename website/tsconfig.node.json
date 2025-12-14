@@ -25,6 +25,7 @@
     "noUncheckedSideEffectImports": true
   },
   "include": [
+    "vite.config.pages.ts",
     "vite.config.ts"
   ]
 }

@@ -7,3 +7,5 @@ import kotlinx.serialization.Serializable
 @Serializable data class TokenResponseDTO(val accessToken: String, val refreshToken: String)
 
 @Serializable data class TokenRefreshPayloadDTO(val refreshToken: String)
+
+@Serializable data class TokenValidResponseDTO(val valid: Boolean)

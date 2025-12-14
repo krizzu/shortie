@@ -26,6 +26,7 @@ fun Application.configureAuth() {
             challenge { _, realm ->
                 throw UnauthorizedHttpError("JWT is invalid or expired for $realm")
             }
+
         }
     }
 }

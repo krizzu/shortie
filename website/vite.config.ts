@@ -1,20 +1,15 @@
 import { defineConfig } from "vite"
 import react from "@vitejs/plugin-react"
 import tailwindcss from "@tailwindcss/vite"
+import { tanstackRouter } from "@tanstack/router-plugin/vite"
 
 export default defineConfig({
-  build: {
-    rollupOptions: {
-      input: {
-        admin: "admin.html",
-
-        // other pages
-        home: "pages/home.html",
-        notFound: "pages/404.html",
-        serverError: "pages/500.html",
-        password: "pages/password.html",
-      },
-    },
-  },
-  plugins: [react(), tailwindcss()],
+  plugins: [
+    tanstackRouter({
+      target: "react",
+      autoCodeSplitting: true,
+    }),
+    react(),
+    tailwindcss(),
+  ],
 })
