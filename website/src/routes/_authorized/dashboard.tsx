@@ -5,10 +5,9 @@ import {
   useRouter,
   useRouterState,
 } from "@tanstack/react-router"
-import { AppSidebar } from "@/routes/_authorized/-components/AppSidebar.tsx"
+import { AppSidebar } from "./-components/nav/AppSidebar.tsx"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { Link2 } from "lucide-react"
-import { Separator } from "@/components/ui/separator"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -57,7 +56,9 @@ function DashboardMain() {
             icon: Link2,
             url: "/dashboard/links",
             isActive:
-              matches[matches.length - 1]?.pathname === "/dashboard/links",
+              matches[matches.length - 1]?.pathname.startsWith(
+                "/dashboard/links"
+              ),
           },
         ]}
         onLogOut={logOut}
@@ -65,10 +66,6 @@ function DashboardMain() {
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
           <div className="flex items-center gap-2 px-4">
-            <Separator
-              orientation="vertical"
-              className="mr-2 data-[orientation=vertical]:h-4"
-            />
             <Breadcrumb>
               <BreadcrumbList>
                 {breadcrumbs.map((item, index, list) => {
@@ -89,7 +86,9 @@ function DashboardMain() {
             </Breadcrumb>
           </div>
         </header>
-        <Outlet />
+        <div className="px-4">
+          <Outlet />
+        </div>
       </SidebarInset>
     </SidebarProvider>
   )
