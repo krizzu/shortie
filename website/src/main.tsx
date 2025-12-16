@@ -1,4 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
+import "../styles/shared.css"
 import { StrictMode } from "react"
 import ReactDOM from "react-dom/client"
 import { createRouter, RouterProvider } from "@tanstack/react-router"

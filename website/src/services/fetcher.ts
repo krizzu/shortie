@@ -16,7 +16,7 @@ async function _fetch(
   )
   if (!result.ok) {
     throw new HttpError(
-      `request failed: ${result.statusText}`,
+      `request failed: ${await result.text()}`,
       result.status,
       result.statusText
     )
@@ -55,7 +55,8 @@ async function refreshToken() {
   return refreshPromise
 }
 
-type RequestOptions = Pick<RequestInit, "method" | "headers" | "body"> & {
+type RequestOptions = Pick<RequestInit, "method" | "headers"> & {
+  body: RequestInit["body"] | Record<string, unknown>
   authorize?: boolean // if request should add auth token in Authorized header, default tot rue
   _retry?: boolean // internal flag indicating the request is retry request and should avoid token refresh
 }
@@ -69,18 +70,19 @@ export async function fetcher<T>(
   url: string,
   options?: RequestOptions
 ): Promise<FetchResult<T>> {
+  const bodyPayload = options?.body ? JSON.stringify(options?.body) : undefined
+  const authorize = options?.authorize ?? true
+  const headers = {
+    ...options?.headers,
+    ...(options?.body ? { "Content-Type": "application/json" } : {}),
+    ...(authorize
+      ? { Authorization: `Bearer ${getTokens()?.accessToken}` }
+      : {}),
+  }
   try {
-    const authorize = options?.authorize ?? true
-    const headers = {
-      ...options?.headers,
-      ...(authorize
-        ? { Authorization: `Bearer ${getTokens()?.accessToken}` }
-        : {}),
-    }
-
     const result = await _fetch(url, {
       method: options?.method,
-      body: options?.body,
+      body: bodyPayload,
       headers: headers,
     })
 
@@ -103,7 +105,7 @@ export async function fetcher<T>(
     if (e.unauthorized && !options?._retry) {
       const updated = await refreshToken()
       if (updated) {
-        return fetcher(url, { ...options, _retry: true })
+        return fetcher(url, { ...options, _retry: true, body: bodyPayload })
       }
     }
 

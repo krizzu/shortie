@@ -1,11 +1,11 @@
 package com.kborowy.shortie.routes.urls
 
 import com.kborowy.shortie.errors.BadRequestError
+import com.kborowy.shortie.extensions.receiveNullableCatching
 import com.kborowy.shortie.models.OriginalUrl
 import com.kborowy.shortie.plugins.withAdminAuth
 import com.kborowy.shortie.services.UrlsService
 import io.ktor.server.application.Application
-import io.ktor.server.request.receiveNullable
 import io.ktor.server.response.respond
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
@@ -25,8 +25,8 @@ fun Application.urlsRouting() {
                  */
                 post {
                     val body =
-                        call.receiveNullable<GenerateShortieDTO>()
-                            ?: throw BadRequestError("missing required body")
+                        call.receiveNullableCatching<GenerateShortieDTO>()
+                            ?: throw BadRequestError("invalid payload")
 
                     val shortie =
                         service.generateShortie(

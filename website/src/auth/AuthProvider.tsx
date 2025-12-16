@@ -1,5 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from "react"
-import { clearTokens } from "../services/auth-tokens.ts"
+import {
+  type AuthTokens,
+  clearTokens,
+  onTokenRemoved,
+  saveTokens,
+} from "../services/auth-tokens.ts"
 import { fetcher } from "../services/fetcher.ts"
 
 export interface AuthState {
@@ -17,14 +22,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   async function checkAuth() {
     try {
       const result = await fetcher<{ valid: boolean }>("/auth/validate")
+
       if (result.data.valid) {
         setAuthenticated(true)
+      } else {
+        logout()
       }
-      clearTokens()
-      setAuthenticated(true)
-    } catch (e: unknown) {
-      clearTokens()
-      setAuthenticated(false)
+    } catch {
+      logout()
     } finally {
       setIsLoading(false)
     }
@@ -33,15 +38,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Restore auth state on app load
   useEffect(() => {
     checkAuth()
+
+    return onTokenRemoved(logout)
   }, [])
 
-  const login = async (username: string, password: string) => {
-    console.error(`TODO: login with ${username} and ${password}`)
+  const login = async (user: string, password: string) => {
+    const result = await fetcher<AuthTokens>("/auth/login", {
+      method: "POST",
+      body: {
+        user,
+        password,
+      },
+    })
+
+    saveTokens(result.data)
+    setAuthenticated(true)
   }
 
   const logout = () => {
     setAuthenticated(false)
-    clearTokens()
+    clearTokens(false)
   }
 
   // Show loading state while checking auth
