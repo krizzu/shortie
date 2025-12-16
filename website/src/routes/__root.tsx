@@ -5,14 +5,14 @@ import {
   HeadContent,
   Outlet,
 } from "@tanstack/react-router"
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools"
+
 import { type AuthState } from "../auth/AuthProvider.tsx"
 
 const RootLayout = () => (
   <>
     <HeadContent />
     <Outlet />
-    <TanStackRouterDevtools />
+    {/*<TanStackRouterDevtools />*/}
   </>
 )
 

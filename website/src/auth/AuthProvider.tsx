@@ -6,6 +6,7 @@ import {
   saveTokens,
 } from "../services/auth-tokens.ts"
 import { fetcher } from "../services/fetcher.ts"
+import { useRouter } from "@tanstack/react-router"
 
 export interface AuthState {
   authenticated: boolean
