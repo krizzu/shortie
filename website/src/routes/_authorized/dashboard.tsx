@@ -42,8 +42,8 @@ function DashboardMain() {
       }
     })
 
-  function logOut() {
-    auth.logout()
+  async function logOut() {
+    await auth.logout()
     router.invalidate()
   }
 

@@ -6,12 +6,11 @@ import {
   saveTokens,
 } from "../services/auth-tokens.ts"
 import { fetcher } from "../services/fetcher.ts"
-import { useRouter } from "@tanstack/react-router"
 
 export interface AuthState {
   authenticated: boolean
   login: (username: string, password: string) => Promise<void>
-  logout: () => void
+  logout: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthState | undefined>(undefined)
@@ -56,7 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setAuthenticated(true)
   }
 
-  const logout = () => {
+  const logout = async () => {
     setAuthenticated(false)
     clearTokens(false)
   }
