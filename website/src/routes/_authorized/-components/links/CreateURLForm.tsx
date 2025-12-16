@@ -24,9 +24,39 @@ export function CreateURLForm() {
   const [useExpiry, setUseExpiry] = useState(false)
   const [usePassword, setUsePassword] = useState(false)
 
+  const today = new Date()
+  const defaultDate = new Date(today)
+  defaultDate.setDate(today.getDate() + 1)
+
+  const defaultYear = defaultDate.getFullYear()
+  const defaultMonth = defaultDate.getMonth() + 1
+  const defaultDay = defaultDate.getDate()
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+
+    const form = e.currentTarget as HTMLFormElement
+    const data = new FormData(form)
+
+    const payload = {
+      originalUrl: data.get("original-url"),
+      alias: useAlias ? data.get("custom-alias") : null,
+      expiry: useExpiry
+        ? {
+            year: data.get("exp-year"),
+            month: data.get("exp-month"),
+            day: data.get("exp-day"),
+          }
+        : null,
+      password: usePassword ? data.get("link-password") : null,
+    }
+
+    console.log("Submit payload", payload)
+  }
+
   return (
     <div className="w-full max-w-md">
-      <form>
+      <form onSubmit={handleSubmit}>
         <FieldGroup>
           <FieldSet>
             <FieldLegend>Create a short URL</FieldLegend>
@@ -37,6 +67,7 @@ export function CreateURLForm() {
                 <FieldLabel htmlFor="original-url">Original URL</FieldLabel>
                 <Input
                   id="original-url"
+                  name="original-url"
                   type="url"
                   placeholder="https://example.com"
                   required
@@ -63,6 +94,7 @@ export function CreateURLForm() {
                     <FieldLabel htmlFor="custom-alias">Custom alias</FieldLabel>
                     <Input
                       id="custom-alias"
+                      name="custom-alias"
                       placeholder="my-short-link"
                       required={useAlias}
                     />
@@ -91,19 +123,46 @@ export function CreateURLForm() {
                 {useExpiry && (
                   <div className="mt-3">
                     <FieldLabel className="mb-2 block">Expiry date</FieldLabel>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-3 gap-4">
                       <Field>
                         <FieldLabel htmlFor="exp-month">Month</FieldLabel>
-                        <Select>
+                        <Select
+                          name="exp-month"
+                          defaultValue={String(defaultMonth).padStart(2, "0")}
+                        >
                           <SelectTrigger id="exp-month">
                             <SelectValue placeholder="MM" />
                           </SelectTrigger>
                           <SelectContent>
                             {Array.from({ length: 12 }, (_, i) => {
-                              const m = String(i + 1).padStart(2, "0")
+                              const m = i + 1
+                              const mm = String(m).padStart(2, "0")
                               return (
-                                <SelectItem key={m} value={m}>
-                                  {m}
+                                <SelectItem key={mm} value={mm}>
+                                  {mm}
+                                </SelectItem>
+                              )
+                            })}
+                          </SelectContent>
+                        </Select>
+                      </Field>
+
+                      <Field>
+                        <FieldLabel htmlFor="exp-day">Day</FieldLabel>
+                        <Select
+                          defaultValue={String(defaultDay).padStart(2, "0")}
+                          name="exp-day"
+                        >
+                          <SelectTrigger id="exp-day">
+                            <SelectValue placeholder="DD" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {Array.from({ length: 31 }, (_, i) => {
+                              const d = i + 1
+                              const dd = String(d).padStart(2, "0")
+                              return (
+                                <SelectItem key={dd} value={dd}>
+                                  {dd}
                                 </SelectItem>
                               )
                             })}
@@ -113,15 +172,18 @@ export function CreateURLForm() {
 
                       <Field>
                         <FieldLabel htmlFor="exp-year">Year</FieldLabel>
-                        <Select>
+                        <Select
+                          defaultValue={String(defaultYear)}
+                          name="exp-year"
+                        >
                           <SelectTrigger id="exp-year">
                             <SelectValue placeholder="YYYY" />
                           </SelectTrigger>
                           <SelectContent>
                             {Array.from({ length: 6 }, (_, i) => {
-                              const y = String(new Date().getFullYear() + i)
+                              const y = defaultYear + i
                               return (
-                                <SelectItem key={y} value={y}>
+                                <SelectItem key={y} value={String(y)}>
                                   {y}
                                 </SelectItem>
                               )
@@ -159,6 +221,7 @@ export function CreateURLForm() {
                   <FieldLabel htmlFor="link-password">Password</FieldLabel>
                   <Input
                     id="link-password"
+                    name="link-password"
                     type="password"
                     placeholder="Enter password"
                     required={usePassword}
