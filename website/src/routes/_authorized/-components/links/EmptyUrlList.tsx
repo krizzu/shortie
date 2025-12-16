@@ -13,7 +13,7 @@ type Props = {
   onCreateLink: () => void
 }
 
-export function EmptyLinkPage({ onCreateLink }: Props) {
+export function EmptyUrlList({ onCreateLink }: Props) {
   return (
     <Empty>
       <EmptyHeader>
@@ -22,13 +22,13 @@ export function EmptyLinkPage({ onCreateLink }: Props) {
         </EmptyMedia>
         <EmptyTitle>No links yet</EmptyTitle>
         <EmptyDescription>
-          You haven&apos;t created any links yet. Get started by creating your
-          first link.
+          You haven&apos;t created any short URLs yet. Get started by creating
+          your first short URL.
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
         <div className="flex gap-2">
-          <Button onClick={() => onCreateLink()}>Create Link</Button>
+          <Button onClick={() => onCreateLink()}>Create short URL</Button>
         </div>
       </EmptyContent>
     </Empty>

@@ -52,12 +52,12 @@ function DashboardMain() {
         userName="Admin"
         links={[
           {
-            title: "links",
+            title: "URLs",
             icon: Link2,
-            url: "/dashboard/links",
+            url: "/dashboard/urls",
             isActive:
               matches[matches.length - 1]?.pathname.startsWith(
-                "/dashboard/links"
+                "/dashboard/urls"
               ),
           },
         ]}
