@@ -33,7 +33,7 @@ suspend inline fun <reified T> ApplicationCall.receiveNullableCatching(): T? {
 }
 
 suspend inline fun <reified T : Any> ApplicationCall.receiveOrThrow(): T {
-    val logger = LoggerFactory.getLogger("receiveOrThrow")
+    val logger = LoggerFactory.getLogger("ReceiveOrThrow")
     return try {
         receive<T>()
     } catch (e: CancellationException) {

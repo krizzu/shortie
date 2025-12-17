@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { CreateURLForm } from "@/routes/_authorized/-components/links/CreateURLForm.tsx"
 import { fetcher, HttpError } from "@/services/fetcher.ts"
+import { useState } from "react"
+import { CreatedLink } from "@/routes/_authorized/-components/links/CreatedLink.tsx"
 
 export const Route = createFileRoute("/_authorized/dashboard/urls_/create")({
   component: CreateLink,
@@ -10,6 +12,9 @@ export const Route = createFileRoute("/_authorized/dashboard/urls_/create")({
 })
 
 function CreateLink() {
+  const navigate = Route.useNavigate()
+  const [created, setCreated] = useState<string | null>(null)
+
   async function createLink(link: {
     originalUrl: string
     alias: string | null
@@ -26,12 +31,24 @@ function CreateLink() {
           alias: link.alias,
         },
       })
-      console.log("good: ", result)
+      setCreated(result.data.shortCode)
     } catch (e) {
       alert((e as HttpError).message)
       console.error(e)
     }
   }
 
-  return <CreateURLForm onSubmit={createLink} />
+  return (
+    <div className="w-full max-w-md mx-auto">
+      {created ? (
+        <CreatedLink
+          link={created}
+          onCreateNew={() => setCreated(null)}
+          onShowList={() => navigate({ to: "/dashboard/urls" })}
+        />
+      ) : (
+        <CreateURLForm onSubmit={createLink} />
+      )}
+    </div>
+  )
 }
