@@ -18,40 +18,62 @@ import {
 import { Checkbox } from "@/components/ui/checkbox.tsx"
 import { Button } from "@/components/ui/button.tsx"
 import { useState } from "react"
+import { Spinner } from "@/components/ui/spinner.tsx"
 
-export function CreateURLForm() {
+type Props = {
+  onSubmit: (payload: {
+    originalUrl: string
+    alias: string | null
+    expiry: string | null // utc string
+    password: string | null
+  }) => Promise<void>
+}
+
+export function CreateURLForm({ onSubmit }: Props) {
   const [useAlias, setUseAlias] = useState(false)
   const [useExpiry, setUseExpiry] = useState(false)
   const [usePassword, setUsePassword] = useState(false)
+  const [pending, setPending] = useState(false)
 
-  const today = new Date()
-  const defaultDate = new Date(today)
+  const today = new Date(new Date().toUTCString())
+  const defaultDate = new Date(
+    Date.UTC(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0, 0)
+  )
   defaultDate.setDate(today.getDate() + 1)
 
   const defaultYear = defaultDate.getFullYear()
   const defaultMonth = defaultDate.getMonth() + 1
   const defaultDay = defaultDate.getDate()
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
 
     const form = e.currentTarget as HTMLFormElement
     const data = new FormData(form)
 
-    const payload = {
-      originalUrl: data.get("original-url"),
-      alias: useAlias ? data.get("custom-alias") : null,
-      expiry: useExpiry
-        ? {
-            year: data.get("exp-year"),
-            month: data.get("exp-month"),
-            day: data.get("exp-day"),
-          }
-        : null,
-      password: usePassword ? data.get("link-password") : null,
-    }
+    const expiry = useExpiry
+      ? {
+          year: Number(data.get("exp-year")),
+          month: Number(data.get("exp-month")),
+          day: Number(data.get("exp-day")),
+        }
+      : null
 
-    console.log("Submit payload", payload)
+    setPending(true)
+    try {
+      await onSubmit({
+        originalUrl: data.get("original-url") as string,
+        alias: useAlias ? (data.get("custom-alias") as string) : null,
+        password: usePassword ? (data.get("link-password") as string) : null,
+        expiry: expiry
+          ? new Date(
+              Date.UTC(expiry.year, expiry.month - 1, expiry.day, 0, 0, 0, 0)
+            ).toISOString()
+          : null,
+      })
+    } finally {
+      setPending(false)
+    }
   }
 
   return (
@@ -125,29 +147,6 @@ export function CreateURLForm() {
                     <FieldLabel className="mb-2 block">Expiry date</FieldLabel>
                     <div className="grid grid-cols-3 gap-4">
                       <Field>
-                        <FieldLabel htmlFor="exp-month">Month</FieldLabel>
-                        <Select
-                          name="exp-month"
-                          defaultValue={String(defaultMonth).padStart(2, "0")}
-                        >
-                          <SelectTrigger id="exp-month">
-                            <SelectValue placeholder="MM" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {Array.from({ length: 12 }, (_, i) => {
-                              const m = i + 1
-                              const mm = String(m).padStart(2, "0")
-                              return (
-                                <SelectItem key={mm} value={mm}>
-                                  {mm}
-                                </SelectItem>
-                              )
-                            })}
-                          </SelectContent>
-                        </Select>
-                      </Field>
-
-                      <Field>
                         <FieldLabel htmlFor="exp-day">Day</FieldLabel>
                         <Select
                           defaultValue={String(defaultDay).padStart(2, "0")}
@@ -163,6 +162,29 @@ export function CreateURLForm() {
                               return (
                                 <SelectItem key={dd} value={dd}>
                                   {dd}
+                                </SelectItem>
+                              )
+                            })}
+                          </SelectContent>
+                        </Select>
+                      </Field>
+
+                      <Field>
+                        <FieldLabel htmlFor="exp-month">Month</FieldLabel>
+                        <Select
+                          name="exp-month"
+                          defaultValue={String(defaultMonth).padStart(2, "0")}
+                        >
+                          <SelectTrigger id="exp-month">
+                            <SelectValue placeholder="MM" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {Array.from({ length: 12 }, (_, i) => {
+                              const m = i + 1
+                              const mm = String(m).padStart(2, "0")
+                              return (
+                                <SelectItem key={mm} value={mm}>
+                                  {mm}
                                 </SelectItem>
                               )
                             })}
@@ -232,7 +254,15 @@ export function CreateURLForm() {
           </FieldSet>
 
           <Field orientation="horizontal">
-            <Button type="submit">Create short URL</Button>
+            <Button disabled={pending} type="submit">
+              {pending ? (
+                <>
+                  <Spinner /> Creating
+                </>
+              ) : (
+                <>Create short URL</>
+              )}
+            </Button>
           </Field>
         </FieldGroup>
       </form>

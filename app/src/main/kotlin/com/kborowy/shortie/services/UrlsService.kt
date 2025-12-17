@@ -14,6 +14,7 @@ import com.kborowy.shortie.utils.PasswordHasher
 import io.ktor.utils.io.CancellationException
 import kotlinx.datetime.LocalDateTime
 import org.jetbrains.exposed.v1.exceptions.ExposedSQLException
+import org.postgresql.util.PSQLException
 import org.slf4j.LoggerFactory
 
 fun UrlsService(repo: UrlsRepository, counter: GlobalCounter, generator: IdGenerator): UrlsService =
@@ -62,12 +63,17 @@ private class RealUrlsService(
                 repo.insert(url = url, code = shortCode, expiry = expiry, hash = passwordHash)
             return shortie
         } catch (e: CancellationException) {
+            log.info("generation was cancelled")
             throw e
         } catch (e: ExposedSQLException) {
-            if (e.errorCode == 23505) {
+            log.error("failed to generate shortie", e)
+            if (e.cause is PSQLException && (e.sqlState == "23505" || e.errorCode == 23505)) {
+                throw AliasAlreadyExistsError()
+            } else if (e.errorCode == 23505) {
                 throw AliasAlreadyExistsError()
             }
-            throw UnexpectedAppError("Database operation failed: $e")
+
+            throw UnexpectedAppError("Database operation failed: ${e.message}")
         }
     }
 

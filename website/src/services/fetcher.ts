@@ -50,7 +50,9 @@ async function refreshToken() {
     const updatedTokens: AuthTokens = await result.json()
     saveTokens(updatedTokens)
     return updatedTokens
-  })()
+  })().finally(() => {
+    refreshPromise = null
+  })
 
   return refreshPromise
 }

@@ -31,7 +31,7 @@ import shortie.tests.DatabaseUtils
 import shortie.tests.DatabaseUtils.clearDatabase
 import shortie.tests.FakeClock
 
-class RealUrlsServiceTest {
+class UrlsServiceTest {
 
     val db = DatabaseUtils.getTestDatabase()
     val repo = UrlsRepository(db)

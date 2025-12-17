@@ -8,6 +8,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.plugins.statuspages.StatusPages
+import io.ktor.server.request.path
 import io.ktor.server.response.respondText
 import org.slf4j.LoggerFactory
 
@@ -17,16 +18,16 @@ fun Application.configureStatusPages() {
             if (cause is NotFoundHttpError) {
                 call.respondWithTemplate(HtmlTemplates.NotFound, status = HttpStatusCode.NotFound)
             } else {
-                call.respondText(
-                    text = "${cause.statusCode}: ${cause.message}",
-                    status = cause.statusCode,
-                )
+                call.respondText(text = "${cause.message}", status = cause.statusCode)
             }
         }
 
         exception<AppError> { call, cause ->
-            call.respondText(
-                text = "Request failed: ${cause::class}: ${cause.message}",
+            LoggerFactory.getLogger("InternalError")
+                .error("Uncaught exception: ${cause.message} on ${call.request.path()}", cause)
+
+            call.respondWithTemplate(
+                HtmlTemplates.ServerError,
                 status = HttpStatusCode.InternalServerError,
             )
         }
@@ -36,7 +37,8 @@ fun Application.configureStatusPages() {
         }
 
         exception<Throwable> { call, cause ->
-            LoggerFactory.getLogger("SeriousException").error("Uncaught exception!", cause)
+            LoggerFactory.getLogger("SeriousException")
+                .error("Uncaught exception: ${cause.message} on ${call.request.path()}", cause)
 
             call.respondWithTemplate(
                 HtmlTemplates.ServerError,

@@ -1,12 +1,12 @@
 package com.kborowy.shortie.routes.urls
 
-import kotlinx.datetime.LocalDateTime
+import kotlin.time.Instant
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class GenerateShortieDTO(
     val url: String,
-    val expiryDate: LocalDateTime?,
+    val expiryDate: Instant?,
     val password: String?,
     val alias: String?,
 )
