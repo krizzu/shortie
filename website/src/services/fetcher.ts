@@ -10,16 +10,23 @@ async function _fetch(
   input: RequestInfo | URL,
   init?: RequestInit
 ): Promise<Response> {
-  const result = await fetch(
-    typeof input === "string" ? new URL(input, EnvVars.apiUrl) : input,
-    init
-  )
-  if (!result.ok) {
-    throw new HttpError(
-      `request failed: ${await result.text()}`,
-      result.status,
-      result.statusText
+  let result: Response
+  try {
+    result = await fetch(
+      typeof input === "string" ? new URL(input, EnvVars.apiUrl) : input,
+      init
     )
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (e: any) {
+    throw new HttpError(
+      `request failed: ${e.message ?? e}`,
+      -1,
+      "request failed"
+    )
+  }
+
+  if (!result.ok) {
+    throw new HttpError(await result.text(), result.status, result.statusText)
   }
   return result
 }
@@ -34,7 +41,7 @@ async function refreshToken() {
       return null
     }
 
-    const result = await fetch(new URL("auth/refresh", EnvVars.apiUrl), {
+    const result = await _fetch(new URL("auth/refresh", EnvVars.apiUrl), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -43,7 +50,6 @@ async function refreshToken() {
     })
 
     if (!result.ok) {
-      clearTokens()
       return null
     }
 
@@ -58,7 +64,7 @@ async function refreshToken() {
 }
 
 type RequestOptions = Pick<RequestInit, "method" | "headers"> & {
-  body: RequestInit["body"] | Record<string, unknown>
+  body?: RequestInit["body"] | Record<string, unknown>
   authorize?: boolean // if request should add auth token in Authorized header, default tot rue
   _retry?: boolean // internal flag indicating the request is retry request and should avoid token refresh
 }
@@ -100,14 +106,19 @@ export async function fetcher<T>(
   } catch (e: unknown) {
     if (!(e instanceof HttpError)) {
       const message = e instanceof Error ? e.message : String(e)
-
       throw new HttpError(`unknown http error: ${message}`, -1, message)
     }
 
     if (e.unauthorized && !options?._retry) {
-      const updated = await refreshToken()
-      if (updated) {
-        return fetcher(url, { ...options, _retry: true, body: bodyPayload })
+      try {
+        const updated = await refreshToken()
+        if (updated) {
+          return fetcher(url, { ...options, _retry: true, body: bodyPayload })
+        } else {
+          clearTokens()
+        }
+      } catch (e: unknown) {
+        console.error(`failed to refresh tokens: ${e}`)
       }
     }
 
@@ -128,5 +139,9 @@ export class HttpError extends Error {
 
   get unauthorized(): boolean {
     return this.statusCode === 401
+  }
+
+  get networkError(): boolean {
+    return this.statusCode < 0
   }
 }

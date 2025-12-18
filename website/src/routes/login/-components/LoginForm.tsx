@@ -15,7 +15,6 @@ export function LoginForm({ className, onLogin }: Props) {
   const { pending } = useFormStatus()
 
   async function submit(form: FormData) {
-    console.log("form", form)
     const password = form.get("password")
     await onLogin(DEFAULT_USER, String(password))
   }

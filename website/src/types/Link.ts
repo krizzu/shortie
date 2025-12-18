@@ -1,6 +1,6 @@
 export interface ShortieLink {
   originalUrl: string
-  alias: string | null
-  expiry: string | null // utc string
-  password: string | null
+  shortCode: string
+  protected: boolean
+  expiryDate?: string // utc string
 }

@@ -1,18 +1,21 @@
 /* eslint-disable react-refresh/only-export-components */
 import "../styles/shared.css"
-import { StrictMode } from "react"
 import ReactDOM from "react-dom/client"
 import { createRouter, RouterProvider } from "@tanstack/react-router"
-
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { routeTree } from "./routeTree.gen"
 import { AuthProvider, useAuth } from "./auth/AuthProvider.tsx"
+
+const queryClient = new QueryClient()
 
 // Create a new router instance
 const router = createRouter({
   routeTree,
   context: {
     auth: undefined!,
+    queryClient,
   },
+  defaultPreloadStaleTime: 0,
 })
 
 // Register the router instance for type safety
@@ -32,10 +35,10 @@ const rootElement = document.getElementById("root")!
 if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement)
   root.render(
-    <StrictMode>
+    <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <RouterWithAuth />
       </AuthProvider>
-    </StrictMode>
+    </QueryClientProvider>
   )
 }

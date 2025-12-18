@@ -2916,6 +2916,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tanstack/query-core@npm:5.90.12":
+  version: 5.90.12
+  resolution: "@tanstack/query-core@npm:5.90.12"
+  checksum: 10c0/60d5dd23d7801118d6ef84a3d76e798aaf6eb851ee5227629a1dc798fa01ac9560580553413208fcc8a003fb12a89e83d6dd1f38ebc3bd9b6e8838cfaaa45fef
+  languageName: node
+  linkType: hard
+
+"@tanstack/react-query@npm:^5.90.12":
+  version: 5.90.12
+  resolution: "@tanstack/react-query@npm:5.90.12"
+  dependencies:
+    "@tanstack/query-core": "npm:5.90.12"
+  peerDependencies:
+    react: ^18 || ^19
+  checksum: 10c0/da01ec2819d301e4be89731e82d3f091fa4f1ab2745be324e5166f9df77e2aaf1c362b0fa61aab226bb01634873f1a00562f7d7f405867fe23bdd47fe4d00fda
+  languageName: node
+  linkType: hard
+
 "@tanstack/react-router-devtools@npm:^1.141.2":
   version: 1.141.2
   resolution: "@tanstack/react-router-devtools@npm:1.141.2"
@@ -7320,6 +7338,7 @@ __metadata:
     "@eslint/js": "npm:^9.39.1"
     "@fontsource-variable/jetbrains-mono": "npm:^5.2.8"
     "@tailwindcss/vite": "npm:^4.1.17"
+    "@tanstack/react-query": "npm:^5.90.12"
     "@tanstack/react-router": "npm:^1.141.2"
     "@tanstack/react-router-devtools": "npm:^1.141.2"
     "@tanstack/router-plugin": "npm:^1.141.2"

@@ -48,7 +48,8 @@ fun Application.urlsRouting() {
                     val limit = call.request.queryParameters["limit"]?.toIntOrNull() ?: 35
                     val cursor =
                         call.request.queryParameters["cursor"]?.let {
-                            ShortCode(Base64.decode(it).toString())
+                            val shortCode = Base64.decode(it).decodeToString()
+                            ShortCode(shortCode)
                         }
 
                     val data =

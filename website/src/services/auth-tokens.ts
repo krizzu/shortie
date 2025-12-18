@@ -36,7 +36,6 @@ export function clearTokens(notify: boolean = true) {
     return
   }
   for (const listener of listeners) {
-    console.log('calling listeners')
     listener()
   }
 }
