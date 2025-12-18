@@ -1,22 +1,21 @@
-package com.kborowy.shortie.services
+package com.kborowy.shortie.services.urls
 
 import com.kborowy.shortie.data.counter.GlobalCounter
-import com.kborowy.shortie.data.urls.PageCursor
-import com.kborowy.shortie.data.urls.ShortieUrlPaginated
 import com.kborowy.shortie.data.urls.UrlsRepository
 import com.kborowy.shortie.errors.AliasAlreadyExistsError
 import com.kborowy.shortie.errors.ExpiryInPastError
 import com.kborowy.shortie.errors.UnexpectedAppError
 import com.kborowy.shortie.extensions.isInPast
-import com.kborowy.shortie.extensions.now
 import com.kborowy.shortie.models.OriginalUrl
 import com.kborowy.shortie.models.ShortCode
+import com.kborowy.shortie.models.ShortiePageCursorDTO
 import com.kborowy.shortie.models.ShortieUrl
 import com.kborowy.shortie.utils.PasswordHasher
 import com.kborowy.shortie.utils.ShortCodeGenerator
 import io.ktor.utils.io.CancellationException
-import kotlin.time.Instant
+import kotlin.io.encoding.Base64
 import kotlinx.datetime.LocalDateTime
+import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.v1.exceptions.ExposedSQLException
 import org.postgresql.util.PSQLException
 import org.slf4j.LoggerFactory
@@ -25,7 +24,8 @@ fun UrlsService(
     repo: UrlsRepository,
     counter: GlobalCounter,
     coder: ShortCodeGenerator,
-): UrlsService = RealUrlsService(repo, counter, coder)
+    json: Json,
+): UrlsService = RealUrlsService(repo, counter, coder, json)
 
 interface UrlsService {
     suspend fun generateShortie(
@@ -42,13 +42,15 @@ interface UrlsService {
     /** If shortie is protected, check if provided password match */
     suspend fun verifyShortCode(shortCode: ShortCode, password: String): Boolean
 
-    suspend fun getShortCodes(limit: Int, after: ShortCode?): ShortieUrlPaginated?
+    /** next cursor is base62 encoded [ShortiePageCursorDTO] */
+    suspend fun getShortCodes(limit: Int, nextCursor: String?): ShortieUrlPaginatedEncoded?
 }
 
 private class RealUrlsService(
     private val repo: UrlsRepository,
     private val counter: GlobalCounter,
     private val coder: ShortCodeGenerator,
+    private val json: Json,
 ) : UrlsService {
     private val log = LoggerFactory.getLogger("UrlsService")
 
@@ -111,15 +113,27 @@ private class RealUrlsService(
         return result
     }
 
-    override suspend fun getShortCodes(limit: Int, after: ShortCode?): ShortieUrlPaginated? {
-        val cursor = after?.let { PageCursor(it.value, Instant.now) }
+    override suspend fun getShortCodes(
+        limit: Int,
+        nextCursor: String?,
+    ): ShortieUrlPaginatedEncoded? {
+        val cursor =
+            nextCursor?.let {
+                // return null as whole operation
+                decodeCursor(nextCursor) ?: return null
+            }
 
         try {
-            return repo.getPaginated(limit, cursor)
+            val result = repo.getPaginated(limit, cursor)
+            return ShortieUrlPaginatedEncoded(
+                data = result.data,
+                hasNext = result.hasNext,
+                nextCursor = result.nextCursor?.let { encodeCursor(it) },
+            )
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            log.error("cannot get paginated result (limit=$limit, after=$after)", e)
+            log.error("cannot get paginated result (limit=$limit, nextCursor=$nextCursor)", e)
             return null
         }
     }
@@ -127,5 +141,22 @@ private class RealUrlsService(
     private suspend fun createHash(): ShortCode {
         val id = counter.getNextId()
         return coder.generateShortCode(id)
+    }
+
+    //
+    private fun encodeCursor(cursor: ShortiePageCursorDTO): String {
+        val encoded = json.encodeToString(cursor)
+        return Base64.encode(encoded.toByteArray())
+    }
+
+    //
+    private fun decodeCursor(encoded: String): ShortiePageCursorDTO? {
+        try {
+            val decoded = Base64.decode(encoded).decodeToString()
+            return json.decodeFromString<ShortiePageCursorDTO>(decoded)
+        } catch (e: Exception) {
+            log.error("failed to decode cursor (cursor=$encoded)", e)
+            return null
+        }
     }
 }

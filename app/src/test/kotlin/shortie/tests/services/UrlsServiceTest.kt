@@ -10,7 +10,7 @@ import com.kborowy.shortie.errors.ExpiryInPastError
 import com.kborowy.shortie.extensions.now
 import com.kborowy.shortie.extensions.nowInstant
 import com.kborowy.shortie.models.OriginalUrl
-import com.kborowy.shortie.services.UrlsService
+import com.kborowy.shortie.services.urls.UrlsService
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals

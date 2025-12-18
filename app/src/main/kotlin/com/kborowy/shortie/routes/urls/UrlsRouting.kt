@@ -4,16 +4,14 @@ import com.kborowy.shortie.errors.InternalServerError
 import com.kborowy.shortie.extensions.asInstantUTC
 import com.kborowy.shortie.extensions.receiveOrThrow
 import com.kborowy.shortie.models.OriginalUrl
-import com.kborowy.shortie.models.ShortCode
 import com.kborowy.shortie.plugins.withAdminAuth
-import com.kborowy.shortie.services.UrlsService
+import com.kborowy.shortie.services.urls.UrlsService
 import io.ktor.server.application.Application
 import io.ktor.server.response.respond
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
-import kotlin.io.encoding.Base64
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.koin.ktor.ext.inject
@@ -46,18 +44,11 @@ fun Application.urlsRouting() {
                 /** Return paginated query */
                 get {
                     val limit = call.request.queryParameters["limit"]?.toIntOrNull() ?: 35
-                    val cursor =
-                        call.request.queryParameters["cursor"]?.let {
-                            val shortCode = Base64.decode(it).decodeToString()
-                            ShortCode(shortCode)
-                        }
+                    val cursor = call.request.queryParameters["cursor"]
 
                     val data =
                         service.getShortCodes(limit, cursor)
                             ?: throw InternalServerError("Could not read data")
-
-                    val nextCursor =
-                        data.nextCursor?.let { Base64.encode(it.shortCode.toByteArray()) }
 
                     call.respond(
                         PaginatedShortieResponseDTO(
@@ -71,7 +62,7 @@ fun Application.urlsRouting() {
                                     )
                                 },
                             hasNext = data.hasNext,
-                            nextCursor = nextCursor,
+                            nextCursor = data.nextCursor,
                         )
                     )
                 }

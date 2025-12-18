@@ -31,7 +31,7 @@ export function LinksList({
   fetchNextPage,
 }: Props) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-6">
       <div>
         <Button onClick={onCreateLink} variant="default">
           <Plus /> Add new

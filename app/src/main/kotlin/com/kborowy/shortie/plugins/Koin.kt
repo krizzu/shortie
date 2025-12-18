@@ -2,18 +2,28 @@ package com.kborowy.shortie.plugins
 
 import com.kborowy.shortie.data.DataDIModule
 import com.kborowy.shortie.infra.provideDatabaseDIModule
-import com.kborowy.shortie.utils.ShortCodeGenerator
 import com.kborowy.shortie.services.ServicesDIModule
 import com.kborowy.shortie.utils.JwtVerifier
+import com.kborowy.shortie.utils.ShortCodeGenerator
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.config.getAs
+import kotlinx.serialization.json.Json
 import org.koin.dsl.module
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
 
 fun Application.configureDI() {
     val appModule = module {
+        single<Json> {
+            Json {
+                prettyPrint = true
+                isLenient = true
+                ignoreUnknownKeys = true
+                explicitNulls = false
+            }
+        }
+
         single<JwtVerifier> {
             JwtVerifier(
                 pass = environment.config.property("auth.secret").getString(),

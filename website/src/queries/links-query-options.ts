@@ -24,6 +24,5 @@ export const linksQueryOption = (limit: number = 25) =>
 
     initialPageParam: undefined as string | undefined,
 
-    getNextPageParam: (lastPage) =>
-      lastPage.hasNext ? lastPage.nextCursor : undefined,
+    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
   })

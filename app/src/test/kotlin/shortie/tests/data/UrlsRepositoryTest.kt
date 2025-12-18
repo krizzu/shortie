@@ -86,7 +86,7 @@ class UrlsRepositoryTest {
         assertEquals(urls[4], result.data.last())
 
         // get next batch
-        result = repo.getPaginated(3, after = result.nextCursor)
+        result = repo.getPaginated(3, nextCursor = result.nextCursor)
         assertEquals(3, result.data.size)
         assertTrue(result.hasNext)
         assertNotNull(result.nextCursor)
@@ -96,7 +96,7 @@ class UrlsRepositoryTest {
         assertEquals(urls[7], result.data.last())
 
         // get last batch
-        result = repo.getPaginated(5, after = result.nextCursor)
+        result = repo.getPaginated(5, nextCursor = result.nextCursor)
         assertEquals(2, result.data.size)
         assertFalse(result.hasNext)
         assertNull(result.nextCursor)
