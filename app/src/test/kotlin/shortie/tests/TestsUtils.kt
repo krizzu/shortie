@@ -1,5 +1,6 @@
 package shortie.tests
 
+import com.kborowy.shortie.utils.ShortCodeGenerator
 import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Instant
@@ -30,3 +31,6 @@ class FakeClock(val start: Long = fakeClockStart) : Clock {
         now = time.toEpochMilliseconds()
     }
 }
+
+val FakeShortCodeGenerator =
+    ShortCodeGenerator("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")

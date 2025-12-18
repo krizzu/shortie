@@ -9,7 +9,6 @@ import com.kborowy.shortie.errors.AliasAlreadyExistsError
 import com.kborowy.shortie.errors.ExpiryInPastError
 import com.kborowy.shortie.extensions.now
 import com.kborowy.shortie.extensions.nowInstant
-import com.kborowy.shortie.migrations.com.kborowy.shortie.utils.IdGenerator
 import com.kborowy.shortie.models.OriginalUrl
 import com.kborowy.shortie.services.UrlsService
 import kotlin.test.BeforeTest
@@ -30,18 +29,14 @@ import kotlinx.datetime.toLocalDateTime
 import shortie.tests.DatabaseUtils
 import shortie.tests.DatabaseUtils.clearDatabase
 import shortie.tests.FakeClock
+import shortie.tests.FakeShortCodeGenerator
 
 class UrlsServiceTest {
 
     val db = DatabaseUtils.getTestDatabase()
-    val repo = UrlsRepository(db)
+    val repo = UrlsRepository(db, FakeShortCodeGenerator)
     val service =
-        UrlsService(
-            repo = repo,
-            counter = FakeGlobalCounter(),
-            generator =
-                IdGenerator("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"),
-        )
+        UrlsService(repo = repo, counter = FakeGlobalCounter(), generator = FakeShortCodeGenerator)
 
     init {
         DatabaseUtils.initDatabase()

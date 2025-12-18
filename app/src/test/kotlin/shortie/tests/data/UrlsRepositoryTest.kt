@@ -1,23 +1,32 @@
 package shortie.tests.data
 
+import com.kborowy.shortie.data.GlobalClockProvider
 import com.kborowy.shortie.data.urls.UrlsRepository
 import com.kborowy.shortie.extensions.now
 import com.kborowy.shortie.models.OriginalUrl
 import com.kborowy.shortie.models.ShortCode
+import com.kborowy.shortie.models.ShortieUrl
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDateTime
 import shortie.tests.DatabaseUtils
 import shortie.tests.DatabaseUtils.clearDatabase
+import shortie.tests.FakeClock
+import shortie.tests.FakeShortCodeGenerator
 
 class UrlsRepositoryTest {
 
     val db = DatabaseUtils.getTestDatabase()
-    val repo = UrlsRepository(db)
+    val coder = FakeShortCodeGenerator
+
+    val repo = UrlsRepository(db, coder)
 
     init {
         DatabaseUtils.initDatabase()
@@ -55,5 +64,69 @@ class UrlsRepositoryTest {
         repo.remove(result.shortCode)
 
         assertNull(repo.get(result.shortCode), "stored shortie has not been removed")
+    }
+
+    @Test
+    fun `paginated results sizes and limits`() = runTest {
+        val urls = mutableListOf<ShortieUrl>()
+        for (i in 0..<10) {
+            val url = OriginalUrl("https://www.$i.com")
+            val code = coder.generateShortCode(i.toLong())
+            urls.add(repo.insert(url, code))
+        }
+
+        urls.reverse() // reverse to test input
+        var result = repo.getPaginated(5)
+        assertEquals(5, result.data.size)
+        assertTrue(result.hasMore)
+        assertNotNull(result.nextCursor)
+
+        // order
+        assertEquals(urls[0], result.data.first())
+        assertEquals(urls[4], result.data.last())
+
+        // get next batch
+        result = repo.getPaginated(3, after = result.nextCursor)
+        assertEquals(3, result.data.size)
+        assertTrue(result.hasMore)
+        assertNotNull(result.nextCursor)
+
+        // order
+        assertEquals(urls[5], result.data.first())
+        assertEquals(urls[7], result.data.last())
+
+        // get last batch
+        result = repo.getPaginated(5, after = result.nextCursor)
+        assertEquals(2, result.data.size)
+        assertFalse(result.hasMore)
+        assertNull(result.nextCursor)
+
+        // order
+        assertEquals(urls[8], result.data.first())
+        assertEquals(urls[9], result.data.last())
+    }
+
+    @Test
+    fun `order of paginated results`() = runTest {
+        val clock = FakeClock()
+        GlobalClockProvider.replaceClock(clock)
+        val max = 20
+
+        val urls = mutableListOf<ShortieUrl>()
+        for (i in 1..max) {
+            val url = OriginalUrl("https://www.$i.com")
+            val code = coder.generateShortCode(i.toLong())
+            urls.add(repo.insert(url, code))
+            clock.forward(1.seconds)
+        }
+
+        val result = repo.getPaginated()
+        assertEquals(max, result.data.size)
+        assertFalse(result.hasMore)
+        assertNull(result.nextCursor)
+
+        // test DESC ordering
+        assertEquals(urls.last(), result.data.first())
+        assertEquals(urls.first(), result.data.last())
     }
 }

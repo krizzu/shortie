@@ -1,17 +1,29 @@
 package com.kborowy.shortie.data.urls
 
+import com.kborowy.shortie.extensions.asInstantUTC
+import com.kborowy.shortie.extensions.toLocalDateTimeUTC
 import com.kborowy.shortie.models.OriginalUrl
 import com.kborowy.shortie.models.ShortCode
 import com.kborowy.shortie.models.ShortieUrl
+import com.kborowy.shortie.utils.ShortCodeGenerator
 import kotlinx.datetime.LocalDateTime
 import org.jetbrains.exposed.v1.core.ResultRow
+import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.less
+import org.jetbrains.exposed.v1.core.or
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.insertAndGetId
 import org.jetbrains.exposed.v1.jdbc.select
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+
+data class ShortieUrlPaginated(
+    val data: List<ShortieUrl>,
+    val hasMore: Boolean,
+    val nextCursor: PageCursor?,
+)
 
 interface UrlsRepository {
     suspend fun insert(
@@ -27,13 +39,15 @@ interface UrlsRepository {
 
     suspend fun getHashForCode(shortCode: ShortCode): String?
 
-    // todo: getAll paginated
+    suspend fun getPaginated(limit: Int = 25, after: PageCursor? = null): ShortieUrlPaginated
 }
 
-fun UrlsRepository(db: Database): UrlsRepository = RealUrlsRepository(db)
+fun UrlsRepository(db: Database, coder: ShortCodeGenerator): UrlsRepository =
+    RealUrlsRepository(db, coder)
 
 // Implementation
-private class RealUrlsRepository(private val db: Database) : UrlsRepository {
+private class RealUrlsRepository(private val db: Database, private val coder: ShortCodeGenerator) :
+    UrlsRepository {
 
     override suspend fun insert(
         url: OriginalUrl,
@@ -74,6 +88,43 @@ private class RealUrlsRepository(private val db: Database) : UrlsRepository {
                 .singleOrNull()
                 ?.getOrNull(UrlsTable.passwordHash)
         }
+
+    override suspend fun getPaginated(limit: Int, after: PageCursor?): ShortieUrlPaginated {
+
+        return transaction(db) {
+            val rows =
+                UrlsTable.selectAll()
+                    .apply {
+                        if (after != null) {
+                            val id = coder.decodeShortCode(ShortCode(after.shortCode))
+                            requireNotNull(id)
+                            where {
+                                (UrlsTable.createdAt less after.createdAt.toLocalDateTimeUTC) or
+                                    (UrlsTable.id less id)
+                            }
+                        }
+                    }
+                    .orderBy(UrlsTable.id to SortOrder.DESC, UrlsTable.createdAt to SortOrder.DESC)
+                    .limit(limit + 1) // neat way to detect if there is more
+                    .toList()
+
+            val items = rows.take(limit)
+            val hasMore = rows.size > limit
+            val nextCursor: PageCursor? =
+                items.lastOrNull()?.let {
+                    if (!hasMore) {
+                        return@let null
+                    }
+                    PageCursor(
+                        coder.generateShortCode(it[UrlsTable.id].value).value,
+                        createdAt = it[UrlsTable.createdAt].asInstantUTC,
+                    )
+                }
+
+            val shortUrls = items.map(ResultRow::toShortieUrl)
+            ShortieUrlPaginated(shortUrls, hasMore = hasMore, nextCursor)
+        }
+    }
 }
 
 private fun ResultRow.toShortieUrl(): ShortieUrl {

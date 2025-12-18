@@ -23,3 +23,7 @@ val LocalDateTime.isInPast: Boolean
     get() {
         return this.toInstant(UtcOffset.ZERO) <= LocalDateTime.now.toInstant(UtcOffset.ZERO)
     }
+
+
+val LocalDateTime.asInstantUTC
+    get() = toInstant(TimeZone.UTC)

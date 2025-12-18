@@ -6,7 +6,7 @@ import com.kborowy.shortie.errors.AliasAlreadyExistsError
 import com.kborowy.shortie.errors.ExpiryInPastError
 import com.kborowy.shortie.errors.UnexpectedAppError
 import com.kborowy.shortie.extensions.isInPast
-import com.kborowy.shortie.migrations.com.kborowy.shortie.utils.IdGenerator
+import com.kborowy.shortie.utils.ShortCodeGenerator
 import com.kborowy.shortie.models.OriginalUrl
 import com.kborowy.shortie.models.ShortCode
 import com.kborowy.shortie.models.ShortieUrl
@@ -17,7 +17,7 @@ import org.jetbrains.exposed.v1.exceptions.ExposedSQLException
 import org.postgresql.util.PSQLException
 import org.slf4j.LoggerFactory
 
-fun UrlsService(repo: UrlsRepository, counter: GlobalCounter, generator: IdGenerator): UrlsService =
+fun UrlsService(repo: UrlsRepository, counter: GlobalCounter, generator: ShortCodeGenerator): UrlsService =
     RealUrlsService(repo, counter, generator)
 
 interface UrlsService {
@@ -39,7 +39,7 @@ interface UrlsService {
 private class RealUrlsService(
     private val repo: UrlsRepository,
     private val counter: GlobalCounter,
-    private val generator: IdGenerator,
+    private val generator: ShortCodeGenerator,
 ) : UrlsService {
     private val log = LoggerFactory.getLogger("UrlsService")
 

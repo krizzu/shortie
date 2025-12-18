@@ -37,7 +37,13 @@ fun Application.urlsRouting() {
 
                     call.respond(GenerateShortieResponseDTO(shortCode = shortie.shortCode.value))
                 }
+
+
+
+
             }
+
+
         }
     }
 }

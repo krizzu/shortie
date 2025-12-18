@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS idx_urls_created_at_id_desc ON urls (id DESC, created_at DESC);
