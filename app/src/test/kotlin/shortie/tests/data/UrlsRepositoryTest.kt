@@ -78,7 +78,7 @@ class UrlsRepositoryTest {
         urls.reverse() // reverse to test input
         var result = repo.getPaginated(5)
         assertEquals(5, result.data.size)
-        assertTrue(result.hasMore)
+        assertTrue(result.hasNext)
         assertNotNull(result.nextCursor)
 
         // order
@@ -88,7 +88,7 @@ class UrlsRepositoryTest {
         // get next batch
         result = repo.getPaginated(3, after = result.nextCursor)
         assertEquals(3, result.data.size)
-        assertTrue(result.hasMore)
+        assertTrue(result.hasNext)
         assertNotNull(result.nextCursor)
 
         // order
@@ -98,7 +98,7 @@ class UrlsRepositoryTest {
         // get last batch
         result = repo.getPaginated(5, after = result.nextCursor)
         assertEquals(2, result.data.size)
-        assertFalse(result.hasMore)
+        assertFalse(result.hasNext)
         assertNull(result.nextCursor)
 
         // order
@@ -122,7 +122,7 @@ class UrlsRepositoryTest {
 
         val result = repo.getPaginated()
         assertEquals(max, result.data.size)
-        assertFalse(result.hasMore)
+        assertFalse(result.hasNext)
         assertNull(result.nextCursor)
 
         // test DESC ordering

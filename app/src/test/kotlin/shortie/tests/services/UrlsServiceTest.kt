@@ -36,7 +36,7 @@ class UrlsServiceTest {
     val db = DatabaseUtils.getTestDatabase()
     val repo = UrlsRepository(db, FakeShortCodeGenerator)
     val service =
-        UrlsService(repo = repo, counter = FakeGlobalCounter(), generator = FakeShortCodeGenerator)
+        UrlsService(repo = repo, counter = FakeGlobalCounter(), coder = FakeShortCodeGenerator)
 
     init {
         DatabaseUtils.initDatabase()

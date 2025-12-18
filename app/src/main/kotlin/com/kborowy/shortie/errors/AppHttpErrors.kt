@@ -16,3 +16,6 @@ class GoneHttpError(message: String = "gone") : AppHttpError(HttpStatusCode.Gone
 
 open class BadRequestError(message: String = "bad request") :
     AppHttpError(HttpStatusCode.BadRequest, message)
+
+class InternalServerError(message: String) :
+    AppHttpError(HttpStatusCode.InternalServerError, message)

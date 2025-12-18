@@ -19,12 +19,6 @@ import org.jetbrains.exposed.v1.jdbc.select
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
-data class ShortieUrlPaginated(
-    val data: List<ShortieUrl>,
-    val hasMore: Boolean,
-    val nextCursor: PageCursor?,
-)
-
 interface UrlsRepository {
     suspend fun insert(
         url: OriginalUrl,
@@ -122,7 +116,7 @@ private class RealUrlsRepository(private val db: Database, private val coder: Sh
                 }
 
             val shortUrls = items.map(ResultRow::toShortieUrl)
-            ShortieUrlPaginated(shortUrls, hasMore = hasMore, nextCursor)
+            ShortieUrlPaginated(shortUrls, hasNext = hasMore, nextCursor)
         }
     }
 }
