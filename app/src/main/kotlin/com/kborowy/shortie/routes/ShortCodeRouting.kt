@@ -59,7 +59,8 @@ fun Application.shortCodeRouting() {
 
                 /**
                  * @path short_code the short code to decode
-                 * @body application/x-www-form-urlencoded Form data containing password to resolve Shortie
+                 * @body application/x-www-form-urlencoded Form data containing password to resolve
+                 *   Shortie
                  * @response 400 Password not found in form data
                  * @response 404 Shortie is not protected or password is not correct
                  * @response 302 Redirect to resolved URL
@@ -67,7 +68,7 @@ fun Application.shortCodeRouting() {
                 post {
                     val shortie = getActiveShortie("short_code", service)
                     if (!shortie.protected) {
-                        throw NotFoundHttpError("${shortie.shortCode} not found")
+                        throw NotFoundHttpError("link not found")
                     }
                     val form = call.receiveParameters()
                     val password = form["password"] ?: throw BadRequestError("password missing")
@@ -75,7 +76,7 @@ fun Application.shortCodeRouting() {
                     if (service.verifyShortCode(shortie.shortCode, password)) {
                         call.respondRedirect(shortie.originalUrl.value, permanent = false)
                     } else {
-                        throw NotFoundHttpError("${shortie.shortCode} not found")
+                        throw NotFoundHttpError("link not found")
                     }
                 }
             }
@@ -90,11 +91,10 @@ private suspend fun RoutingContext.getActiveShortie(
 ): ShortieUrl {
     val shortCode = call.parameters.getOrFail(paramName)
 
-    val shortie =
-        service.resolveShortCode(shortCode) ?: throw NotFoundHttpError("$shortCode not found")
+    val shortie = service.resolveShortCode(shortCode) ?: throw NotFoundHttpError("link not found")
 
     if (shortie.expired) {
-        throw GoneHttpError("$shortCode expired")
+        throw GoneHttpError("link expired")
     }
 
     return shortie
