@@ -2,7 +2,6 @@ import { createFileRoute, useRouter } from "@tanstack/react-router"
 import { LinksList } from "@/routes/_authorized/-components/links/LinksList.tsx"
 import { linksQueryOptions } from "@/queries/links-query-options.ts"
 import { useQuery } from "@tanstack/react-query"
-import { Loading } from "@/components/Loading.tsx"
 import { Error } from "@/components/Error.tsx"
 
 export const Route = createFileRoute("/_authorized/dashboard/urls")({
@@ -37,10 +36,6 @@ function LinksPage() {
     navigate({ to: "/dashboard/urls", search: (cur) => ({ ...cur, page }) })
   }
 
-  if (linksQuery.isLoading) {
-    return <Loading />
-  }
-
   if (linksQuery.error) {
     return (
       <Error
@@ -58,6 +53,7 @@ function LinksPage() {
     <LinksList
       links={data?.data ?? []}
       hasMore={data?.hasNext ?? false}
+      loading={linksQuery.isLoading}
       fetchNextPage={() => {
         if (data?.nextCursor) {
           navigateToNextPage(data.nextCursor)

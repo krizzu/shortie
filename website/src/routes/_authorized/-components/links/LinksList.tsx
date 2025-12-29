@@ -19,9 +19,11 @@ import {
   PaginationItem,
   PaginationNext,
 } from "@/components/ui/pagination.tsx"
+import TableLoadingSkeleton from "@/routes/_authorized/-components/links/TableLoadingSkeleton.tsx"
 
 type Props = {
   links: ShortieLink[]
+  loading: boolean
   hasMore: boolean
   onCreateLink: () => void
   fetchNextPage: () => void
@@ -31,6 +33,7 @@ export function LinksList({
   onCreateLink,
   links,
   hasMore,
+  loading,
   fetchNextPage,
 }: Props) {
   return (
@@ -53,65 +56,71 @@ export function LinksList({
           </TableHeader>
 
           <TableBody>
-            {!links.length && (
+            {loading ? <TableLoadingSkeleton rows={10} columns={4} /> : null}
+
+            {!loading && !links.length ? (
               <TableRow>
-                <TableCell colSpan={4}>
+                <TableCell className="h-6" colSpan={4}>
                   <EmptyUrlList onCreateLink={onCreateLink} />
                 </TableCell>
               </TableRow>
-            )}
+            ) : null}
 
-            {links.map((link) => {
-              const isExpired =
-                link.expiryDate && new Date(link.expiryDate) < new Date()
+            {!loading
+              ? links.map((link) => {
+                  const isExpired =
+                    link.expiryDate && new Date(link.expiryDate) < new Date()
 
-              return (
-                <TableRow key={link.shortCode}>
-                  {/* Short code */}
-                  <TableCell className="font-medium">
-                    <a
-                      href={`http://localhost:8080/${link.shortCode}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-primary hover:underline"
-                    >
-                      {link.shortCode}
-                    </a>
-                  </TableCell>
+                  return (
+                    <TableRow key={link.shortCode}>
+                      {/* Short code */}
+                      <TableCell className="h-6 font-medium">
+                        <a
+                          href={`http://localhost:8080/${link.shortCode}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-primary hover:underline"
+                        >
+                          {link.shortCode}
+                        </a>
+                      </TableCell>
 
-                  {/* Original URL */}
-                  <TableCell className="max-w-[420px] truncate">
-                    <a
-                      href={link.originalUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="hover:underline"
-                      title={link.originalUrl}
-                    >
-                      {link.originalUrl}
-                    </a>
-                  </TableCell>
+                      {/* Original URL */}
+                      <TableCell className="max-w-[420px] h-6 truncate">
+                        <a
+                          href={link.originalUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="hover:underline"
+                          title={link.originalUrl}
+                        >
+                          {link.originalUrl}
+                        </a>
+                      </TableCell>
 
-                  {/* Protection status */}
-                  <TableCell>
-                    <Badge variant={link.protected ? "secondary" : "outline"}>
-                      {link.protected ? "Protected" : "Public"}
-                    </Badge>
-                  </TableCell>
+                      {/* Protection status */}
+                      <TableCell className="h-6">
+                        <Badge
+                          variant={link.protected ? "secondary" : "outline"}
+                        >
+                          {link.protected ? "Protected" : "Public"}
+                        </Badge>
+                      </TableCell>
 
-                  {/* Expiry */}
-                  <TableCell>
-                    {link.expiryDate ? (
-                      <span className={cn(isExpired && "text-destructive")}>
-                        {formatDate(link.expiryDate)}
-                      </span>
-                    ) : (
-                      <span className="text-muted-foreground">Never</span>
-                    )}
-                  </TableCell>
-                </TableRow>
-              )
-            })}
+                      {/* Expiry */}
+                      <TableCell className="h-6">
+                        {link.expiryDate ? (
+                          <span className={cn(isExpired && "text-destructive")}>
+                            {formatDate(link.expiryDate)}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">Never</span>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  )
+                })
+              : null}
           </TableBody>
         </Table>
         {hasMore ? (
