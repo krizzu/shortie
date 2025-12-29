@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite dev",
     "build:pages": "tsc -b && vite build --config vite.config.pages",
     "build:admin": "tsc -b && vite build",
     "test:ts": "tsc --noEmit -p tsconfig.app.json",

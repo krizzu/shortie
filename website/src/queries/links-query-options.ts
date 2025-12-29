@@ -1,4 +1,4 @@
-import { infiniteQueryOptions } from "@tanstack/react-query"
+import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query"
 import { fetcher } from "@/services/fetcher.ts"
 import type { ShortieLink } from "@/types/Link.ts"
 
@@ -8,7 +8,7 @@ export type ResponsePaginatedLinks = {
   data: Array<ShortieLink>
 }
 
-export const linksQueryOption = (limit: number = 25) =>
+export const linksInfiniteQueryOptions = (limit: number = 25) =>
   infiniteQueryOptions({
     queryKey: ["all-links-paginated", limit],
     queryFn: async ({ pageParam }) => {
@@ -25,4 +25,19 @@ export const linksQueryOption = (limit: number = 25) =>
     initialPageParam: undefined as string | undefined,
 
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+  })
+
+export const linksQueryOptions = (cursor: string | undefined, limit: number = 25) =>
+  queryOptions({
+    queryKey: ["links-paginated", cursor, limit],
+    queryFn: async () => {
+      let url = `/urls?limit=${limit}`
+      if (cursor) {
+        url += `&cursor=${encodeURIComponent(cursor)}`
+      }
+      const result = await fetcher<ResponsePaginatedLinks>(url, {
+        method: "GET",
+      })
+      return result.data
+    },
   })

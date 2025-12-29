@@ -13,12 +13,16 @@ import { cn } from "@/lib/utils.ts"
 import type { ShortieLink } from "@/types/Link.ts"
 import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Spinner } from "@/components/ui/spinner.tsx"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+} from "@/components/ui/pagination.tsx"
 
 type Props = {
   links: ShortieLink[]
   hasMore: boolean
-  fetchingNextPage: boolean
   onCreateLink: () => void
   fetchNextPage: () => void
 }
@@ -27,7 +31,6 @@ export function LinksList({
   onCreateLink,
   links,
   hasMore,
-  fetchingNextPage,
   fetchNextPage,
 }: Props) {
   return (
@@ -36,11 +39,10 @@ export function LinksList({
         <Button onClick={onCreateLink} variant="default">
           <Plus /> Add new
         </Button>
-        {fetchingNextPage ? <Spinner /> : null}
       </div>
 
-      <div className="rounded-2xl border bg-background">
-        <Table>
+      <div>
+        <Table className="rounded-2xl border bg-background">
           <TableHeader>
             <TableRow>
               <TableHead>Code</TableHead>
@@ -110,23 +112,27 @@ export function LinksList({
                 </TableRow>
               )
             })}
-            {hasMore ? (
-              <TableRow>
-                <TableCell className="text-center" colSpan={4}>
-                  {fetchingNextPage ? (
-                    <Spinner />
-                  ) : (
-                    <Button onClick={() => fetchNextPage()} variant="link">
-                      Load more
-                    </Button>
-                  )}
-                </TableCell>
-              </TableRow>
-            ) : null}
           </TableBody>
         </Table>
+        {hasMore ? (
+          <div className="mt-8">
+            <NextPage onClick={() => fetchNextPage()} />
+          </div>
+        ) : null}
       </div>
     </div>
+  )
+}
+
+function NextPage({ onClick }: { onClick: () => void }) {
+  return (
+    <Pagination>
+      <PaginationContent>
+        <PaginationItem>
+          <PaginationNext onClick={onClick} />
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
   )
 }
 
