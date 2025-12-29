@@ -6,7 +6,6 @@ import com.kborowy.shortie.models.OriginalUrl
 import com.kborowy.shortie.models.ShortCode
 import com.kborowy.shortie.models.ShortiePageCursorDTO
 import com.kborowy.shortie.models.ShortieUrl
-import com.kborowy.shortie.utils.ShortCodeGenerator
 import kotlinx.datetime.LocalDateTime
 import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.core.SortOrder
@@ -41,12 +40,10 @@ interface UrlsRepository {
     ): ShortieUrlPaginated
 }
 
-fun UrlsRepository(db: Database, coder: ShortCodeGenerator): UrlsRepository =
-    RealUrlsRepository(db, coder)
+fun UrlsRepository(db: Database): UrlsRepository = RealUrlsRepository(db)
 
 // Implementation
-private class RealUrlsRepository(private val db: Database, private val coder: ShortCodeGenerator) :
-    UrlsRepository {
+private class RealUrlsRepository(private val db: Database) : UrlsRepository {
 
     override suspend fun insert(
         url: OriginalUrl,
@@ -98,14 +95,12 @@ private class RealUrlsRepository(private val db: Database, private val coder: Sh
                 UrlsTable.selectAll()
                     .apply {
                         if (nextCursor != null) {
-                            val id = coder.decodeShortCode(ShortCode(nextCursor.shortCode))
-                            requireNotNull(id)
                             where {
                                 (UrlsTable.createdAt less
                                     nextCursor.createdAt.toLocalDateTimeUTC) or
                                     ((UrlsTable.createdAt eq
                                         nextCursor.createdAt.toLocalDateTimeUTC) and
-                                        (UrlsTable.id less id))
+                                        (UrlsTable.id less nextCursor.id))
                             }
                         }
                     }
@@ -119,7 +114,7 @@ private class RealUrlsRepository(private val db: Database, private val coder: Sh
                 items.lastOrNull()?.let {
                     if (hasMore) {
                         ShortiePageCursorDTO(
-                            coder.generateShortCode(it[UrlsTable.id].value).value,
+                            it[UrlsTable.id].value,
                             createdAt = it[UrlsTable.createdAt].asInstantUTC,
                         )
                     } else null

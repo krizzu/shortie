@@ -6,7 +6,7 @@ import com.kborowy.shortie.data.users.UserRepository
 import org.koin.dsl.module
 
 val DataDIModule = module {
-    single<UrlsRepository> { UrlsRepository(db = get(), coder = get()) }
+    single<UrlsRepository> { UrlsRepository(db = get()) }
     single<GlobalCounter> { GlobalCounter(db = get()) }
     single<UserRepository> { UserRepository(db = get()) }
 }

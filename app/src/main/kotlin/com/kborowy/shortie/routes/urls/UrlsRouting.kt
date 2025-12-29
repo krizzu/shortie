@@ -1,5 +1,6 @@
 package com.kborowy.shortie.routes.urls
 
+import com.kborowy.shortie.errors.BadRequestError
 import com.kborowy.shortie.errors.InternalServerError
 import com.kborowy.shortie.extensions.asInstantUTC
 import com.kborowy.shortie.extensions.receiveOrThrow
@@ -7,6 +8,7 @@ import com.kborowy.shortie.models.OriginalUrl
 import com.kborowy.shortie.plugins.withAdminAuth
 import com.kborowy.shortie.services.urls.UrlsService
 import io.ktor.server.application.Application
+import io.ktor.server.application.InvalidBodyException
 import io.ktor.server.response.respond
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
@@ -48,7 +50,7 @@ fun Application.urlsRouting() {
 
                     val data =
                         service.getShortCodes(limit, cursor)
-                            ?: throw InternalServerError("Could not read data")
+                            ?: throw BadRequestError("Could not decode cursor")
 
                     call.respond(
                         PaginatedShortieResponseDTO(
