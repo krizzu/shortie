@@ -13,7 +13,9 @@ import com.kborowy.shortie.models.ShortieUrl
 import com.kborowy.shortie.utils.PasswordHasher
 import com.kborowy.shortie.utils.ShortCodeGenerator
 import io.ktor.utils.io.CancellationException
+import java.nio.ByteBuffer
 import kotlin.io.encoding.Base64
+import kotlin.time.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.v1.exceptions.ExposedSQLException
@@ -143,17 +145,26 @@ private class RealUrlsService(
         return coder.generateShortCode(id)
     }
 
-    //
     private fun encodeCursor(cursor: ShortiePageCursorDTO): String {
-        val encoded = json.encodeToString(cursor)
-        return Base64.encode(encoded.toByteArray())
+        val buffer =
+            ByteBuffer.allocate(16)
+                .apply {
+                    putLong(cursor.createdAt.toEpochMilliseconds())
+                    putLong(cursor.id)
+                }
+                .array()
+
+        return Base64.UrlSafe.withPadding(Base64.PaddingOption.ABSENT).encode(buffer)
     }
 
-    //
     private fun decodeCursor(encoded: String): ShortiePageCursorDTO? {
         try {
-            val decoded = Base64.decode(encoded).decodeToString()
-            return json.decodeFromString<ShortiePageCursorDTO>(decoded)
+            val decoded = Base64.UrlSafe.withPadding(Base64.PaddingOption.ABSENT).decode(encoded)
+            val buffer = ByteBuffer.wrap(decoded)
+            return ShortiePageCursorDTO(
+                createdAt = Instant.fromEpochMilliseconds(buffer.getLong()),
+                id = buffer.getLong(),
+            )
         } catch (e: Exception) {
             log.error("failed to decode cursor (cursor=$encoded)", e)
             return null
