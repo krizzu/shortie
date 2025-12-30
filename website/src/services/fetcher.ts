@@ -47,7 +47,7 @@ async function refreshToken() {
       return null
     }
 
-    const result = await _fetch(new URL("auth/refresh", EnvVars.apiUrl), {
+    const result = await _fetch("auth/refresh", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

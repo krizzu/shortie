@@ -19,7 +19,7 @@ RUN gradle app:buildFatJar --no-daemon
 # todo: build pages (./scripts/build-pages.sh)
 
 
-FROM eclipse-temurin:21-jre-alpine AS runtime
+FROM eclipse-temurin:21-jre AS runtime
 EXPOSE 8080
 RUN mkdir /app
 COPY --from=build /shortie/app/build/libs/*.jar /app/shortie.jar
