@@ -1,6 +1,26 @@
 services:
-  # todo: upload shortie image to dockerhub once done development
-  # then use it here
+
+  api:
+    container_name: shortie-api
+    # todo: upload shortie image to dockerhub and use it here
+    restart: unless-stopped
+    build:
+      dockerfile: api.dockerfile
+    depends_on:
+      - db
+    environment:
+      APP_DB_URL: jdbc:postgresql://db:5432/${APP_DB_NAME}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD}
+      APP_DB_USER: ${APP_DB_USER}
+      APP_ID_ALPHABET: ${APP_ID_ALPHABET}
+      APP_ID_MIN_LENGTH: ${APP_ID_MIN_LENGTH}
+      APP_AUTH_SECRET: ${APP_AUTH_SECRET}
+      APP_AUTH_ISSUER: ${APP_AUTH_ISSUER}
+      APP_AUTH_AUDIENCE: ${APP_AUTH_AUDIENCE}
+      APP_AUTH_REALM: ${APP_AUTH_REALM}
+      APP_ADMIN_PASSWORD: ${APP_ADMIN_PASSWORD}
+      APP_ALLOW_CORS: ${APP_ALLOW_CORS}
+
   db:
     image: postgres
     container_name: shortie-db
@@ -11,10 +31,11 @@ services:
       POSTGRES_DB: ${APP_DB_NAME}
       POSTGRES_USER: ${APP_DB_USER}
       POSTGRES_PASSWORD: ${APP_DB_PASSWORD}
-    ports:
-      - "5432:5432"
+    #    exposed port if needed (for debug purposes)
+    #    ports:
+    #      - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${APP_DB_USER} -d ${APP_DB_NAME}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${APP_DB_USER} -d ${APP_DB_NAME}" ]
       interval: 1s
 volumes:
   postgres_data:

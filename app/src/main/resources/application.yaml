@@ -8,7 +8,7 @@ ktor:
   deployment:
     port: 8080
 
-  allowCORS: ${APP_ALLOW_CORS}
+  allowCORS: ${APP_ALLOW_CORS?:false}
 
 database:
   url: ${APP_DB_URL}

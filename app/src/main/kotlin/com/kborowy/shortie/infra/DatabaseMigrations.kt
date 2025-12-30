@@ -21,11 +21,10 @@ private fun createMigration(
     @Property("database.password") pass: String,
 ): Flyway =
     Flyway.configure()
-        .apply {
-            dataSource(url, user, pass)
-            locations("classpath:migrations")
-            baselineOnMigrate(true)
-        }
+        .dataSource(url, user, pass)
+        /** note: flyway 11 has issue with .locations so sit at latest 10 for now */
+        .locations("classpath:migrations")
+        .baselineOnMigrate(true)
         .load()
 
 fun Application.runDatabaseMigrations() {

@@ -15,6 +15,10 @@ version = "0.0.1"
 application { mainClass = "io.ktor.server.netty.EngineMain" }
 
 ktor {
+    fatJar {
+        archiveFileName.set("shortie.jar")
+    }
+
     openApi {
         title = "Shortie API"
         description = "Documentation for Shortie API"
