@@ -1,4 +1,3 @@
-# Stage 1: Cache Gradle dependencies
 FROM gradle:9-jdk21-ubi10 AS cache
 RUN mkdir -p /home/gradle/cache_home
 RUN mkdir -p /shortie
@@ -10,7 +9,6 @@ WORKDIR /shortie
 RUN gradle app:dependencies --no-daemon
 
 
-# Stage 2: Build Application
 FROM gradle:9-jdk21-ubi10 AS build
 COPY --from=cache /home/gradle/cache_home /home/gradle/.gradle
 COPY --chown=gradle:gradle . /shortie
@@ -21,7 +19,6 @@ RUN gradle app:buildFatJar --no-daemon
 # todo: build pages (./scripts/build-pages.sh)
 
 
-# Stage 3: Create the Runtime Image
 FROM eclipse-temurin:21-jre-alpine AS runtime
 EXPOSE 8080
 RUN mkdir /app

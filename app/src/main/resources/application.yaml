@@ -2,13 +2,10 @@ ktor:
   application:
     modules:
       - com.kborowy.shortie.ApplicationKt.app
-    dependencies:
-      - com.kborowy.shortie.infra.DatabaseMigrationsKt.provideMigration
-      - com.kborowy.shortie.infra.DatabaseConnectionKt.provideDatabase
   deployment:
     port: 8080
 
-  allowCORS: ${APP_ALLOW_CORS?:false}
+  allowCORS: ${APP_ALLOW_CORS:false}
 
 database:
   url: ${APP_DB_URL}
