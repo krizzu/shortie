@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { BadgeCheck } from "lucide-react"
+import { EnvVars } from "@/services/env-vars.ts"
 
 type Props = {
   link: string
@@ -16,7 +17,7 @@ type Props = {
 }
 
 export function CreatedLink({ link, onCreateNew, onShowList }: Props) {
-  const url = new URL(link, window.location.origin)
+  const url = new URL(link, EnvVars.apiUrl)
 
   return (
     <Card className="max-w-sm">

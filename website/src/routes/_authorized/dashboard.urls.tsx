@@ -9,9 +9,9 @@ export const Route = createFileRoute("/_authorized/dashboard/urls")({
   beforeLoad: () => ({
     pageTitle: "Links",
   }),
-  validateSearch: (raw) => {
+  validateSearch: (raw): { limit?: number; page?: string } => {
     return {
-      limit: isNaN(Number(raw["limit"])) ? 10 : Number(raw["limit"]),
+      limit: isNaN(Number(raw["limit"])) ? undefined : Number(raw["limit"]),
       page: raw["page"] ? String(raw["page"]) : undefined,
     }
   },

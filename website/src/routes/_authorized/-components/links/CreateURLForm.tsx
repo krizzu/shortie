@@ -231,7 +231,6 @@ export function CreateURLForm({ onSubmit }: Props) {
               </FieldGroup>
             </FieldSet>
           </div>
-
           <div>
             <FieldSeparator className="mb-4" />
             {/* Password Protection */}

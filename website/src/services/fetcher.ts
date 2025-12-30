@@ -25,9 +25,15 @@ async function _fetch(
     )
   }
 
+  if (result.redirected) {
+    window.location.replace(result.url)
+    return result
+  }
+
   if (!result.ok) {
     throw new HttpError(await result.text(), result.status, result.statusText)
   }
+
   return result
 }
 
@@ -63,7 +69,7 @@ async function refreshToken() {
   return refreshPromise
 }
 
-type RequestOptions = Pick<RequestInit, "method" | "headers"> & {
+type RequestOptions = Pick<RequestInit, "method" | "headers" | "redirect"> & {
   body?: RequestInit["body"] | Record<string, unknown>
   authorize?: boolean // if request should add auth token in Authorized header, default tot rue
   _retry?: boolean // internal flag indicating the request is retry request and should avoid token refresh
@@ -76,20 +82,40 @@ type FetchResult<T> = Pick<Response, "headers"> & {
 }
 export async function fetcher<T>(
   url: string,
-  options?: RequestOptions
+  options: RequestOptions = {}
 ): Promise<FetchResult<T>> {
-  const bodyPayload = options?.body ? JSON.stringify(options?.body) : undefined
-  const authorize = options?.authorize ?? true
+  const {
+    authorize = true,
+    body,
+    _retry,
+    method,
+    headers: restHeaders,
+    ...otherOptions
+  } = options
+  let bodyPayload: string | FormData | undefined
+
+  let type: Record<string, string> = {}
+  if (body) {
+    // do not set content-type for form data
+    if (body instanceof FormData) {
+      bodyPayload = body
+    } else {
+      type = { "Content-Type": "application/json" }
+      bodyPayload = JSON.stringify(body)
+    }
+  }
+
   const headers = {
-    ...options?.headers,
-    ...(options?.body ? { "Content-Type": "application/json" } : {}),
+    ...restHeaders,
+    ...type,
     ...(authorize
       ? { Authorization: `Bearer ${getTokens()?.accessToken}` }
       : {}),
   }
   try {
     const result = await _fetch(url, {
-      method: options?.method,
+      ...otherOptions,
+      method,
       body: bodyPayload,
       headers: headers,
     })
@@ -109,11 +135,15 @@ export async function fetcher<T>(
       throw new HttpError(`unknown http error: ${message}`, -1, message)
     }
 
-    if (e.unauthorized && !options?._retry) {
+    if (e.unauthorized && _retry) {
       try {
         const updated = await refreshToken()
         if (updated) {
-          return fetcher(url, { ...options, _retry: true, body: bodyPayload })
+          return await fetcher(url, {
+            ...options,
+            _retry: true,
+            body: bodyPayload,
+          })
         } else {
           clearTokens()
         }

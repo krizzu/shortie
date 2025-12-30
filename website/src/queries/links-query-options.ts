@@ -27,11 +27,14 @@ export const linksInfiniteQueryOptions = (limit: number = 25) =>
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
   })
 
-export const linksQueryOptions = (cursor: string | undefined, limit: number = 25) =>
+export const linksQueryOptions = (
+  cursor: string | undefined,
+  limit: number | undefined = 20
+) =>
   queryOptions({
-    queryKey: ["links-paginated", cursor, limit],
+    queryKey: ["links-paginated", cursor, limit ?? 20],
     queryFn: async () => {
-      let url = `/urls?limit=${limit}`
+      let url = `/urls?limit=${limit ?? 20}`
       if (cursor) {
         url += `&cursor=${encodeURIComponent(cursor)}`
       }
