@@ -5,19 +5,29 @@
  */
 type RuntimeEnv = {
   API_URL: string
+  API_BASE_URL: string
 }
 
 class Vars {
   envs = (window as any).__ENV__ as RuntimeEnv | undefined
 
-  get apiUrl(): string {
-    const buildFlag = import.meta.env.VITE_API_URL as string | undefined
-
+  readValue(name: string) {
+    const buildFlag = import.meta.env[`VITE_${name}`] as string | undefined
     const final = buildFlag ?? this.envs?.API_URL
+
     if (!final) {
-      throw new Error("API variable set!")
+      throw new Error(`variable ${name} not set!`)
     }
+
     return final
+  }
+
+  get apiUrl(): string {
+    return this.readValue("API_URL")
+  }
+
+  get apiBaseUrl(): string {
+    return this.readValue("API_BASE_URL")
   }
 }
 

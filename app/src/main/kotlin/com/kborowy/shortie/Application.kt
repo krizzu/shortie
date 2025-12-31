@@ -9,7 +9,6 @@ import com.kborowy.shortie.plugins.configureDI
 import com.kborowy.shortie.plugins.configureStatusPages
 import com.kborowy.shortie.plugins.configureTemplating
 import com.kborowy.shortie.routes.auth.authRouting
-import com.kborowy.shortie.routes.docsRouting
 import com.kborowy.shortie.routes.shortCodeRouting
 import com.kborowy.shortie.routes.staticContentRouting
 import com.kborowy.shortie.routes.urls.urlsRouting
@@ -33,7 +32,6 @@ fun Application.app() {
     runDatabaseMigrations()
 
     staticContentRouting()
-    docsRouting()
     urlsRouting()
     shortCodeRouting()
     authRouting()

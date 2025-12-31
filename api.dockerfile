@@ -15,12 +15,12 @@ COPY --chown=gradle:gradle . /shortie
 WORKDIR /shortie
 RUN gradle app:buildFatJar --no-daemon
 
-# todo: build docs (app:buildOpenApi)
 # todo: build pages (./scripts/build-pages.sh)
 
 
 FROM eclipse-temurin:21-jre AS runtime
 EXPOSE 8080
-RUN mkdir /app
-COPY --from=build /shortie/app/build/libs/*.jar /app/shortie.jar
-ENTRYPOINT ["java","-jar","/app/shortie.jar"]
+RUN mkdir /api
+COPY --from=build /shortie/app/build/libs/*.jar /api/shortie.jar
+#ENTRYPOINT ["java","-jar","/app/shortie.jar"]
+# todo: setup entry point for nginx, running ktor in background

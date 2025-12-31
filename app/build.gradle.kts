@@ -18,14 +18,6 @@ ktor {
     fatJar {
         archiveFileName.set("shortie.jar")
     }
-
-    openApi {
-        title = "Shortie API"
-        description = "Documentation for Shortie API"
-        version = "1.0"
-        target =
-            project.layout.projectDirectory.file("src/main/resources/openapi/documentation.json")
-    }
 }
 
 kotlin { compilerOptions { optIn.add("kotlin.time.ExperimentalTime") } }

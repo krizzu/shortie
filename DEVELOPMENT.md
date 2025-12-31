@@ -1,16 +1,8 @@
 
-# Docker
+## Docker
 
-## Building API
-
-```shell
-docker build -t krizzu/shortie-api:VERSION . -f api.dockerfile
-```
-
-
-## Building Dashboard
-
+Building image:
 
 ```shell
-docker build -t krizzu/shortie-dashboard:VERSION . -f dashboard.dockerfile
+docker build . -f ./docker/Dockerfile -t krizzu/shortie:latest
 ```

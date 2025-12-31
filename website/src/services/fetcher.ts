@@ -1,9 +1,5 @@
-import {
-  type AuthTokens,
-  clearTokens,
-  getTokens,
-  saveTokens,
-} from "./auth-tokens.ts"
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { type AuthTokens, clearTokens, getTokens, saveTokens, } from "./auth-tokens.ts"
 import { EnvVars } from "./env-vars.ts"
 
 async function _fetch(
@@ -12,12 +8,17 @@ async function _fetch(
 ): Promise<Response> {
   let result: Response
   try {
-    result = await fetch(
-      typeof input === "string" ? new URL(input, EnvVars.apiUrl) : input,
-      init
+    const base = endpointUrl(
+      new URL(relativePath(EnvVars.apiUrl), EnvVars.apiBaseUrl).href
     )
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let endpoint = input
+    if (typeof endpoint === "string") {
+      endpoint = new URL(relativePath(endpoint), base).href
+    }
+
+    result = await fetch(endpoint, init)
   } catch (e: any) {
+    console.error(e)
     throw new HttpError(
       `request failed: ${e.message ?? e}`,
       -1,
@@ -174,4 +175,13 @@ export class HttpError extends Error {
   get networkError(): boolean {
     return this.statusCode < 0
   }
+}
+
+function relativePath(path: string): string {
+  return path.startsWith("/") ? path.slice(1) : path
+}
+
+// path needs to end with trailing slash, otherwise it will be removed
+function endpointUrl(path: string): string {
+  return path.endsWith("/") ? path : `${path}/`
 }
