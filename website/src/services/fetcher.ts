@@ -8,9 +8,7 @@ async function _fetch(
 ): Promise<Response> {
   let result: Response
   try {
-    const base = endpointUrl(
-      new URL(relativePath(EnvVars.apiUrl), EnvVars.apiBaseUrl).href
-    )
+    const base = endpointUrl(EnvVars.apiUrl)
     let endpoint = input
     if (typeof endpoint === "string") {
       endpoint = new URL(relativePath(endpoint), base).href

@@ -20,6 +20,7 @@ import {
   PaginationNext,
 } from "@/components/ui/pagination.tsx"
 import TableLoadingSkeleton from "@/routes/_authorized/-components/links/TableLoadingSkeleton.tsx"
+import { EnvVars } from "@/services/env-vars.ts"
 
 type Props = {
   links: ShortieLink[]
@@ -68,6 +69,8 @@ export function LinksList({
 
             {!loading
               ? links.map((link) => {
+                  const url = EnvVars.redirectUrl(link.shortCode)
+
                   const isExpired =
                     link.expiryDate && new Date(link.expiryDate) < new Date()
 
@@ -76,7 +79,7 @@ export function LinksList({
                       {/* Short code */}
                       <TableCell className="h-6 font-medium">
                         <a
-                          href={`http://localhost:8080/${link.shortCode}`}
+                          href={url}
                           target="_blank"
                           rel="noreferrer"
                           className="text-primary hover:underline"

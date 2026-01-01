@@ -58,6 +58,9 @@ fun Application.shortCodeRouting() {
                 }
 
                 /**
+                 *
+                 * Receive a password and resolve to original url if resolved
+                 *
                  * @path short_code the short code to decode
                  * @body application/x-www-form-urlencoded Form data containing password to resolve
                  *   Shortie
