@@ -1,9 +1,10 @@
 #!/bin/sh
 
-
 set -e
 
-# substitute env variables
-envsubst < env.template.js > dist/env.js
+# run api in background
+# todo: make sure to restart if stopped
+java -jar /app/shortie.jar &
 
-sleep infinity
+# detached nginx
+exec nginx -g "daemon off;"

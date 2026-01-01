@@ -6,7 +6,7 @@ A link shortening application build with Ktor.
 
 ## Requirements
 
-- JDK 17
+- JDK 21
 - Node 22+
 
 ### Libraries
@@ -49,14 +49,6 @@ Static content is generated from `website` project. Node 22+ is required to run 
 
 - install dependencies in `website` via `yarn install`
 - run `./scripts/build-pages.sh` to build and copy assets into proper directories
-
-### Rebuild OpenAPI documentation
-
-OpenAPI is server at `/docs`. To regenerate it, run:
-
-```shell
-./gradlew :app:buildOpenApi
-```
 
 ## License
 
