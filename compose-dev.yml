@@ -18,7 +18,7 @@ services:
   nginx:
     image: nginx:1.29.4-alpine
     ports:
-      - "4000:80"
+      - "$APP_PROXY_PORT:80"
       - "4001:81"
     restart: unless-stopped
     volumes:

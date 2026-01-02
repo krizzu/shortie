@@ -10,6 +10,7 @@ import com.kborowy.shortie.plugins.HtmlTemplates
 import com.kborowy.shortie.services.urls.UrlsService
 import io.ktor.http.appendPathSegments
 import io.ktor.server.application.Application
+import io.ktor.server.plugins.origin
 import io.ktor.server.request.receiveParameters
 import io.ktor.server.response.respondRedirect
 import io.ktor.server.routing.RoutingContext
@@ -17,11 +18,13 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
+import org.koin.core.qualifier.named
 import org.koin.ktor.ext.inject
 
 fun Application.shortCodeRouting() {
     routing {
         val service by inject<UrlsService>()
+        val proxyPort: Int? by inject(qualifier = named("proxy_port"))
         /** "Shortie" resolving */
         route("/{short_code}") {
 
@@ -38,6 +41,8 @@ fun Application.shortCodeRouting() {
                 if (shortie.protected) {
                     // redirect to allow user enter password
                     return@get call.respondRedirect(permanent = false) {
+                        port = proxyPort ?: call.request.origin.serverPort
+                        host = call.request.origin.serverHost
                         appendPathSegments("password")
                     }
                 }
@@ -58,7 +63,6 @@ fun Application.shortCodeRouting() {
                 }
 
                 /**
-                 *
                  * Receive a password and resolve to original url if resolved
                  *
                  * @path short_code the short code to decode
