@@ -1,6 +1,7 @@
 package com.kborowy.shortie.plugins
 
 import com.github.mustachejava.DefaultMustacheFactory
+import com.kborowy.shortie.models.ShortCode
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.mustache.Mustache
@@ -16,6 +17,8 @@ sealed class HtmlTemplates(val file: String) {
 }
 
 fun HtmlTemplates.NotFound.model(page: String) = mapOf("page" to page)
+
+fun HtmlTemplates.Password.model(shortCode: ShortCode) = mapOf("shortCode" to shortCode.value)
 
 fun Application.configureTemplating() {
     install(Mustache) { mustacheFactory = DefaultMustacheFactory("templates") }

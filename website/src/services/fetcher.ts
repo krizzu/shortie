@@ -80,7 +80,7 @@ type FetchResult<T> = Pick<Response, "headers"> & {
   statusCode: number
 }
 export async function fetcher<T>(
-  url: string,
+  url: string | URL,
   options: RequestOptions = {}
 ): Promise<FetchResult<T>> {
   const {

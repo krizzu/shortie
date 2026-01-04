@@ -16,6 +16,7 @@ import { fetcher, HttpError } from "@/services/fetcher.ts"
 // eslint-disable-next-line react-refresh/only-export-components
 const PasswordForm = () => {
   const shortCode = readShortCode()
+  const endpoint = new URL(`${shortCode}/password`, window.location.origin)
   const [pending, setPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
@@ -29,7 +30,7 @@ const PasswordForm = () => {
     setSuccess(false)
 
     try {
-      await fetcher(`/${shortCode}/password`, {
+      await fetcher(endpoint.href, {
         method: "POST",
         body: data,
         redirect: "follow",
@@ -93,12 +94,14 @@ const PasswordForm = () => {
   )
 }
 
-function readShortCode(): string | null {
-  const element = document.getElementById("root")
-  if (!element) {
-    return null
+function readShortCode(): string {
+  const element = document.getElementById("root")!
+
+  const code = element.getAttribute("data-shortCode")
+  if (!code) {
+    throw new Error("No shortcode injected")
   }
-  return element.getAttribute("data-shortCode")
+  return code
 }
 
 // Render the app

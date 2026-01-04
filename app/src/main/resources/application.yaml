@@ -4,7 +4,7 @@ ktor:
       - com.kborowy.shortie.ApplicationKt.app
   deployment:
     port: 8080
-    proxyPort: ${APP_PROXY_PORT:80}
+    proxyPort: ${APP_API_PROXY_PORT:80}
 
   allowCORS: ${APP_ALLOW_CORS:false}
 
