@@ -9,7 +9,7 @@ import com.kborowy.shortie.plugins.configureDI
 import com.kborowy.shortie.plugins.configureStatusPages
 import com.kborowy.shortie.plugins.configureTemplating
 import com.kborowy.shortie.routes.auth.authRouting
-import com.kborowy.shortie.routes.shortCodeRouting
+import com.kborowy.shortie.routes.redirect.redirectRouting
 import com.kborowy.shortie.routes.staticContentRouting
 import com.kborowy.shortie.routes.urls.urlsRouting
 import io.ktor.server.application.Application
@@ -33,6 +33,6 @@ fun Application.app() {
 
     staticContentRouting()
     urlsRouting()
-    shortCodeRouting()
+    redirectRouting()
     authRouting()
 }

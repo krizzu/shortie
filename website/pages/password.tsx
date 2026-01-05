@@ -30,15 +30,17 @@ const PasswordForm = () => {
     setSuccess(false)
 
     try {
-      await fetcher(endpoint.href, {
+      const result = await fetcher<{ redirectUrl: string }>(endpoint.href, {
         method: "POST",
         body: data,
-        redirect: "follow",
         headers: {
           "Access-Control-Allow-Origin": "*", // allow to redirect
         },
       })
       setSuccess(true)
+      if (result.data) {
+        window.location.replace(result.data.redirectUrl)
+      }
     } catch (e: unknown) {
       if (!(e instanceof HttpError)) {
         return alert(e)

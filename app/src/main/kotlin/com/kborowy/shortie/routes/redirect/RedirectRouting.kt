@@ -1,4 +1,4 @@
-package com.kborowy.shortie.routes
+package com.kborowy.shortie.routes.redirect
 
 import com.kborowy.shortie.errors.BadRequestError
 import com.kborowy.shortie.errors.GoneHttpError
@@ -13,6 +13,7 @@ import io.ktor.http.appendPathSegments
 import io.ktor.server.application.Application
 import io.ktor.server.plugins.origin
 import io.ktor.server.request.receiveParameters
+import io.ktor.server.response.respond
 import io.ktor.server.response.respondRedirect
 import io.ktor.server.routing.RoutingContext
 import io.ktor.server.routing.get
@@ -22,7 +23,7 @@ import io.ktor.server.routing.routing
 import org.koin.core.qualifier.named
 import org.koin.ktor.ext.inject
 
-fun Application.shortCodeRouting() {
+fun Application.redirectRouting() {
     routing {
         val service by inject<UrlsService>()
         val proxyPort: Int? by inject(qualifier = named("proxy_port"))
@@ -82,7 +83,9 @@ fun Application.shortCodeRouting() {
                     val password = form["password"] ?: throw BadRequestError("password missing")
 
                     if (service.verifyShortCode(shortie.shortCode, password)) {
-                        call.respondRedirect(shortie.originalUrl.value, permanent = false)
+                        call.respond<ShortiePasswordResponseDTO>(
+                            ShortiePasswordResponseDTO(shortie.originalUrl.value)
+                        )
                     } else {
                         throw NotFoundHttpError("link not found")
                     }
