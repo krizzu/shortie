@@ -1,10 +1,20 @@
-#!/bin/sh
+#!/usr/bin/env bash
+set -euo pipefail
 
-set -e
-
-# run api in background
-# todo: make sure to restart if stopped
 java -jar /app/shortie.jar &
+KTOR_PID=$!
 
-# detached nginx
-exec nginx -g "daemon off;"
+nginx -g "daemon off;" &
+NGINX_PID=$!
+
+# on sigterm, kill nginx and ktor - forward sigterm
+trap 'kill $KTOR_PID $NGINX_PID; wait; exit 0' TERM INT
+# wait until any process exits
+wait -n "$KTOR_PID" "$NGINX_PID"
+
+# stop other process, ignoring kill errors
+kill "$KTOR_PID" "$NGINX_PID" 2>/dev/null || true
+wait 2>/dev/null || true
+
+
+exit 1

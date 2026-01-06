@@ -11,7 +11,7 @@ docker compose -f compose-dev.yml up -d
 - Run dashboard in dev mode:
 
 ```shell
-cd website && yarn dev
+cd frontend && yarn dev
 ```
 
 - Run api app:

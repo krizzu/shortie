@@ -19,9 +19,9 @@ hash:
 
 auth:
   secret: ${APP_AUTH_SECRET}
-  issuer: ${APP_AUTH_ISSUER:shortie}
-  audience: ${APP_AUTH_AUDIENCE:admin}
-  realm: ${APP_AUTH_REALM:dashboard}
+  issuer: ${APP_AUTH_ISSUER:shortie-api}
+  audience: ${APP_AUTH_AUDIENCE:shortie-user}
+  realm: shortie-dashboard
 
 admin:
   password: ${APP_ADMIN_PASSWORD}

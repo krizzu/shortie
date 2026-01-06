@@ -2,7 +2,7 @@
 set -euo pipefail
 
 
-WEBSITE_PROJECT="website"
+FRONTEND_PROJECT="frontend"
 WEBSITE_BUILD_COMMAND="yarn build:pages"
 TEMPLATE_DIR="app/src/main/resources/templates"
 ASSETS_DIR="app/src/main/resources/assets"
@@ -16,8 +16,8 @@ assertRoot() {
 }
 
 assertNodeModules() {
-  if [ ! -d "$WEBSITE_PROJECT/node_modules" ]; then
-    echo "Cannot find node_modules in $WEBSITE_PROJECT/node_modules - did you run 'yarn install'?"
+  if [ ! -d "$FRONTEND_PROJECT/node_modules" ]; then
+    echo "Cannot find node_modules in $FRONTEND_PROJECT/node_modules - did you run 'yarn install'?"
     exit 1
   fi
 }
@@ -26,7 +26,7 @@ assertNodeModules() {
 buildPages() {
   echo "Building pages..."
   (
-    cd "$WEBSITE_PROJECT"
+    cd "$FRONTEND_PROJECT"
     $WEBSITE_BUILD_COMMAND
   )
 }
@@ -35,14 +35,14 @@ copyPagesToTemplates() {
   echo "Copying pages to $TEMPLATE_DIR"
   rm -rf "$TEMPLATE_DIR"
   mkdir -p "$TEMPLATE_DIR"
-  cp $WEBSITE_PROJECT/dist-pages/pages/*.html "$TEMPLATE_DIR"
+  cp $FRONTEND_PROJECT/dist-pages/pages/*.html "$TEMPLATE_DIR"
 }
 
 copyAssets() {
   echo "Copying assets to $ASSETS_DIR"
   rm -rf "$ASSETS_DIR"
   mkdir -p "$ASSETS_DIR"
-  cp -r "$WEBSITE_PROJECT/dist-pages/assets/." "$ASSETS_DIR"
+  cp -r "$FRONTEND_PROJECT/dist-pages/assets/." "$ASSETS_DIR"
 }
 
 

@@ -1,7 +1,6 @@
 services:
   db:
     image: postgres
-    container_name: shortie-db
     restart: always
     volumes:
       - postgres_data:/var/lib/postgresql
@@ -18,44 +17,11 @@ services:
   nginx:
     image: nginx:1.29.4-alpine
     ports:
-      - "$APP_PROXY_PORT:80"
+      - "$APP_API_PROXY_PORT:80"
       - "4001:81"
     restart: unless-stopped
     volumes:
       - ./nginx/dev.conf:/etc/nginx/conf.d/default.conf:ro
-#
-#  api:
-#    container_name: shortie-api
-#    # todo: upload shortie image to dockerhub and use it here
-#    restart: unless-stopped
-#    build:
-#      dockerfile: api.dockerfile
-#    depends_on:
-#      - db
-#    environment:
-#      APP_DB_URL: jdbc:postgresql://db:5432/${APP_DB_NAME}
-#      APP_DB_PASSWORD: ${APP_DB_PASSWORD}
-#      APP_DB_USER: ${APP_DB_USER}
-#      APP_ID_ALPHABET: ${APP_ID_ALPHABET}
-#      APP_ID_MIN_LENGTH: ${APP_ID_MIN_LENGTH}
-#      APP_AUTH_SECRET: ${APP_AUTH_SECRET}
-#      APP_AUTH_ISSUER: ${APP_AUTH_ISSUER}
-#      APP_AUTH_AUDIENCE: ${APP_AUTH_AUDIENCE}
-#      APP_AUTH_REALM: ${APP_AUTH_REALM}
-#      APP_ADMIN_PASSWORD: ${APP_ADMIN_PASSWORD}
-#      APP_ALLOW_CORS: ${APP_ALLOW_CORS}
-#
-#  dashboard:
-#    container_name: shortie-dashboard
-#    restart: no
-#    build:
-#      dockerfile: dashboard.dockerfile
-#    environment:
-#      API_BASE_URL: http://localhost
-#      API_URL: /api
-#    volumes:
-#      - dashboard_dist:/dist
-
 
 volumes:
   postgres_data:
