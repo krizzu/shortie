@@ -4,18 +4,28 @@ import { linksQueryOptions } from "@/queries/links-query-options.ts"
 import { useQuery } from "@tanstack/react-query"
 import { Error } from "@/components/Error.tsx"
 
+const DEFAULT_LIMIT = 10
+
 export const Route = createFileRoute("/_authorized/dashboard/urls")({
   component: LinksPage,
   beforeLoad: () => ({
     pageTitle: "Links",
   }),
-  validateSearch: (raw): { limit?: number; page?: string } => {
+  validateSearch: (
+    raw
+  ): { limit?: number; page?: string; previous?: string[] } => {
     return {
-      limit: isNaN(Number(raw["limit"])) ? undefined : Number(raw["limit"]),
+      limit: isNaN(Number(raw["limit"])) ? DEFAULT_LIMIT : Number(raw["limit"]),
       page: raw["page"] ? String(raw["page"]) : undefined,
+      previous: raw["previous"]
+        ? String(raw["previous"]).split(",")
+        : undefined,
     }
   },
-  loaderDeps: ({ search }) => ({ limit: search.limit, page: search.page }),
+  loaderDeps: ({ search }) => ({
+    limit: search.limit,
+    page: search.page,
+  }),
   loader: ({ context, deps }) =>
     context.queryClient.ensureQueryData(
       linksQueryOptions(deps.page, deps.limit)
@@ -24,16 +34,48 @@ export const Route = createFileRoute("/_authorized/dashboard/urls")({
 
 function LinksPage() {
   const deps = Route.useLoaderDeps()
-  const router = useRouter()
+  const search = Route.useSearch()
   const linksQuery = useQuery(linksQueryOptions(deps.page, deps.limit))
+  const router = useRouter()
   const navigate = Route.useNavigate()
+
+  const hasPreviousPage = (search.previous?.length ?? 0) > 0
+  const previousButtonActive =
+    hasPreviousPage || (!hasPreviousPage && search.page)
 
   function navigateToCreate() {
     navigate({ to: "/dashboard/urls/create" })
   }
 
+  function navigateToPreviousPage() {
+    navigate({
+      to: "/dashboard/urls",
+      search: (cur) => {
+        const [toPage, ...restPages] = cur.previous ?? []
+
+        return {
+          ...cur,
+          page: toPage || undefined,
+          previous: restPages.length ? restPages : undefined,
+        }
+      },
+    })
+  }
+
   function navigateToNextPage(page: string) {
-    navigate({ to: "/dashboard/urls", search: (cur) => ({ ...cur, page }) })
+    navigate({
+      to: "/dashboard/urls",
+      search: (cur) => {
+        const history = cur.previous ?? []
+        const newHistory = cur.page ? [cur.page, ...history] : history
+
+        return {
+          ...cur,
+          previous: newHistory.length ? newHistory : undefined,
+          page,
+        }
+      },
+    })
   }
 
   if (linksQuery.error) {
@@ -52,13 +94,21 @@ function LinksPage() {
   return (
     <LinksList
       links={data?.data ?? []}
-      hasMore={data?.hasNext ?? false}
       loading={linksQuery.isLoading}
-      fetchNextPage={() => {
-        if (data?.nextCursor) {
-          navigateToNextPage(data.nextCursor)
-        }
-      }}
+      fetchNextPage={
+        data?.nextCursor
+          ? () => {
+              navigateToNextPage(data.nextCursor!)
+            }
+          : null
+      }
+      goToPreviousPage={
+        previousButtonActive
+          ? () => {
+              navigateToPreviousPage()
+            }
+          : null
+      }
       onCreateLink={navigateToCreate}
     />
   )

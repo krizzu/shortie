@@ -18,6 +18,7 @@ import {
   PaginationContent,
   PaginationItem,
   PaginationNext,
+  PaginationPrevious,
 } from "@/components/ui/pagination.tsx"
 import TableLoadingSkeleton from "@/routes/_authorized/-components/links/TableLoadingSkeleton.tsx"
 import { EnvVars } from "@/services/env-vars.ts"
@@ -25,24 +26,38 @@ import { EnvVars } from "@/services/env-vars.ts"
 type Props = {
   links: ShortieLink[]
   loading: boolean
-  hasMore: boolean
   onCreateLink: () => void
-  fetchNextPage: () => void
+  fetchNextPage: (() => void) | null
+  goToPreviousPage: (() => void) | null
 }
 
 export function LinksList({
   onCreateLink,
   links,
-  hasMore,
   loading,
   fetchNextPage,
+  goToPreviousPage,
 }: Props) {
   return (
     <div className="space-y-6 pb-6">
-      <div>
+      <div className="flex flex-row gap-x-16">
         <Button onClick={onCreateLink} variant="default">
           <Plus /> Add new
         </Button>
+
+        <div className="flex flex-row gap-x-6">
+          {goToPreviousPage ? (
+            <div>
+              <PageButton type="previous" onClick={goToPreviousPage} />
+            </div>
+          ) : null}
+
+          {fetchNextPage ? (
+            <div>
+              <PageButton type="next" onClick={fetchNextPage} />
+            </div>
+          ) : null}
+        </div>
       </div>
 
       <div>
@@ -126,22 +141,24 @@ export function LinksList({
               : null}
           </TableBody>
         </Table>
-        {hasMore ? (
-          <div className="mt-8">
-            <NextPage onClick={() => fetchNextPage()} />
-          </div>
-        ) : null}
       </div>
     </div>
   )
 }
 
-function NextPage({ onClick }: { onClick: () => void }) {
+function PageButton({
+  onClick,
+  type,
+}: {
+  type: "next" | "previous"
+  onClick: () => void
+}) {
+  const Element = type === "previous" ? PaginationPrevious : PaginationNext
   return (
     <Pagination>
       <PaginationContent>
         <PaginationItem>
-          <PaginationNext onClick={onClick} />
+          <Element onClick={onClick} />
         </PaginationItem>
       </PaginationContent>
     </Pagination>
