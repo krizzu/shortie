@@ -8,7 +8,7 @@ import com.kborowy.shortie.errors.UnexpectedAppError
 import com.kborowy.shortie.extensions.isInPast
 import com.kborowy.shortie.models.OriginalUrl
 import com.kborowy.shortie.models.ShortCode
-import com.kborowy.shortie.models.ShortiePageCursorDTO
+import com.kborowy.shortie.models.ShortiePageCursor
 import com.kborowy.shortie.models.ShortieUrl
 import com.kborowy.shortie.utils.PasswordHasher
 import com.kborowy.shortie.utils.ShortCodeGenerator
@@ -17,7 +17,6 @@ import java.nio.ByteBuffer
 import kotlin.io.encoding.Base64
 import kotlin.time.Instant
 import kotlinx.datetime.LocalDateTime
-import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.v1.exceptions.ExposedSQLException
 import org.postgresql.util.PSQLException
 import org.slf4j.LoggerFactory
@@ -26,8 +25,7 @@ fun UrlsService(
     repo: UrlsRepository,
     counter: GlobalCounter,
     coder: ShortCodeGenerator,
-    json: Json,
-): UrlsService = RealUrlsService(repo, counter, coder, json)
+): UrlsService = RealUrlsService(repo, counter, coder)
 
 interface UrlsService {
     suspend fun generateShortie(
@@ -41,18 +39,15 @@ interface UrlsService {
 
     suspend fun resolveShortCode(code: String): ShortieUrl?
 
-    /** If shortie is protected, check if provided password match */
-    suspend fun verifyShortCode(shortCode: ShortCode, password: String): Boolean
+    suspend fun verifyPassword(shortCode: ShortCode, password: String): Boolean
 
-    /** next cursor is base62 encoded [ShortiePageCursorDTO] */
-    suspend fun getShortCodes(limit: Int, nextCursor: String?): ShortieUrlPaginatedEncoded?
+    suspend fun getShorties(limit: Int, nextCursor: String?): ShortieUrlPaginatedEncoded?
 }
 
 private class RealUrlsService(
     private val repo: UrlsRepository,
     private val counter: GlobalCounter,
     private val coder: ShortCodeGenerator,
-    private val json: Json,
 ) : UrlsService {
     private val log = LoggerFactory.getLogger("UrlsService")
 
@@ -106,7 +101,7 @@ private class RealUrlsService(
         }
     }
 
-    override suspend fun verifyShortCode(shortCode: ShortCode, password: String): Boolean {
+    override suspend fun verifyPassword(shortCode: ShortCode, password: String): Boolean {
         val shortieHash = repo.getHashForCode(shortCode)
         requireNotNull(shortieHash) { "code \"${shortCode.value}\" not found" }
         val result = PasswordHasher.verify(password, shortieHash)
@@ -115,10 +110,7 @@ private class RealUrlsService(
         return result
     }
 
-    override suspend fun getShortCodes(
-        limit: Int,
-        nextCursor: String?,
-    ): ShortieUrlPaginatedEncoded? {
+    override suspend fun getShorties(limit: Int, nextCursor: String?): ShortieUrlPaginatedEncoded? {
         val cursor =
             nextCursor?.let {
                 // return null as whole operation
@@ -126,7 +118,7 @@ private class RealUrlsService(
             }
 
         try {
-            val result = repo.getPaginated(limit, cursor)
+            val result = repo.getPage(limit, cursor)
             return ShortieUrlPaginatedEncoded(
                 data = result.data,
                 hasNext = result.hasNext,
@@ -145,7 +137,7 @@ private class RealUrlsService(
         return coder.generateShortCode(id)
     }
 
-    private fun encodeCursor(cursor: ShortiePageCursorDTO): String {
+    private fun encodeCursor(cursor: ShortiePageCursor): String {
         val buffer =
             ByteBuffer.allocate(16)
                 .apply {
@@ -157,11 +149,11 @@ private class RealUrlsService(
         return Base64.UrlSafe.withPadding(Base64.PaddingOption.ABSENT).encode(buffer)
     }
 
-    private fun decodeCursor(encoded: String): ShortiePageCursorDTO? {
+    private fun decodeCursor(encoded: String): ShortiePageCursor? {
         try {
             val decoded = Base64.UrlSafe.withPadding(Base64.PaddingOption.ABSENT).decode(encoded)
             val buffer = ByteBuffer.wrap(decoded)
-            return ShortiePageCursorDTO(
+            return ShortiePageCursor(
                 createdAt = Instant.fromEpochMilliseconds(buffer.getLong()),
                 id = buffer.getLong(),
             )

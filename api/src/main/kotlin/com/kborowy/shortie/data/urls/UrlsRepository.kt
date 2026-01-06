@@ -4,7 +4,7 @@ import com.kborowy.shortie.extensions.asInstantUTC
 import com.kborowy.shortie.extensions.toLocalDateTimeUTC
 import com.kborowy.shortie.models.OriginalUrl
 import com.kborowy.shortie.models.ShortCode
-import com.kborowy.shortie.models.ShortiePageCursorDTO
+import com.kborowy.shortie.models.ShortiePageCursor
 import com.kborowy.shortie.models.ShortieUrl
 import kotlinx.datetime.LocalDateTime
 import org.jetbrains.exposed.v1.core.ResultRow
@@ -34,9 +34,9 @@ interface UrlsRepository {
 
     suspend fun getHashForCode(shortCode: ShortCode): String?
 
-    suspend fun getPaginated(
+    suspend fun getPage(
         limit: Int = 25,
-        nextCursor: ShortiePageCursorDTO? = null,
+        nextCursor: ShortiePageCursor? = null,
     ): ShortieUrlPaginated
 }
 
@@ -85,9 +85,9 @@ private class RealUrlsRepository(private val db: Database) : UrlsRepository {
                 ?.getOrNull(UrlsTable.passwordHash)
         }
 
-    override suspend fun getPaginated(
+    override suspend fun getPage(
         limit: Int,
-        nextCursor: ShortiePageCursorDTO?,
+        nextCursor: ShortiePageCursor?,
     ): ShortieUrlPaginated {
 
         return transaction(db) {
@@ -110,10 +110,10 @@ private class RealUrlsRepository(private val db: Database) : UrlsRepository {
 
             val items = rows.take(limit)
             val hasMore = rows.size > limit
-            val next: ShortiePageCursorDTO? =
+            val next: ShortiePageCursor? =
                 items.lastOrNull()?.let {
                     if (hasMore) {
-                        ShortiePageCursorDTO(
+                        ShortiePageCursor(
                             it[UrlsTable.id].value,
                             createdAt = it[UrlsTable.createdAt].asInstantUTC,
                         )

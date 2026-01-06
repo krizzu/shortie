@@ -90,11 +90,11 @@ class UrlsServiceTest {
         assertTrue(shortie.protected, "shortie had a password so should be protected")
 
         assertFalse("passwords should not match") {
-            service.verifyShortCode(shortie.shortCode, "my wrong password")
+            service.verifyPassword(shortie.shortCode, "my wrong password")
         }
 
         assertTrue("passwords should match") {
-            service.verifyShortCode(shortie.shortCode, password)
+            service.verifyPassword(shortie.shortCode, password)
         }
     }
 
