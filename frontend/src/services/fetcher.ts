@@ -70,7 +70,7 @@ async function refreshToken() {
 
 type RequestOptions = Pick<RequestInit, "method" | "headers" | "redirect"> & {
   body?: RequestInit["body"] | Record<string, unknown>
-  authorize?: boolean // if request should add auth token in Authorized header, default tot rue
+  authorize?: boolean // if request should add auth token in Authorized header, defaults to true
   _retry?: boolean // internal flag indicating the request is retry request and should avoid token refresh
 }
 
@@ -134,7 +134,7 @@ export async function fetcher<T>(
       throw new HttpError(`unknown http error: ${message}`, -1, message)
     }
 
-    if (e.unauthorized && _retry) {
+    if (e.unauthorized && !_retry) {
       try {
         const updated = await refreshToken()
         if (updated) {
