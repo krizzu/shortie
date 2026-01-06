@@ -1,6 +1,7 @@
 services:
   db:
     image: postgres
+    container_name: db
     restart: always
     volumes:
       - postgres_data:/var/lib/postgresql
@@ -13,9 +14,8 @@ services:
       interval: 1s
 
   shortie:
-    # todo: upload shortie image to dockerhub and use it here
-    build:
-      dockerfile: ./docker/Dockerfile
+    image: krizzu/shortie:0.0.1-dev.02
+    container_name: app
     restart: unless-stopped
     ports:
       - "80:80"
