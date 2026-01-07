@@ -4,7 +4,6 @@ import com.kborowy.shortie.data.users.DEFAULT_ADMIN_NAME
 import com.kborowy.shortie.data.users.UsersTable
 import com.kborowy.shortie.utils.PasswordHasher
 import io.ktor.server.application.Application
-import io.ktor.server.plugins.di.annotations.Property
 import org.flywaydb.core.Flyway
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.Database
@@ -15,19 +14,18 @@ import org.koin.ktor.ext.inject
 
 const val MIGRATIONS_DIRECTORY = "src/main/resources/migrations"
 
-private fun createMigration(
-    @Property("database.url") url: String,
-    @Property("database.user") user: String,
-    @Property("database.password") pass: String,
-): Flyway =
+private fun createMigration(url: String, user: String, pass: String): Flyway =
     Flyway.configure()
         .dataSource(url, user, pass)
         /** note: flyway 11 has issue with .locations so sit at latest 10 for now */
         .locations("classpath:migrations")
+        .validateMigrationNaming(true)
         .baselineOnMigrate(true)
         .load()
 
 fun Application.runDatabaseMigrations() {
+
+    // todo: construct db url by hand, rather than passing an extra url
     val url = environment.config.property("database.url").getString()
     val user = environment.config.property("database.user").getString()
     val pass = environment.config.property("database.password").getString()

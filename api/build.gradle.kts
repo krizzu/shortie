@@ -1,5 +1,6 @@
 @file:OptIn(OpenApiPreview::class)
 
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import io.ktor.plugin.OpenApiPreview
 
 plugins {
@@ -14,10 +15,12 @@ version = "0.0.1"
 
 application { mainClass = "io.ktor.server.netty.EngineMain" }
 
-ktor {
-    fatJar {
-        archiveFileName.set("shortie.jar")
-    }
+ktor { fatJar { archiveFileName.set("shortie.jar") } }
+
+// merge service files, so flyway can correctly find and apply migrations
+tasks.withType<ShadowJar> {
+    mergeServiceFiles()
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
 kotlin { compilerOptions { optIn.add("kotlin.time.ExperimentalTime") } }
