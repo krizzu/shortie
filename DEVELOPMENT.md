@@ -1,27 +1,43 @@
 # Local development
 
-## Running build:
+## Running locally
 
-- Run compose-dev to start database and nginx server:
+Local development give you access to dashboard at port 4001, api at 4000.
+
+To run it locally, you have to:
+
+- set up env variable in root (copy from .env-example)
+- run dev containers (nginx and db)
+- run frontend
+- run api
+
+### Running dev containers
+
+Simply run docker compose:
 
 ```shell
 docker compose -f compose-dev.yml up -d
 ```
 
-- Run dashboard in dev mode:
+### Running frontend
 
-```shell
-cd frontend && yarn dev
-```
+Inside `frontend` directory:
 
-- Run api app:
+- install dependencies with `yarn`
+- run vite project via `yarn dev` (make sure it runs at port 5137)
+
+### Running api
 
 todo
 
-## Docker
+## Build and deploy dev builds
 
-Building image:
+`deploy-docker-dev` script builds and deploys `dev` tags of the app.
+
+Run it, passing in semantic version:
 
 ```shell
-docker build . -f ./docker/Dockerfile -t krizzu/shortie:VERSION
+./scripts/deploy-docker-dev.sh 1.2.3
 ```
+
+
