@@ -14,12 +14,12 @@ services:
       interval: 1s
 
   shortie:
-    image: krizzu/shortie:0.0.1-dev
+    image: krizzu/shortie:dev
     container_name: app
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "81:81"
+      - "80:80" # api port
+      - "81:81" # dashboard port
     depends_on:
       - db
     environment:
@@ -29,6 +29,10 @@ services:
       APP_ID_ALPHABET: ${APP_ID_ALPHABET}
       APP_AUTH_SECRET: ${APP_AUTH_SECRET}
       APP_ADMIN_PASSWORD: ${APP_ADMIN_PASSWORD}
+
+      # keep this in sync with exposed api port on host for proper redirections
+      # default to 80
+      #APP_API_PROXY_PORT: 4000
 
 volumes:
   postgres_data:

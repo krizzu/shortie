@@ -8,15 +8,16 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { BadgeCheck } from "lucide-react"
+import { EnvVars } from "@/services/env-vars.ts"
 
 type Props = {
-  link: string
+  shortCode: string
   onCreateNew: () => void
   onShowList: () => void
 }
 
-export function CreatedLink({ link, onCreateNew, onShowList }: Props) {
-  const url = new URL(link, window.location.origin)
+export function CreatedLink({ shortCode, onCreateNew, onShowList }: Props) {
+  const url = EnvVars.redirectUrl(shortCode)
 
   return (
     <Card className="max-w-sm">
@@ -25,12 +26,12 @@ export function CreatedLink({ link, onCreateNew, onShowList }: Props) {
           <BadgeCheck className="text-primary size-32" />
         </div>
         <CardTitle>
-          URL created: <span className="text-primary">{link}</span>
+          URL created: <span className="text-primary">{shortCode}</span>
         </CardTitle>
         <CardDescription>
           You can now visit it at{" "}
-          <a href={url.href} className="text-primary hover:underline">
-            {url.href}
+          <a href={url} className="text-primary hover:underline">
+            {url}
           </a>
         </CardDescription>
       </CardHeader>

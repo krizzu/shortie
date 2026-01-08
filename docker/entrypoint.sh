@@ -1,20 +1,27 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-java -jar /app/shortie.jar &
-KTOR_PID=$!
+# replace dynamic variables in dashboard/index.html file
+export APP_API_PROXY_PORT="${APP_API_PROXY_PORT:-80}"
+envsubst '$APP_API_PROXY_PORT' < dashboard/index.html > dashboard/index.out.html
+mv dashboard/index.out.html dashboard/index.html
 
 nginx -g "daemon off;" &
 NGINX_PID=$!
+echo "nginx started in background (pid=$NGINX_PID)"
 
-# on sigterm, kill nginx and ktor - forward sigterm
-trap 'kill $KTOR_PID $NGINX_PID; wait; exit 0' TERM INT
-# wait until any process exits
-wait -n "$KTOR_PID" "$NGINX_PID"
+# Define a function to catch ANY signal and send TERM to Java
+terminate() {
+  echo "Signal received, terminating api"
+  kill -TERM "$KTOR_PID" 2>/dev/null
+  # Wait a moment for Ktor to finish
+  wait "$KTOR_PID"
+  exit 0
+}
 
-# stop other process, ignoring kill errors
-kill "$KTOR_PID" "$NGINX_PID" 2>/dev/null || true
-wait 2>/dev/null || true
+trap terminate TERM INT QUIT # catch quit and int signals
+java -jar /app/shortie.jar &
+KTOR_PID=$!
 
-
-exit 1
+echo "api started (pid=$KTOR_PID)"
+wait "$KTOR_PID"

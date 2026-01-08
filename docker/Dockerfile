@@ -36,6 +36,7 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     tini \
     bash \
+    gettext \
     && rm -rf /var/lib/apt/lists/*
 ARG API_DIR
 ARG FRONTEND_DIR
@@ -43,7 +44,6 @@ ARG APP=app
 RUN mkdir /${APP}
 COPY --from=frontend-build /dashboard/dist /${APP}/dashboard/
 COPY --from=api-build /shortie/${API_DIR}/build/libs/shortie.jar /${APP}/shortie.jar
-# remove default nginx config
 RUN rm -f /etc/nginx/conf.d/default.conf
 COPY nginx/production.conf /etc/nginx/nginx.conf
 COPY docker/entrypoint.sh /${APP}/

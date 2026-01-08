@@ -42,7 +42,7 @@ function CreateLink() {
     <div className="w-full max-w-md mx-auto">
       {created ? (
         <CreatedLink
-          link={created}
+          shortCode={created}
           onCreateNew={() => setCreated(null)}
           onShowList={() => navigate({ to: "/dashboard/urls" })}
         />
