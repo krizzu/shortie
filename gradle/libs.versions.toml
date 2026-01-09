@@ -9,6 +9,7 @@ kotlin-datetime = "0.7.1"
 flyway = "10.22.0"
 koin = "4.1.1"
 coroutines = "1.10.2"
+spotless = "6.25.0"
 
 [libraries]
 kotlin-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlin-datetime" }
@@ -54,6 +55,7 @@ tests-kotlin-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", versio
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 
 [bundles]
 exposed = [
