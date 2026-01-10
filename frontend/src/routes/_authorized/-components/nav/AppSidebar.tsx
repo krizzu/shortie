@@ -8,7 +8,8 @@ import {
 import { NavUser } from "./UserNav.tsx"
 import { NavMain } from "./MainNav.tsx"
 import type { LucideIcon } from "lucide-react"
-import type { LinkProps } from "@tanstack/react-router"
+import { Link, type LinkProps } from "@tanstack/react-router"
+import ShortieLogo from "@/../assets/shortie-logo.png"
 
 type NavLink = {
   title: string
@@ -28,7 +29,11 @@ export function AppSidebar({
 }) {
   return (
     <Sidebar>
-      <SidebarHeader />
+      <SidebarHeader className="self-start px-3">
+        <Link to="/dashboard">
+          <img className="h-10 object-contain ..." src={ShortieLogo}  alt="shortie-logo"/>
+        </Link>
+      </SidebarHeader>
       <SidebarContent>
         <NavMain items={links} />
       </SidebarContent>
