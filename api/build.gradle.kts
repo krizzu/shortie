@@ -23,6 +23,22 @@ tasks.withType<ShadowJar> {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
+tasks.withType<JavaExec> {
+    val envFile = rootProject.file(".env")
+    if (envFile.exists()) {
+        envFile.readLines().forEach { line ->
+            if (line.isNotBlank() && !line.startsWith("#")) {
+                val parts = line.split("=", limit = 2)
+                if (parts.size == 2) {
+                    val key = parts[0].trim()
+                    val value = parts[1].split("#", limit = 2)[0].trim()
+                    environment(key, value)
+                }
+            }
+        }
+    }
+}
+
 kotlin { compilerOptions { optIn.add("kotlin.time.ExperimentalTime") } }
 
 dependencies {
@@ -37,6 +53,7 @@ dependencies {
     implementation(libs.utils.hashing.argon2)
     implementation(libs.utils.validation.urlValidator)
     implementation(libs.utils.idGenerator.sqids)
+    implementation(libs.dotenv.kotlin)
 
     testImplementation(libs.bundles.tests)
 }

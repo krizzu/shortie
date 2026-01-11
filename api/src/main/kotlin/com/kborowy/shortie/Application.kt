@@ -27,10 +27,20 @@ import com.kborowy.shortie.routes.auth.authRouting
 import com.kborowy.shortie.routes.redirect.redirectRouting
 import com.kborowy.shortie.routes.staticContentRouting
 import com.kborowy.shortie.routes.urls.urlsRouting
+import io.github.cdimascio.dotenv.dotenv
 import io.ktor.server.application.Application
 import io.ktor.server.netty.EngineMain
 
 fun main(args: Array<String>) {
+    val dotenv = dotenv {
+        ignoreIfMalformed = true
+        ignoreIfMissing = true
+    }
+    dotenv.entries().forEach { entry ->
+        if (System.getProperty(entry.key) == null && System.getenv(entry.key) == null) {
+            System.setProperty(entry.key, entry.value)
+        }
+    }
     EngineMain.main(args)
 }
 

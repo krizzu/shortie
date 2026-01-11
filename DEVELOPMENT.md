@@ -31,14 +31,14 @@ Inside `frontend` directory:
 
 ### Running api
 
-Having your shell sourced with `.env` files, either run Gradle task
+Run the Gradle task:
 
 ```shell
 ./gradlew api:runFatJar
 ```
 
-or [see the Run a Ktor application section in the IntelliJ IDEA documentation](https://www.jetbrains.com/help/idea/ktor.html#run_ktor_app).
-Make sure the run configuration has ENV variables set up correctly (from `.env` file).
+Or [see the Run a Ktor application section in the IntelliJ IDEA documentation](https://www.jetbrains.com/help/idea/ktor.html#run_ktor_app).
+The application is configured to automatically load environment variables from the `.env` file in the root directory.
 
 ## Build and deploy dev builds
 
@@ -55,15 +55,7 @@ Run it, passing in semantic version:
 
 ## Creating migrations
 
-Perform required database changes, then follow steps:
-
-- Source .env file
-
-```shell
-set -a; source .env; set +a
-```
-
-- Run migrations script. Pass in a migration name like "V<version>__<description>"
+Perform required database changes, then run the migrations script. Pass in a migration name like "V<version>__<description>":
 
 ```shell
 ./gradlew :api:generateMigrations -PmigrationName="V1__initial"

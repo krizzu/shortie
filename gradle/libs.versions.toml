@@ -10,6 +10,7 @@ flyway = "10.22.0"
 koin = "4.1.1"
 coroutines = "1.10.2"
 spotless = "6.25.0"
+dotenv = "6.5.0"
 
 [libraries]
 kotlin-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlin-datetime" }
@@ -47,6 +48,7 @@ koin-ktorLogging = { module = "io.insert-koin:koin-logger-slf4j", version.ref = 
 utils-hashing-argon2 = { module = "de.mkammerer:argon2-jvm", version = "2.12" }
 utils-validation-urlValidator = { module = "commons-validator:commons-validator", version = "1.10.1" }
 utils-idGenerator-sqids = { module = "org.sqids:sqids-kotlin", version = "0.1.1" }
+dotenv-kotlin = { module = "io.github.cdimascio:dotenv-kotlin", version.ref = "dotenv" }
 
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 tests-kotlin-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
