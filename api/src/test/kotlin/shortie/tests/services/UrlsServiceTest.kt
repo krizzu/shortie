@@ -49,7 +49,7 @@ import shortie.tests.FakeShortCodeGenerator
 class UrlsServiceTest {
 
     val db = DatabaseUtils.getTestDatabase()
-    val repo = UrlsRepository(db, FakeShortCodeGenerator)
+    val repo = UrlsRepository(db)
     val service =
         UrlsService(repo = repo, counter = FakeGlobalCounter(), coder = FakeShortCodeGenerator)
 
