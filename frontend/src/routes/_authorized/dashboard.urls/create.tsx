@@ -4,7 +4,7 @@ import { fetcher, HttpError } from "@/services/fetcher.ts"
 import { useState } from "react"
 import { CreatedLink } from "@/routes/_authorized/-components/links/CreatedLink.tsx"
 
-export const Route = createFileRoute("/_authorized/dashboard/urls_/create")({
+export const Route = createFileRoute("/_authorized/dashboard/urls/create")({
   component: CreateLink,
   context: () => ({
     pageTitle: "Create URL",

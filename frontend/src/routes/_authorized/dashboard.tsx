@@ -1,6 +1,7 @@
 import {
   createFileRoute,
   Link,
+  type MakeRouteMatchUnion,
   Outlet,
   useRouter,
   useRouterState,
@@ -33,6 +34,18 @@ function DashboardMain() {
     .filter(
       (match): match is typeof match & { context: { pageTitle: string } } =>
         "pageTitle" in match.context
+    )
+    .reduce(
+      (acc, p) => {
+        const includes = acc.find(
+          (v) => v.context.pageTitle === p.context.pageTitle
+        )
+        if (!includes) {
+          return [...acc, p]
+        }
+        return acc
+      },
+      [] as (MakeRouteMatchUnion & { context: { pageTitle: string } })[]
     )
     .map(({ pathname, context }) => {
       return {
