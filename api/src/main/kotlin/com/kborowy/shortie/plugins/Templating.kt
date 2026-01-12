@@ -27,8 +27,6 @@ sealed class HtmlTemplates(val file: String) {
     object ServerError : HtmlTemplates("500.html")
 
     object Password : HtmlTemplates("password.html")
-
-    object Home : HtmlTemplates("home.html")
 }
 
 fun HtmlTemplates.NotFound.model(page: String) = mapOf("page" to page)
