@@ -1,6 +1,7 @@
 import {
   createFileRoute,
   Link,
+  type MakeRouteMatchUnion,
   Outlet,
   useRouter,
   useRouterState,
@@ -34,12 +35,26 @@ function DashboardMain() {
       (match): match is typeof match & { context: { pageTitle: string } } =>
         "pageTitle" in match.context
     )
+    .reduce(
+      (acc, p) => {
+        const includes = acc.find(
+          (v) => v.context.pageTitle === p.context.pageTitle
+        )
+        if (!includes) {
+          return [...acc, p]
+        }
+        return acc
+      },
+      [] as (MakeRouteMatchUnion & { context: { pageTitle: string } })[]
+    )
     .map(({ pathname, context }) => {
       return {
         title: context.pageTitle,
         path: pathname,
       }
     })
+
+  console.log("bread", breadcrumbs)
 
   async function logOut() {
     await auth.logout()
