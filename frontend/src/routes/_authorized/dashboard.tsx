@@ -54,8 +54,6 @@ function DashboardMain() {
       }
     })
 
-  console.log("bread", breadcrumbs)
-
   async function logOut() {
     await auth.logout()
     router.invalidate()

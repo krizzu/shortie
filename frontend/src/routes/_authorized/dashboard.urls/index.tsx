@@ -6,7 +6,7 @@ import { Error } from "@/components/Error.tsx"
 
 const DEFAULT_LIMIT = 10
 
-export const Route = createFileRoute("/_authorized/dashboard/urls")({
+export const Route = createFileRoute("/_authorized/dashboard/urls/")({
   component: LinksPage,
   beforeLoad: () => ({
     pageTitle: "Links",
