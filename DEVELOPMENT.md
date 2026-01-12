@@ -42,15 +42,20 @@ Make sure the run configuration has ENV variables set up correctly (from `.env` 
 
 ## Build and deploy dev builds
 
-`deploy-docker-dev` script builds `dev` tags and publish it to docker hub.
+First, bump the version via one of gradle tasks:
+- `bumpPatch`
+- `bumpMinor`
+- `bumpMajor`
+
+then run `deploy-docker-dev` script.
+
+The script builds `dev` tags and publish it to docker hub.
 It creates tags:
 - krizzu/shortie:X.Y.Z-dev
 - krizzu/shortie:dev
 
-Run it, passing in semantic version:
-
 ```shell
-./scripts/deploy-docker-dev.sh 1.2.3
+./scripts/deploy-docker-dev.sh 
 ```
 
 ## Creating migrations
