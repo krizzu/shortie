@@ -11,7 +11,7 @@ import {
 import { Badge } from "@/components/ui/badge.tsx"
 import { cn } from "@/lib/utils.ts"
 import type { ShortieLink } from "@/types/Link.ts"
-import { Plus } from "lucide-react"
+import { LucideTrash, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Pagination,
@@ -22,11 +22,14 @@ import {
 } from "@/components/ui/pagination.tsx"
 import TableLoadingSkeleton from "@/routes/_authorized/-components/links/TableLoadingSkeleton.tsx"
 import { EnvVars } from "@/services/env-vars.ts"
+import { ConfirmationAlert } from "@/routes/_authorized/-components/dashboard/ConfirmationAlert.tsx"
+import { useState } from "react"
 
 type Props = {
   links: ShortieLink[]
   loading: boolean
   onCreateLink: () => void
+  onDeleteLink: (link: ShortieLink) => Promise<void>
   fetchNextPage: (() => void) | null
   goToPreviousPage: (() => void) | null
 }
@@ -36,8 +39,26 @@ export function LinksList({
   links,
   loading,
   fetchNextPage,
+  onDeleteLink,
   goToPreviousPage,
 }: Props) {
+  const [toDelete, setToDelete] = useState<ShortieLink | null>(null)
+  const [deleting, setDeleting] = useState(false)
+
+  async function deleteLink(link: ShortieLink) {
+    setDeleting(true)
+    try {
+      await onDeleteLink(link)
+      setToDelete(null)
+    } catch (e) {
+      const message =
+        (e as Error)?.message ?? "failed to delete link - see console"
+      alert(message)
+    } finally {
+      setDeleting(false)
+    }
+  }
+
   return (
     <div className="space-y-6 pb-6">
       <div className="flex flex-row gap-x-16">
@@ -68,11 +89,12 @@ export function LinksList({
               <TableHead>Original URL</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Expires</TableHead>
+              <TableHead />
             </TableRow>
           </TableHeader>
 
           <TableBody>
-            {loading ? <TableLoadingSkeleton rows={10} columns={4} /> : null}
+            {loading ? <TableLoadingSkeleton rows={10} columns={5} /> : null}
 
             {!loading && !links.length ? (
               <TableRow>
@@ -104,7 +126,7 @@ export function LinksList({
                       </TableCell>
 
                       {/* Original URL */}
-                      <TableCell className="max-w-[420px] h-6 truncate">
+                      <TableCell className="max-w-[150px] h-6 truncate">
                         <a
                           href={link.originalUrl}
                           target="_blank"
@@ -117,7 +139,7 @@ export function LinksList({
                       </TableCell>
 
                       {/* Protection status */}
-                      <TableCell className="h-6">
+                      <TableCell className="h-6 max-w-[60px]">
                         <Badge
                           variant={link.protected ? "secondary" : "outline"}
                         >
@@ -135,6 +157,15 @@ export function LinksList({
                           <span className="text-muted-foreground">Never</span>
                         )}
                       </TableCell>
+                      <TableCell className="h-6">
+                        <Button
+                          onClick={() => setToDelete(link)}
+                          variant="destructive"
+                          className="rounded-2xl"
+                        >
+                          <LucideTrash className="text-red-500" />
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   )
                 })
@@ -142,6 +173,18 @@ export function LinksList({
           </TableBody>
         </Table>
       </div>
+      <ConfirmationAlert
+        confirmLoading={deleting}
+        title="Delete shortcode"
+        description={`Are you sure you want to delete this short link?`}
+        visible={!!toDelete}
+        onConfirm={() => {
+          if (toDelete) {
+            deleteLink(toDelete)
+          }
+        }}
+        onClose={() => setToDelete(null)}
+      />
     </div>
   )
 }
