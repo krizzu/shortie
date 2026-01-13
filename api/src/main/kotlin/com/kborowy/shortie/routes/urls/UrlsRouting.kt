@@ -19,10 +19,12 @@ import com.kborowy.shortie.errors.BadRequestError
 import com.kborowy.shortie.extensions.asInstantUTC
 import com.kborowy.shortie.extensions.receiveOrThrow
 import com.kborowy.shortie.models.OriginalUrl
+import com.kborowy.shortie.models.ShortCode
 import com.kborowy.shortie.plugins.withAdminAuth
 import com.kborowy.shortie.services.urls.UrlsService
 import io.ktor.server.application.Application
 import io.ktor.server.response.respond
+import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
@@ -56,9 +58,16 @@ fun Application.urlsRouting() {
                     call.respond(GenerateShortieResponseDTO(shortCode = shortie.shortCode.value))
                 }
 
+                /** allow to bulk delete shorties */
+                delete {
+                    val body = call.receiveOrThrow<DeleteShortiePayloadDTO>()
+                    val removed = service.removeShorties(body.shortCodes.map { ShortCode(it) })
+                    call.respond(DeleteShortieResponseDTO(deleted = removed))
+                }
+
                 /** keyset paginated query */
                 get {
-                    val limit = call.request.queryParameters["limit"]?.toIntOrNull() ?: 35
+                    val limit = call.request.queryParameters["limit"]?.toIntOrNull() ?: 20
                     val cursor = call.request.queryParameters["cursor"]
 
                     val data =

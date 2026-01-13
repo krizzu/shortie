@@ -54,9 +54,11 @@ interface UrlsService {
 
     suspend fun resolveShortCode(code: String): ShortieUrl?
 
+    suspend fun removeShorties(code: List<ShortCode>): Int
+
     suspend fun verifyPassword(shortCode: ShortCode, password: String): Boolean
 
-    suspend fun getShorties(limit: Int, nextCursor: String?): ShortieUrlPaginatedEncoded?
+    suspend fun getShorties(limit: Int, nextCursor: String? = null): ShortieUrlPaginatedEncoded?
 }
 
 private class RealUrlsService(
@@ -144,6 +146,19 @@ private class RealUrlsService(
         } catch (e: Exception) {
             log.error("cannot get paginated result (limit=$limit, nextCursor=$nextCursor)", e)
             return null
+        }
+    }
+
+    override suspend fun removeShorties(code: List<ShortCode>): Int {
+        try {
+            val removed = repo.remove(code)
+            log.info("removed $removed codes")
+            return removed
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            log.error("failed to remove ${code.size} codes", e)
+            return 0
         }
     }
 

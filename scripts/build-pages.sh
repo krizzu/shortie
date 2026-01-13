@@ -4,8 +4,8 @@ set -euo pipefail
 
 FRONTEND_PROJECT="frontend"
 WEBSITE_BUILD_COMMAND="yarn build:pages"
-TEMPLATE_DIR="app/src/main/resources/templates"
-ASSETS_DIR="app/src/main/resources/assets"
+TEMPLATE_DIR="api/src/main/resources/templates"
+ASSETS_DIR="api/src/main/resources/assets"
 
 
 assertRoot() {

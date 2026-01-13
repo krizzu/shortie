@@ -1,12 +1,14 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router"
 import { LinksList } from "@/routes/_authorized/-components/links/LinksList.tsx"
 import { linksQueryOptions } from "@/queries/links-query-options.ts"
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { Error } from "@/components/Error.tsx"
+import type { ShortieLink } from "@/types/Link.ts"
+import { deleteLinkMutationOptions } from "@/queries/delete-links-mutation-options.ts"
 
 const DEFAULT_LIMIT = 10
 
-export const Route = createFileRoute("/_authorized/dashboard/urls")({
+export const Route = createFileRoute("/_authorized/dashboard/urls/")({
   component: LinksPage,
   beforeLoad: () => ({
     pageTitle: "Links",
@@ -38,10 +40,15 @@ function LinksPage() {
   const linksQuery = useQuery(linksQueryOptions(deps.page, deps.limit))
   const router = useRouter()
   const navigate = Route.useNavigate()
+  const deleteLinkMutation = useMutation(deleteLinkMutationOptions)
 
   const hasPreviousPage = (search.previous?.length ?? 0) > 0
   const previousButtonActive =
     hasPreviousPage || (!hasPreviousPage && search.page)
+
+  async function deleteLink(link: ShortieLink) {
+    await deleteLinkMutation.mutateAsync(link.shortCode)
+  }
 
   function navigateToCreate() {
     navigate({ to: "/dashboard/urls/create" })
@@ -110,6 +117,7 @@ function LinksPage() {
           : null
       }
       onCreateLink={navigateToCreate}
+      onDeleteLink={deleteLink}
     />
   )
 }

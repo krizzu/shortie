@@ -1,23 +1,16 @@
 #!/bin/sh
 set -eu
 
-
 IMAGE="krizzu/shortie"
 PLATFORMS="linux/amd64,linux/arm64"
+VERSION_FILE="version.txt"
 
-# validate input exists
-if [ "$#" -ne 1 ]; then
-  echo "Usage: $0 <semantic-version>"
-  echo "Example: $0 1.2.3"
+if [ ! -f "$VERSION_FILE" ]; then
+  echo "$VERSION_FILE not found in root?"
   exit 1
 fi
 
-VERSION="$1"
-echo "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' || {
-  echo "Error: version must be semantic (x.y.z)"
-  exit 1
-}
-
+VERSION=$(cat $VERSION_FILE | tr -d '[:space:]')
 VERSION="$VERSION-dev"
 
 echo "building $IMAGE:$VERSION (also $IMAGE:dev)"
@@ -26,6 +19,7 @@ echo
 docker buildx build \
   -f ./docker/Dockerfile \
   --platform "$PLATFORMS" \
+  --build-arg APP_VERSION="$VERSION" \
   -t "$IMAGE:$VERSION" \
   -t "$IMAGE:dev" \
   --push .

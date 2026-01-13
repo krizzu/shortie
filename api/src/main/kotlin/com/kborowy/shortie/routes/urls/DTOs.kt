@@ -42,3 +42,7 @@ data class PaginatedShortieResponseDTO(
     val hasNext: Boolean,
     val nextCursor: String?,
 )
+
+@Serializable data class DeleteShortiePayloadDTO(val shortCodes: List<String>)
+
+@Serializable data class DeleteShortieResponseDTO(val deleted: Int)

@@ -56,7 +56,7 @@ fun Application.redirectRouting() {
                 val shortie = getActiveShortie("short_code", service)
 
                 if (shortie.protected) {
-                    // redirect to allow user enter password
+                    // redirect to /password, allow user enter password
                     return@get call.respondRedirect(permanent = false) {
                         port = proxyPort ?: call.request.origin.serverPort
                         host = call.request.origin.serverHost

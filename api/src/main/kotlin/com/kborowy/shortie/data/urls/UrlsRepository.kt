@@ -26,6 +26,7 @@ import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.inList
 import org.jetbrains.exposed.v1.core.less
 import org.jetbrains.exposed.v1.core.or
 import org.jetbrains.exposed.v1.jdbc.Database
@@ -45,14 +46,13 @@ interface UrlsRepository {
 
     suspend fun remove(shortCode: ShortCode): Boolean
 
+    suspend fun remove(shortCodes: List<ShortCode>): Int
+
     suspend fun get(shortCode: ShortCode): ShortieUrl?
 
     suspend fun getHashForCode(shortCode: ShortCode): String?
 
-    suspend fun getPage(
-        limit: Int = 25,
-        nextCursor: ShortiePageCursor? = null,
-    ): ShortieUrlPaginated
+    suspend fun getPage(limit: Int = 25, nextCursor: ShortiePageCursor? = null): ShortieUrlPaginated
 }
 
 fun UrlsRepository(db: Database): UrlsRepository = RealUrlsRepository(db)
@@ -84,6 +84,11 @@ private class RealUrlsRepository(private val db: Database) : UrlsRepository {
             deleted > 0
         }
 
+    override suspend fun remove(shortCodes: List<ShortCode>): Int {
+        val list = shortCodes.map { it.value }.distinct()
+        return transaction(db) { UrlsTable.deleteWhere { UrlsTable.shortCode inList list } }
+    }
+
     override suspend fun get(shortCode: ShortCode): ShortieUrl? =
         transaction(db) {
             UrlsTable.selectAll()
@@ -100,10 +105,7 @@ private class RealUrlsRepository(private val db: Database) : UrlsRepository {
                 ?.getOrNull(UrlsTable.passwordHash)
         }
 
-    override suspend fun getPage(
-        limit: Int,
-        nextCursor: ShortiePageCursor?,
-    ): ShortieUrlPaginated {
+    override suspend fun getPage(limit: Int, nextCursor: ShortiePageCursor?): ShortieUrlPaginated {
 
         return transaction(db) {
             val rows =

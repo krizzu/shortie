@@ -41,7 +41,7 @@ class UrlsRepositoryTest {
     val db = DatabaseUtils.getTestDatabase()
     val coder = FakeShortCodeGenerator
 
-    val repo = UrlsRepository(db, coder)
+    val repo = UrlsRepository(db)
 
     init {
         DatabaseUtils.initDatabase()

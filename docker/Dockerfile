@@ -1,3 +1,4 @@
+ARG APP_VERSION
 ARG FRONTEND_DIR=frontend
 ARG API_DIR=api
 
@@ -38,9 +39,17 @@ RUN apt-get update && apt-get install -y \
     bash \
     gettext \
     && rm -rf /var/lib/apt/lists/*
+
+ARG APP_VERSION
 ARG API_DIR
 ARG FRONTEND_DIR
 ARG APP=app
+
+LABEL org.opencontainers.image.title="Shortie"
+LABEL org.opencontainers.image.description="A minimal, self-hostable URL shortening service with an admin dashboard for managing links"
+LABEL org.opencontainers.image.version=$APP_VERSION
+LABEL org.opencontainers.image.source="https://github.com/krizzu/shortie"
+
 RUN mkdir /${APP}
 COPY --from=frontend-build /dashboard/dist /${APP}/dashboard/
 COPY --from=api-build /shortie/${API_DIR}/build/libs/shortie.jar /${APP}/shortie.jar
