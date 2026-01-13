@@ -25,6 +25,7 @@ import com.kborowy.shortie.errors.ExpiryInPastError
 import com.kborowy.shortie.extensions.now
 import com.kborowy.shortie.extensions.nowInstant
 import com.kborowy.shortie.models.OriginalUrl
+import com.kborowy.shortie.models.ShortCode
 import com.kborowy.shortie.services.urls.UrlsService
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -131,6 +132,25 @@ class UrlsServiceTest {
         assertFailsWith(ExpiryInPastError::class) {
             service.generateShortie(url = OriginalUrl("https://ex.com"), expiry = yesterday)
         }
+    }
+
+    @Test
+    fun `deletes shorties, ignores unknowns`() = runTest {
+        val links =
+            listOf(
+                "https://www.example.com",
+                "https://www.example2.com",
+                "https://www.example3.com",
+                "https://www.example4.com",
+            )
+        val codes = links.map { service.generateShortie(OriginalUrl(it)) }
+
+        val toDelete = codes.map { it.shortCode }.toMutableList()
+        toDelete += listOf(ShortCode("not-know-1"), ShortCode("not-know-2"))
+
+        assertEquals(4, service.getShorties(10)?.data?.size)
+        assertEquals(4, service.removeShorties(toDelete))
+        assertEquals(0, service.getShorties(10)?.data?.size)
     }
 }
 
