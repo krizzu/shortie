@@ -32,4 +32,8 @@ object UrlsTable : LongIdTable(name = "urls") {
     val expiryDate = datetime("expiry_date").nullable().default(null)
     val createdAt = datetime("created_at").defaultExpression(CurrentDateTime)
     val updatedAt = datetime("updated_at").clientDefault { LocalDateTime.now }
+
+    // used for analytics
+    val totalClicks = long("total_clicks").default(0)
+    val lastRedirectAt = datetime("last_redirect").nullable()
 }

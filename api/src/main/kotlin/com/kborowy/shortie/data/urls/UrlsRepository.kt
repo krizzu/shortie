@@ -149,5 +149,7 @@ private fun ResultRow.toShortieUrl(): ShortieUrl {
         originalUrl = OriginalUrl(this[UrlsTable.originalUrl]),
         protected = this[UrlsTable.passwordHash] != null,
         expiryDate = this[UrlsTable.expiryDate],
+        totalClicks = this[UrlsTable.totalClicks],
+        lastRedirect = this[UrlsTable.lastRedirectAt]
     )
 }

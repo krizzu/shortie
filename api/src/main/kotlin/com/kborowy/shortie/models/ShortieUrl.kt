@@ -38,7 +38,9 @@ data class ShortieUrl(
     val shortCode: ShortCode,
     val originalUrl: OriginalUrl,
     val protected: Boolean,
-    val expiryDate: LocalDateTime? = null,
+    val totalClicks: Long,
+    val expiryDate: LocalDateTime?,
+    val lastRedirect: LocalDateTime?,
 ) {
 
     @OptIn(ExperimentalTime::class)
