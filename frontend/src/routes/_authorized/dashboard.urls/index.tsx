@@ -3,6 +3,7 @@ import { LinksList } from "@/routes/_authorized/-components/links/LinksList.tsx"
 import { linksQueryOptions } from "@/queries/links-query-options.ts"
 import { useQuery } from "@tanstack/react-query"
 import { Error } from "@/components/Error.tsx"
+import type { ShortieLink } from "@/types/Link.ts"
 
 const DEFAULT_LIMIT = 10
 
@@ -42,6 +43,10 @@ function LinksPage() {
   const hasPreviousPage = (search.previous?.length ?? 0) > 0
   const previousButtonActive =
     hasPreviousPage || (!hasPreviousPage && search.page)
+
+  async function deleteLink(link: ShortieLink) {
+    alert(`todo: delete ${link.shortCode}`)
+  }
 
   function navigateToCreate() {
     navigate({ to: "/dashboard/urls/create" })
@@ -110,6 +115,7 @@ function LinksPage() {
           : null
       }
       onCreateLink={navigateToCreate}
+      onDeleteLink={deleteLink}
     />
   )
 }
