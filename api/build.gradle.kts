@@ -1,13 +1,22 @@
-@file:OptIn(OpenApiPreview::class)
+@file:OptIn(io.ktor.plugin.OpenApiPreview::class)
 
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import io.ktor.plugin.OpenApiPreview
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath(libs.dotenv.kotlin)
+    }
+}
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ktor)
 }
+
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import io.github.cdimascio.dotenv.dotenv
 
 group = "com.kborowy"
 
@@ -17,24 +26,22 @@ application { mainClass = "io.ktor.server.netty.EngineMain" }
 
 ktor { fatJar { archiveFileName.set("shortie.jar") } }
 
+val dotenv = dotenv {
+    directory = rootProject.projectDir.absolutePath
+    ignoreIfMissing = true
+    ignoreIfMalformed = true
+}
+
 // merge service files, so flyway can correctly find and apply migrations
 tasks.withType<ShadowJar> {
     mergeServiceFiles()
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
-tasks.withType<JavaExec> {
-    val envFile = rootProject.file(".env")
-    if (envFile.exists()) {
-        envFile.readLines().forEach { line ->
-            if (line.isNotBlank() && !line.startsWith("#")) {
-                val parts = line.split("=", limit = 2)
-                if (parts.size == 2) {
-                    val key = parts[0].trim()
-                    val value = parts[1].split("#", limit = 2)[0].trim()
-                    environment(key, value)
-                }
-            }
+tasks.withType<JavaExec>().configureEach {
+    dotenv.entries().forEach { entry ->
+        if (System.getenv(entry.key) == null) {
+            environment(entry.key, entry.value)
         }
     }
 }
@@ -53,7 +60,6 @@ dependencies {
     implementation(libs.utils.hashing.argon2)
     implementation(libs.utils.validation.urlValidator)
     implementation(libs.utils.idGenerator.sqids)
-    implementation(libs.dotenv.kotlin)
 
     testImplementation(libs.bundles.tests)
 }
