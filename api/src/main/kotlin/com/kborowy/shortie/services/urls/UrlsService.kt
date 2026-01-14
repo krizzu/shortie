@@ -16,6 +16,7 @@
 package com.kborowy.shortie.services.urls
 
 import com.kborowy.shortie.data.counter.GlobalCounter
+import com.kborowy.shortie.data.urls.MAX_SHORT_CODE_LENGTH
 import com.kborowy.shortie.data.urls.UrlsRepository
 import com.kborowy.shortie.errors.AliasAlreadyExistsError
 import com.kborowy.shortie.errors.AliasTooLongError
@@ -36,8 +37,6 @@ import kotlinx.datetime.LocalDateTime
 import org.jetbrains.exposed.v1.exceptions.ExposedSQLException
 import org.postgresql.util.PSQLException
 import org.slf4j.LoggerFactory
-
-const val MAX_SHORT_CODE_LENGTH = 30
 
 fun UrlsService(
     repo: UrlsRepository,
