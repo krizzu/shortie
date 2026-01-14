@@ -22,5 +22,5 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 
 /** Returns current date in utc timezone */
-val LocalDate.Companion.now: LocalDate
+val LocalDate.Companion.today: LocalDate
     get() = LocalDateTime.now.date

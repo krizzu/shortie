@@ -57,10 +57,8 @@ interface UrlsRepository {
 
     suspend fun getPage(limit: Int = 25, nextCursor: ShortiePageCursor? = null): ShortieUrlPaginated
 
-    /**
-     * Increments the click count by 1 and changes lastRedirect to now
-     */
-    suspend fun incrementClick(shortCode: ShortCode): Int
+    /** Increments the click count by 1 and updates lastRedirect to now. */
+    suspend fun incrementClickCount(code: ShortCode)
 }
 
 fun UrlsRepository(db: Database): UrlsRepository = RealUrlsRepository(db)
@@ -150,13 +148,14 @@ private class RealUrlsRepository(private val db: Database) : UrlsRepository {
         }
     }
 
-    override suspend fun incrementClick(shortCode: ShortCode): Int =
+    override suspend fun incrementClickCount(code: ShortCode) {
         transaction(db) {
-            UrlsTable.update({ UrlsTable.shortCode eq shortCode.value }) {
+            UrlsTable.update({ UrlsTable.shortCode eq code.value }) {
                 it[totalClicks] = totalClicks + 1
                 it[lastRedirectAt] = LocalDateTime.now
             }
         }
+    }
 }
 
 private fun ResultRow.toShortieUrl(): ShortieUrl {
