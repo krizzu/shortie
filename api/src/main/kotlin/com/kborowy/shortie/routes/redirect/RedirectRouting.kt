@@ -102,6 +102,7 @@ fun Application.redirectRouting() {
                     val password = form["password"] ?: throw BadRequestError("password missing")
 
                     if (service.verifyPassword(shortie.shortCode, password)) {
+                        analytics.incrementClick(shortie)
                         call.respond<ShortiePasswordResponseDTO>(
                             ShortiePasswordResponseDTO(shortie.originalUrl.value)
                         )
