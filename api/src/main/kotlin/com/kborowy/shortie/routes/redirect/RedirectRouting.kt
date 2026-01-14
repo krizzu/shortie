@@ -23,6 +23,7 @@ import com.kborowy.shortie.extensions.respondWithTemplate
 import com.kborowy.shortie.models.ShortieUrl
 import com.kborowy.shortie.plugins.HtmlTemplates
 import com.kborowy.shortie.plugins.model
+import com.kborowy.shortie.services.AnalyticService
 import com.kborowy.shortie.services.urls.UrlsService
 import io.ktor.http.appendPathSegments
 import io.ktor.server.application.Application
@@ -41,12 +42,14 @@ import org.koin.ktor.ext.inject
 fun Application.redirectRouting() {
     routing {
         val service by inject<UrlsService>()
+        val analytics by inject<AnalyticService>()
         val proxyPort: Int? by inject(qualifier = named("proxy_port"))
         /** "Shortie" resolving */
         route("/{short_code}") {
 
             /**
-             * Decode given short code ("Shortie")
+             * Decode given short code ("Shortie") and redirect user to final url If shortie
+             * requires password, redirects to password page
              *
              * @path short_code the short code to decode
              * @response 302 Redirect to /password if url is protected
@@ -64,6 +67,7 @@ fun Application.redirectRouting() {
                     }
                 }
 
+                analytics.incrementClick(shortie)
                 call.respondRedirect(shortie.originalUrl.value, permanent = false)
             }
 
@@ -98,6 +102,7 @@ fun Application.redirectRouting() {
                     val password = form["password"] ?: throw BadRequestError("password missing")
 
                     if (service.verifyPassword(shortie.shortCode, password)) {
+                        analytics.incrementClick(shortie)
                         call.respond<ShortiePasswordResponseDTO>(
                             ShortiePasswordResponseDTO(shortie.originalUrl.value)
                         )

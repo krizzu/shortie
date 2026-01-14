@@ -1,0 +1,3 @@
+ALTER TABLE urls
+    ALTER COLUMN short_code TYPE VARCHAR(30);
+

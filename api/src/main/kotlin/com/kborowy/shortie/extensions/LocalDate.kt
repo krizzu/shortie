@@ -13,16 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.kborowy.shortie.services
+@file:OptIn(ExperimentalTime::class)
 
-import com.kborowy.shortie.services.urls.UrlsService
-import org.koin.core.qualifier.named
-import org.koin.dsl.module
+package com.kborowy.shortie.extensions
 
-val ServicesDIModule = module {
-    single<UrlsService> { UrlsService(repo = get(), counter = get(), coder = get()) }
-    single<UserService> { UserService(repo = get(), jwt = get()) }
-    single<AnalyticService> {
-        AnalyticService(urlRepo = get(), scope = get(qualifier = named("application")))
-    }
-}
+import kotlin.time.ExperimentalTime
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+
+/** Returns current date in utc timezone */
+val LocalDate.Companion.today: LocalDate
+    get() = LocalDateTime.now.date

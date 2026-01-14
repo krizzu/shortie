@@ -25,7 +25,7 @@ import kotlinx.datetime.UtcOffset
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 
-/** Returns current date in utc timezone */
+/** Returns current date time in utc timezone */
 val LocalDateTime.Companion.now: LocalDateTime
     get() = GlobalClockProvider.clock.now().toLocalDateTime(TimeZone.UTC)
 

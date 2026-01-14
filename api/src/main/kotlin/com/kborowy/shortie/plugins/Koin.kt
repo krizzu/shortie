@@ -23,6 +23,7 @@ import com.kborowy.shortie.utils.ShortCodeGenerator
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.config.getAs
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.Json
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -30,10 +31,15 @@ import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
 
 fun Application.configureDI() {
+
+    val applicationScope = this as CoroutineScope
+
     val appModule = module {
         single<Int?>(qualifier = named("proxy_port")) {
             environment.config.propertyOrNull("ktor.deployment.proxyPort")?.getString()?.toInt()
         }
+
+        single<CoroutineScope>(qualifier = named("application")) { applicationScope }
 
         single<Json> {
             Json {
