@@ -18,6 +18,7 @@ package com.kborowy.shortie.services.urls
 import com.kborowy.shortie.data.counter.GlobalCounter
 import com.kborowy.shortie.data.urls.UrlsRepository
 import com.kborowy.shortie.errors.AliasAlreadyExistsError
+import com.kborowy.shortie.errors.AliasTooLongError
 import com.kborowy.shortie.errors.ExpiryInPastError
 import com.kborowy.shortie.errors.UnexpectedAppError
 import com.kborowy.shortie.extensions.isInPast
@@ -35,6 +36,8 @@ import kotlinx.datetime.LocalDateTime
 import org.jetbrains.exposed.v1.exceptions.ExposedSQLException
 import org.postgresql.util.PSQLException
 import org.slf4j.LoggerFactory
+
+const val MAX_SHORT_CODE_LENGTH = 30
 
 fun UrlsService(
     repo: UrlsRepository,
@@ -83,6 +86,11 @@ private class RealUrlsService(
 
         val passwordHash = password?.let { PasswordHasher.hash(it) }
         val shortCode = alias?.let { ShortCode(it) } ?: createHash()
+
+        if (shortCode.value.length > MAX_SHORT_CODE_LENGTH) {
+            throw AliasTooLongError(MAX_SHORT_CODE_LENGTH)
+        }
+
         try {
             val shortie =
                 repo.insert(url = url, code = shortCode, expiry = expiry, hash = passwordHash)
@@ -91,7 +99,7 @@ private class RealUrlsService(
             log.info("generation was cancelled")
             throw e
         } catch (e: ExposedSQLException) {
-            log.error("failed to generate shortie", e)
+            log.error("sql issue while generating shortie", e)
             if (e.cause is PSQLException && (e.sqlState == "23505" || e.errorCode == 23505)) {
                 throw AliasAlreadyExistsError()
             } else if (e.errorCode == 23505) {
@@ -99,6 +107,9 @@ private class RealUrlsService(
             }
 
             throw UnexpectedAppError("Database operation failed: ${e.message}")
+        } catch (e: Exception) {
+            log.error("fatal exception when generating shortie", e)
+            throw UnexpectedAppError("issue while generating a link: ${e.message}")
         }
     }
 

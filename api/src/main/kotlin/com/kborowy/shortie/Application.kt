@@ -36,6 +36,7 @@ fun main(args: Array<String>) {
 
 // main scaffold module
 fun Application.app() {
+
     configureDI()
     configureAuth()
     configureCORS()

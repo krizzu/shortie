@@ -21,7 +21,7 @@ import org.jetbrains.exposed.v1.core.dao.id.LongIdTable
 import org.jetbrains.exposed.v1.datetime.CurrentDateTime
 import org.jetbrains.exposed.v1.datetime.datetime
 
-private const val MAX_SHORT_URL_LENGTH = 10
+private const val MAX_SHORT_URL_LENGTH = 30
 private const val MAX_LONG_URL_LENGTH = 2048
 private const val MAX_PASSWORD_LENGTH = 255
 
