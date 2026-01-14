@@ -48,8 +48,8 @@ fun Application.redirectRouting() {
         route("/{short_code}") {
 
             /**
-             * Decode given short code ("Shortie") and redirect user to final url
-             * If shortie requires password, redirects to password page
+             * Decode given short code ("Shortie") and redirect user to final url If shortie
+             * requires password, redirects to password page
              *
              * @path short_code the short code to decode
              * @response 302 Redirect to /password if url is protected
