@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import com.kborowy.shortie.data.clicks.ClicksDailyTable
 import com.kborowy.shortie.data.urls.UrlsTable
 import com.kborowy.shortie.data.users.UsersTable
 import com.kborowy.shortie.infra.MIGRATIONS_DIRECTORY
@@ -48,6 +49,7 @@ fun main() {
         MigrationUtils.generateMigrationScript(
             UrlsTable,
             UsersTable,
+            ClicksDailyTable,
             scriptDirectory = MIGRATIONS_DIRECTORY,
             scriptName = name,
             withLogs = true,
