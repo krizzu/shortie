@@ -13,10 +13,9 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.jdbc.upsert
 
 interface ClicksDailyRepository {
+    suspend fun incrementCount(code: ShortCode, date: LocalDate, by: Int = 1)
 
     suspend fun getCount(code: ShortCode, start: LocalDate, end: LocalDate): Map<LocalDate, Long>
-
-    suspend fun incrementCount(code: ShortCode, date: LocalDate, by: Int = 1)
 }
 
 fun ClicksDailyRepository(db: Database): ClicksDailyRepository = RealClicksDailyRepository(db)
