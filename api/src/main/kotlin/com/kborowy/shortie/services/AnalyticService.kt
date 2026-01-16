@@ -15,12 +15,16 @@
  */
 package com.kborowy.shortie.services
 
+import com.kborowy.shortie.data.clicks.ClicksDailyRepository
 import com.kborowy.shortie.data.urls.UrlsRepository
+import com.kborowy.shortie.extensions.today
 import com.kborowy.shortie.models.ShortieUrl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -32,18 +36,23 @@ interface AnalyticService {
 
 fun AnalyticService(
     urlRepo: UrlsRepository,
+    dailyRepo: ClicksDailyRepository,
     scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO),
     log: Logger = LoggerFactory.getLogger("AnalyticService"),
-): AnalyticService = RealAnalyticService(urlRepo, scope, log)
+): AnalyticService = RealAnalyticService(urlRepo, dailyRepo, scope, log)
 
 private class RealAnalyticService(
     private val urlRepo: UrlsRepository,
+    private val dailyRepo: ClicksDailyRepository,
     private val scope: CoroutineScope,
     private val log: Logger,
 ) : AnalyticService {
     override fun incrementClick(shortie: ShortieUrl) {
         scope.launch(Dispatchers.IO) {
-            urlRepo.incrementClickCount(shortie.shortCode)
+            coroutineScope {
+                launch { urlRepo.incrementClickCount(shortie.shortCode) }
+                launch { dailyRepo.incrementCount(shortie.shortCode, LocalDate.today) }
+            }
             log.info("${shortie.shortCode} click bump")
         }
     }

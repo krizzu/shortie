@@ -1,7 +1,9 @@
 package com.kborowy.shortie.data.clicks
 
+import com.kborowy.shortie.extensions.now
 import com.kborowy.shortie.models.ShortCode
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.greaterEq
 import org.jetbrains.exposed.v1.core.lessEq
@@ -39,20 +41,17 @@ private class RealClicksDailyRepository(private val db: Database) : ClicksDailyR
 
     override suspend fun incrementCount(code: ShortCode, date: LocalDate, by: Int) {
         transaction(db) {
-            with(ClicksDailyTable) {
-                upsert(
-                    clickCount,
-                    clickDate,
-                    onUpdate = {
-                        it[clickDate] = clickDate
-                        it[clickCount] = insertValue(clickCount) + by.toLong()
-                    },
-                    onUpdateExclude = listOf(createdAt),
-                ) {
-                    it[shortCode] = code.value
-                    it[clickCount] = clickCount
-                    it[clickDate] = date
-                }
+            ClicksDailyTable.upsert(
+                ClicksDailyTable.shortCode,
+                ClicksDailyTable.clickDate,
+                onUpdate = {
+                    it[ClicksDailyTable.clickCount] = ClicksDailyTable.clickCount + by.toLong()
+                    it[ClicksDailyTable.updatedAt] = LocalDateTime.now
+                },
+            ) {
+                it[shortCode] = code.value
+                it[clickCount] = by.toLong() // initial insert
+                it[clickDate] = date
             }
         }
     }

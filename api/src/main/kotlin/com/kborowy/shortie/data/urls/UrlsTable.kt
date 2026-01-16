@@ -36,4 +36,13 @@ object UrlsTable : LongIdTable(name = "urls") {
     // used for analytics
     val totalClicks = long("total_clicks").default(0)
     val lastRedirectAt = datetime("last_redirect").nullable()
+
+    init {
+        index(
+            customIndexName = "idx_urls_created_at_id_desc",
+            isUnique = false,
+            createdAt,
+            id,
+        )
+    }
 }

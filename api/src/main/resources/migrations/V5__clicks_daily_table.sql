@@ -6,9 +6,9 @@ CREATE TABLE IF NOT EXISTS clicks_daily
     click_count BIGINT                              NOT NULL,
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at  TIMESTAMP                           NOT NULL,
-    CONSTRAINT fk_clicks_daily_short_code__short_code FOREIGN KEY (short_code) REFERENCES urls (short_code) ON DELETE CASCADE ON UPDATE CASCADE
+    CONSTRAINT fk_clicks_daily_short_code__short_code FOREIGN KEY (short_code) REFERENCES urls (short_code) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT check_clicks_daily_0 CHECK (click_count >= 0)
 );
 ALTER TABLE clicks_daily
-    ADD CONSTRAINT clicks_date_count_unique UNIQUE (click_date, click_count);
+    ADD CONSTRAINT clicks_short_code_date_unique UNIQUE (short_code, click_date);
 CREATE SEQUENCE IF NOT EXISTS clicks_daily_id_seq START WITH 1 MINVALUE 1 MAXVALUE 9223372036854775807;
-
