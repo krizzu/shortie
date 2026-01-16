@@ -23,6 +23,10 @@ val ServicesDIModule = module {
     single<UrlsService> { UrlsService(repo = get(), counter = get(), coder = get()) }
     single<UserService> { UserService(repo = get(), jwt = get()) }
     single<AnalyticService> {
-        AnalyticService(urlRepo = get(), scope = get(qualifier = named("application")))
+        AnalyticService(
+            urlRepo = get(),
+            dailyRepo = get(),
+            scope = get(qualifier = named("application")),
+        )
     }
 }

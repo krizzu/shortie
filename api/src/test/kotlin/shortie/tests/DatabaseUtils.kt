@@ -15,6 +15,7 @@
  */
 package shortie.tests
 
+import com.kborowy.shortie.data.clicks.ClicksDailyTable
 import com.kborowy.shortie.data.urls.UrlsTable
 import org.flywaydb.core.Flyway
 import org.jetbrains.exposed.v1.jdbc.Database
@@ -44,6 +45,9 @@ object DatabaseUtils {
     }
 
     fun clearDatabase(db: Database) {
-        transaction(db) { UrlsTable.deleteAll() }
+        transaction(db) {
+            UrlsTable.deleteAll()
+            ClicksDailyTable.deleteAll()
+        }
     }
 }
