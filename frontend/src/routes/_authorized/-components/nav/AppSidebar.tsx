@@ -31,7 +31,11 @@ export function AppSidebar({
     <Sidebar>
       <SidebarHeader className="self-start px-3">
         <Link to="/dashboard">
-          <img className="h-10 object-contain ..." src={ShortieLogo}  alt="shortie-logo"/>
+          <img
+            className="h-10 object-contain ..."
+            src={ShortieLogo}
+            alt="shortie-logo"
+          />
         </Link>
       </SidebarHeader>
       <SidebarContent>
