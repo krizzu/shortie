@@ -1,13 +1,22 @@
-@file:OptIn(OpenApiPreview::class)
+@file:OptIn(io.ktor.plugin.OpenApiPreview::class)
 
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import io.ktor.plugin.OpenApiPreview
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath(libs.dotenv.kotlin)
+    }
+}
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ktor)
 }
+
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import io.github.cdimascio.dotenv.dotenv
 
 group = "com.kborowy"
 
@@ -17,10 +26,24 @@ application { mainClass = "io.ktor.server.netty.EngineMain" }
 
 ktor { fatJar { archiveFileName.set("shortie.jar") } }
 
+val dotenv = dotenv {
+    directory = rootProject.projectDir.absolutePath
+    ignoreIfMissing = true
+    ignoreIfMalformed = true
+}
+
 // merge service files, so flyway can correctly find and apply migrations
 tasks.withType<ShadowJar> {
     mergeServiceFiles()
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
+tasks.withType<JavaExec>().configureEach {
+    dotenv.entries().forEach { entry ->
+        if (System.getenv(entry.key) == null) {
+            environment(entry.key, entry.value)
+        }
+    }
 }
 
 kotlin { compilerOptions { optIn.add("kotlin.time.ExperimentalTime") } }
