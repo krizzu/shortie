@@ -45,7 +45,7 @@ data class ShortieAnalyticsDTO(
     val protected: Boolean,
     val expiryDate: Instant?,
     val totalClicks: Long,
-    val lastClick: LocalDateTime?, // utc datetime, iso format
+    val lastClick: Instant?, // utc datetime, iso format
     val details: Map<LocalDate, Long>,
 )
 

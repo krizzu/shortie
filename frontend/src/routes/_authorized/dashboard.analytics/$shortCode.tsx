@@ -4,6 +4,8 @@ import { useQuery } from "@tanstack/react-query"
 import { dateToUtcDateString } from "@/lib/utils.ts"
 import { Error } from "@/components/Error.tsx"
 import { Loading } from "@/components/Loading.tsx"
+import { ClicksOverTimeChart } from "@/routes/_authorized/dashboard.analytics/-components/ClicksOverTimeChart.tsx"
+import { LinkSummaryCard } from "./-components/LinkSummaryCard"
 
 export const Route = createFileRoute(
   "/_authorized/dashboard/analytics/$shortCode"
@@ -16,12 +18,12 @@ export const Route = createFileRoute(
   },
 
   loaderDeps: ({ search }) => {
+    const past7Days = dateToUtcDateString(new Date(Date.now() - 604800 * 1000))
     const today = dateToUtcDateString(new Date())
-    const next7Days = dateToUtcDateString(new Date(Date.now() + 604800))
 
     return {
-      startDate: search?.startDate ?? today,
-      endDate: search?.endDate ?? next7Days,
+      startDate: search?.startDate ?? past7Days,
+      endDate: search?.endDate ?? today,
     }
   },
 
@@ -50,16 +52,38 @@ function RouteComponent() {
     return (
       <Error
         error={query.error}
-        reset={() => {
+        onRetry={() => {
           router.invalidate()
         }}
       />
     )
   }
 
+  const linkData = query.data
+
+  if (!linkData) {
+    return (
+      <Error
+        title="Link data not found"
+        error={`Sorry, but link "${shortCode}" could not be found`}
+        retryLabel="Go back"
+        onRetry={() => {
+          router.navigate({ to: "/dashboard/analytics" })
+        }}
+      />
+    )
+  }
+
   return (
-    <div>
-      <p>hello to {shortCode} analytics</p>
+    <div className="grid grid-cols-4 gap-x-4">
+      <LinkSummaryCard link={linkData} />
+
+      <ClicksOverTimeChart
+        shortie={linkData}
+        startDate={startDate}
+        endDate={endDate}
+        className="col-span-2"
+      />
     </div>
   )
 }

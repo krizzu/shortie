@@ -15,6 +15,11 @@ export const linkAnalyticsQueryOptions = (
         method: "GET",
       })
 
-      return result.data
+      const data = result.data
+
+      return {
+        ...data,
+        details: new Map(Object.entries(data.details)),
+      }
     },
   })

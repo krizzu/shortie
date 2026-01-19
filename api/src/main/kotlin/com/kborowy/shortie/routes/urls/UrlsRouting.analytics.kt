@@ -39,7 +39,7 @@ fun Route.urlsAnalyticRouting() {
                 protected = shortie.protected,
                 expiryDate = shortie.expiryDate?.asInstantUTC,
                 totalClicks = shortie.totalClicks,
-                lastClick = shortie.lastRedirect,
+                lastClick = shortie.lastRedirect?.asInstantUTC,
                 details = details?.clicksOverTime ?: mapOf(),
             )
         )
@@ -47,7 +47,7 @@ fun Route.urlsAnalyticRouting() {
 }
 
 private fun RoutingContext.parseDateParam(paramName: String, log: Logger): LocalDate? {
-    val dateString = call.parameters["startDate"]
+    val dateString = call.parameters[paramName]
 
     if (dateString == null) {
         log.warn("$paramName parameter not provided")
