@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.kborowy.shortie.services
+package com.kborowy.shortie.services.analytics
 
 import com.kborowy.shortie.data.clicks.ClicksDailyRepository
 import com.kborowy.shortie.data.urls.UrlsRepository
@@ -22,6 +22,7 @@ import com.kborowy.shortie.models.ShortieUrl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
@@ -32,6 +33,13 @@ interface AnalyticService {
 
     /** Increments total clicks and last redirected date */
     fun incrementClick(shortie: ShortieUrl)
+
+    /** gathers analytics data for given shortie returns null if not found */
+    suspend fun getDetails(
+        shortie: ShortieUrl,
+        start: LocalDate,
+        end: LocalDate,
+    ): ShortieAnalyticDetails?
 }
 
 fun AnalyticService(
@@ -55,5 +63,23 @@ private class RealAnalyticService(
             }
             log.info("${shortie.shortCode} click bump")
         }
+    }
+
+    override suspend fun getDetails(
+        shortie: ShortieUrl,
+        start: LocalDate,
+        end: LocalDate,
+    ): ShortieAnalyticDetails? = coroutineScope {
+        val totalResults = async { urlRepo.get(shortie.shortCode) }
+        val detailsResults = async { dailyRepo.getCount(shortie.shortCode, start, end) }
+
+        val totals = totalResults.await() ?: return@coroutineScope null
+
+        ShortieAnalyticDetails(
+            shortCode = totals.shortCode,
+            totalClicks = totals.totalClicks,
+            lastClick = totals.lastRedirect,
+            clicksOverTime = detailsResults.await(),
+        )
     }
 }
