@@ -7,6 +7,7 @@ import { Loading } from "@/components/Loading.tsx"
 import { ClicksOverTimeChart } from "@/routes/_authorized/dashboard.analytics/-components/ClicksOverTimeChart.tsx"
 import { LinkSummaryCard } from "./-components/LinkSummaryCard"
 import { DatePickerWithRange } from "@/routes/_authorized/dashboard.analytics/-components/DateRangePicker.tsx"
+import type { ShortieLinkAnalytic } from "@/types/Link.ts"
 
 export const Route = createFileRoute(
   "/_authorized/dashboard/analytics/$shortCode"
@@ -71,20 +72,7 @@ function RouteComponent() {
     )
   }
 
-  const linkData = query.data
-
-  if (!linkData) {
-    return (
-      <Error
-        title="Link data not found"
-        error={`Sorry, but link "${shortCode}" could not be found`}
-        retryLabel="Go back"
-        onRetry={() => {
-          router.navigate({ to: "/dashboard/analytics" })
-        }}
-      />
-    )
-  }
+  const chartData = query.data ? getChartData(query.data.details) : undefined
 
   return (
     <div className="grid grid-cols-4 gap-x-4 gap-y-4">
@@ -95,14 +83,36 @@ function RouteComponent() {
         />
       </div>
 
-      <LinkSummaryCard link={linkData} />
+      <LinkSummaryCard
+        loading={query.isLoading}
+        updating={query.isFetching}
+        link={query.data}
+      />
 
       <ClicksOverTimeChart
-        shortie={linkData}
+        linkClicks={chartData}
+        loading={query.isLoading}
+        updating={query.isFetching}
         startDate={startDate}
         endDate={endDate}
         className="col-span-2"
       />
     </div>
   )
+}
+
+function getChartData(
+  details: ShortieLinkAnalytic["details"] | undefined
+): { date: string; clicks: number }[] | undefined {
+  if (!details) {
+    return undefined
+  }
+
+  const data: { date: string; clicks: number }[] = []
+
+  details.forEach((_, date, clicks) => {
+    data.push({ date, clicks: clicks.get(date) ?? 0 })
+  })
+
+  return data.length ? data : undefined
 }

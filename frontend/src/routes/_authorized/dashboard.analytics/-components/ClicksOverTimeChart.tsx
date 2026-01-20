@@ -12,20 +12,28 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-import type { ShortieLinkAnalytic } from "@/types/Link.ts"
+import { Spinner } from "@/components/ui/spinner.tsx"
 
 export function ClicksOverTimeChart({
-  shortie,
+  linkClicks,
+  loading,
+  updating,
   startDate,
   endDate,
   className,
+  dateDataKey = "date",
+  clicksDataKey = "clicks",
 }: {
-  shortie: ShortieLinkAnalytic
+  linkClicks: { date: string; clicks: number }[] | undefined
+  dateDataKey?: string
+  clicksDataKey?: string
+  loading: boolean
+  updating: boolean
   startDate: string
   endDate: string
   className?: string
 }) {
-  const chartData = getChartData(shortie)
+  // const chartData = getChartData(linkDetails)
 
   return (
     <Card className={className}>
@@ -36,23 +44,36 @@ export function ClicksOverTimeChart({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
-          <BarChart  accessibilityLayer data={chartData}>
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="date"
-              tickLine={false}
-              tickMargin={10}
-              axisLine={false}
-              tickFormatter={(value) => value}
-            />
-            <ChartTooltip
-              cursor={true}
-              content={<ChartTooltipContent />}
-            />
-            <Bar dataKey="clicks" fill="var(--color-chart-1)" radius={8} />
-          </BarChart>
-        </ChartContainer>
+        {loading || updating ? (
+          <div className="flex justify-center h-24 items-center">
+            <Spinner className="size-12 text-primary" />
+          </div>
+        ) : (
+          <ChartContainer config={chartConfig}>
+            {linkClicks ? (
+              <BarChart accessibilityLayer data={linkClicks}>
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey={dateDataKey}
+                  tickLine={false}
+                  tickMargin={10}
+                  axisLine={false}
+                  tickFormatter={(value) => value}
+                />
+                <ChartTooltip cursor={true} content={<ChartTooltipContent />} />
+                <Bar
+                  dataKey={clicksDataKey}
+                  fill="var(--color-chart-1)"
+                  radius={8}
+                />
+              </BarChart>
+            ) : (
+              <div className="flex justify-center h-24 items-center">
+                <h3 className="text-red-500 text-2xl">no data</h3>
+              </div>
+            )}
+          </ChartContainer>
+        )}
       </CardContent>
     </Card>
   )
@@ -64,15 +85,3 @@ const chartConfig = {
     color: "var(--chart-1)",
   },
 } satisfies ChartConfig
-
-function getChartData(
-  shortie: ShortieLinkAnalytic
-): { date: string; clicks: number }[] {
-  const data: { date: string; clicks: number }[] = []
-
-  shortie.details.forEach((_, date, clicks) => {
-    data.push({ date, clicks: clicks.get(date) ?? 0 })
-  })
-
-  return data
-}
