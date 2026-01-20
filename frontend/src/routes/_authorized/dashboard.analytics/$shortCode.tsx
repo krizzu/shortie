@@ -6,6 +6,7 @@ import { Error } from "@/components/Error.tsx"
 import { Loading } from "@/components/Loading.tsx"
 import { ClicksOverTimeChart } from "@/routes/_authorized/dashboard.analytics/-components/ClicksOverTimeChart.tsx"
 import { LinkSummaryCard } from "./-components/LinkSummaryCard"
+import { DatePickerWithRange } from "@/routes/_authorized/dashboard.analytics/-components/DateRangePicker.tsx"
 
 export const Route = createFileRoute(
   "/_authorized/dashboard/analytics/$shortCode"
@@ -39,10 +40,21 @@ export const Route = createFileRoute(
 function RouteComponent() {
   const { shortCode } = Route.useParams()
   const { startDate, endDate } = Route.useLoaderDeps()
+  const navigate = Route.useNavigate()
   const router = useRouter()
   const query = useQuery(
     linkAnalyticsQueryOptions(shortCode, startDate, endDate)
   )
+
+  function updateDates(dates: { from: Date; to: Date }) {
+    navigate({
+      search: (prev) => ({
+        ...prev,
+        startDate: dateToUtcDateString(dates.from),
+        endDate: dateToUtcDateString(dates.to),
+      }),
+    })
+  }
 
   if (query.isLoading) {
     return <Loading label="loading data..." />
@@ -75,7 +87,14 @@ function RouteComponent() {
   }
 
   return (
-    <div className="grid grid-cols-4 gap-x-4">
+    <div className="grid grid-cols-4 gap-x-4 gap-y-4">
+      <div className="col-span-4">
+        <DatePickerWithRange
+          initial={{ from: new Date(startDate), to: new Date(endDate) }}
+          onDateSelected={updateDates}
+        />
+      </div>
+
       <LinkSummaryCard link={linkData} />
 
       <ClicksOverTimeChart

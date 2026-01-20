@@ -96,7 +96,7 @@ function LinksPage() {
     return (
       <Error
         error={linksQuery.error}
-        reset={() => {
+        onRetry={() => {
           router.invalidate()
         }}
       />
