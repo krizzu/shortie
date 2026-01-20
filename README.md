@@ -12,11 +12,11 @@
   <img src="https://img.shields.io/badge/Coroutines-1.10.2-0095D5" alt="Kotlin Coroutines 1.10.2" />
   <img src="https://img.shields.io/badge/Koin-4.1.1-FE7A16" alt="Koin 4.1.1" />
   <br/>
-  <img src="https://img.shields.io/badge/PostgreSQL-42.7.3-336791?logo=postgresql&logoColor=white" alt="PostgreSQL 42.7.3" />
   <img src="https://img.shields.io/badge/Exposed-1.0.0--rc--4-000000" alt="Exposed 1.0.0-rc-4" />
   <img src="https://img.shields.io/badge/HikariCP-7.0.2-2C2C2C" alt="HikariCP 7.0.2" />
   <img src="https://img.shields.io/badge/Flyway-10.22.0-CC0200?logo=flyway&logoColor=white" alt="Flyway 10.22.0" />
   <br/>
+  <img src="https://img.shields.io/badge/PostgreSQL-Database-336791?logo=postgresql&logoColor=white" alt="PostgreSQL" />
   <img src="https://img.shields.io/badge/Docker-Friendly-2496ED?logo=docker&logoColor=white" alt="Docker Friendly" />
   <img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg" alt="License: Apache 2.0" />
 </p>
