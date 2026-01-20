@@ -1,38 +1,49 @@
+import { Button } from "@/components/ui/button.tsx"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card.tsx"
+
 type ErrorProps = {
-  error: unknown
-  reset?: () => void
+  title?: string
+  error?: Error | string
+  retryLabel?: string
+  onRetry?: () => void
 }
 
-export function Error({ error, reset }: ErrorProps) {
-  const title = "Something went wrong"
-  let message = "An unexpected error occurred."
+export function Error({
+  error,
+  retryLabel = "try again",
+  onRetry,
+  title = "Something went wrong",
+}: ErrorProps) {
+  let message = "An unexpected error occurred"
 
   if (error instanceof Error) {
     message = (error as Error).message
+  } else if (typeof error === "string") {
+    message = error
   }
 
   return (
-    <div
-      style={{
-        padding: "1.5rem",
-        maxWidth: 480,
-      }}
-    >
-      <h2 style={{ marginBottom: "0.5rem" }}>{title}</h2>
-      <p style={{ marginBottom: "1rem", color: "#666" }}>{message}</p>
+    <Card className="p-2 max-w-md">
+      <CardHeader>
+        <CardTitle className="text-red-500 ">{title}</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        <CardDescription>
+          <p className="text-sm text-red-400">{message}</p>
+        </CardDescription>
 
-      {reset && (
-        <button
-          onClick={reset}
-          style={{
-            padding: "0.5rem 0.75rem",
-            fontSize: "0.875rem",
-            cursor: "pointer",
-          }}
-        >
-          Try again
-        </button>
-      )}
-    </div>
+        {onRetry && (
+          <Button onClick={onRetry} variant="secondary">
+            {retryLabel}
+          </Button>
+        )}
+      </CardContent>
+    </Card>
   )
 }

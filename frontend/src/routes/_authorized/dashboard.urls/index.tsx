@@ -54,6 +54,13 @@ function LinksPage() {
     navigate({ to: "/dashboard/urls/create" })
   }
 
+  function navigateToCodeAnalytics(shortie: ShortieLink) {
+    navigate({
+      to: "/dashboard/analytics/$shortCode",
+      params: { shortCode: shortie.shortCode },
+    })
+  }
+
   function navigateToPreviousPage() {
     navigate({
       to: "/dashboard/urls",
@@ -89,7 +96,7 @@ function LinksPage() {
     return (
       <Error
         error={linksQuery.error}
-        reset={() => {
+        onRetry={() => {
           router.invalidate()
         }}
       />
@@ -118,6 +125,7 @@ function LinksPage() {
       }
       onCreateLink={navigateToCreate}
       onDeleteLink={deleteLink}
+      goToCodeAnalytics={navigateToCodeAnalytics}
     />
   )
 }

@@ -8,7 +8,7 @@ import {
 } from "@tanstack/react-router"
 import { AppSidebar } from "./-components/nav/AppSidebar.tsx"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
-import { Link2 } from "lucide-react"
+import { ChartNoAxesCombined, Link2 } from "lucide-react"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -72,6 +72,14 @@ function DashboardMain() {
               matches[matches.length - 1]?.pathname.startsWith(
                 "/dashboard/urls"
               ),
+          },
+          {
+            title: "Analytics",
+            icon: ChartNoAxesCombined,
+            url: "/dashboard/analytics",
+            isActive: matches[matches.length - 1]?.pathname.startsWith(
+              "/dashboard/analytics"
+            ),
           },
         ]}
         onLogOut={logOut}

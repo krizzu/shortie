@@ -90,6 +90,8 @@ fun Application.urlsRouting() {
                         )
                     )
                 }
+
+                route("/analytics") { urlsAnalyticRouting() }
             }
         }
     }

@@ -11,7 +11,7 @@ import {
 import { Badge } from "@/components/ui/badge.tsx"
 import { cn } from "@/lib/utils.ts"
 import type { ShortieLink } from "@/types/Link.ts"
-import { LucideTrash, Plus } from "lucide-react"
+import { LucideChartColumnIncreasing, LucideTrash, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Pagination,
@@ -32,6 +32,7 @@ type Props = {
   onDeleteLink: (link: ShortieLink) => Promise<void>
   fetchNextPage: (() => void) | null
   goToPreviousPage: (() => void) | null
+  goToCodeAnalytics: (code: ShortieLink) => void
 }
 
 export function LinksList({
@@ -40,6 +41,7 @@ export function LinksList({
   loading,
   fetchNextPage,
   onDeleteLink,
+  goToCodeAnalytics,
   goToPreviousPage,
 }: Props) {
   const [toDelete, setToDelete] = useState<ShortieLink | null>(null)
@@ -157,7 +159,15 @@ export function LinksList({
                           <span className="text-muted-foreground">Never</span>
                         )}
                       </TableCell>
-                      <TableCell className="h-6">
+                      <TableCell className="h-6 space-x-2">
+                        <Button
+                          onClick={() => goToCodeAnalytics(link)}
+                          variant="secondary"
+                          className="rounded-2xl"
+                        >
+                          <LucideChartColumnIncreasing />
+                        </Button>
+
                         <Button
                           onClick={() => setToDelete(link)}
                           variant="destructive"

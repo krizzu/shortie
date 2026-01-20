@@ -15,6 +15,7 @@
  */
 package com.kborowy.shortie.services
 
+import com.kborowy.shortie.services.analytics.AnalyticService
 import com.kborowy.shortie.services.urls.UrlsService
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
