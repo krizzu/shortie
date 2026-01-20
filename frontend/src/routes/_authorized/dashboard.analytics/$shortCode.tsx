@@ -8,6 +8,7 @@ import { ClicksOverTimeChart } from "@/routes/_authorized/dashboard.analytics/-c
 import { LinkSummaryCard } from "./-components/LinkSummaryCard"
 import { DatePickerWithRange } from "@/routes/_authorized/dashboard.analytics/-components/DateRangePicker.tsx"
 import type { ShortieLinkAnalytic } from "@/types/Link.ts"
+import { createDateRange } from "@/routes/_authorized/dashboard.analytics/-utils/createDateRange.ts"
 
 export const Route = createFileRoute(
   "/_authorized/dashboard/analytics/$shortCode"
@@ -72,7 +73,9 @@ function RouteComponent() {
     )
   }
 
-  const chartData = query.data ? getChartData(query.data.details) : undefined
+  const chartData = query.data
+    ? getChartData(query.data.details, startDate, endDate)
+    : undefined
 
   return (
     <div className="grid grid-cols-4 gap-x-4 gap-y-4">
@@ -102,17 +105,19 @@ function RouteComponent() {
 }
 
 function getChartData(
-  details: ShortieLinkAnalytic["details"] | undefined
+  details: ShortieLinkAnalytic["details"] | undefined,
+  startDate: string,
+  endDate: string
 ): { date: string; clicks: number }[] | undefined {
   if (!details) {
     return undefined
   }
-
   const data: { date: string; clicks: number }[] = []
+  const range = createDateRange(startDate, endDate)
 
-  details.forEach((_, date, clicks) => {
-    data.push({ date, clicks: clicks.get(date) ?? 0 })
-  })
+  for (const date of range) {
+    data.push({ date, clicks: details.get(date) ?? 0 })
+  }
 
-  return data.length ? data : undefined
+  return data
 }
