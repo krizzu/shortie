@@ -10,7 +10,7 @@ type ShortieLinkAnalyticResponse = {
   details: Record<string, number>
 }
 
-export const linkAnalyticsQueryOptions = (
+export const linkAnalyticsDetailsQueryOptions = (
   shortCode: string,
   startDate: string, // iso date string
   endDate: string // iso date string

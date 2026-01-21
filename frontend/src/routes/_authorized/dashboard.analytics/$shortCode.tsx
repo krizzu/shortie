@@ -1,5 +1,5 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router"
-import { linkAnalyticsQueryOptions } from "@/queries/links-analytics-details-query-options.ts"
+import { linkAnalyticsDetailsQueryOptions } from "@/queries/links-analytics-details-query-options.ts"
 import { useQuery } from "@tanstack/react-query"
 import { dateToUtcDateString } from "@/lib/utils.ts"
 import { Error } from "@/components/Error.tsx"
@@ -35,7 +35,7 @@ export const Route = createFileRoute(
 
   loader: ({ params, context, deps }) => {
     context.queryClient.ensureQueryData(
-      linkAnalyticsQueryOptions(params.shortCode, deps.startDate, deps.endDate)
+      linkAnalyticsDetailsQueryOptions(params.shortCode, deps.startDate, deps.endDate)
     )
   },
 
@@ -48,7 +48,7 @@ function RouteComponent() {
   const navigate = Route.useNavigate()
   const router = useRouter()
   const query = useQuery(
-    linkAnalyticsQueryOptions(shortCode, startDate, endDate)
+    linkAnalyticsDetailsQueryOptions(shortCode, startDate, endDate)
   )
 
   function updateDates(dates: { from: Date; to: Date }) {

@@ -20,7 +20,7 @@ fun Route.urlsAnalyticRouting() {
     val urls by inject<UrlsService>()
     val analytics by inject<AnalyticService>()
 
-    get("/overview") {
+    get {
         val limit = call.request.queryParameters["limit"]?.toIntOrNull() ?: 20
         val cursor = call.request.queryParameters["cursor"]
 
@@ -28,14 +28,16 @@ fun Route.urlsAnalyticRouting() {
             urls.getShorties(limit, cursor) ?: throw BadRequestError("Could not decode cursor")
 
         call.respond(
-            PaginatedShortieResponseDTO(
+            PaginatedShortieAnalyticsResponseDTO(
                 data =
                     data.data.map {
-                        ShortieDTO(
+                        ShortieAnalyticsDTO(
                             shortCode = it.shortCode.value,
                             originalUrl = it.originalUrl.value,
                             protected = it.protected,
                             expiryDate = it.expiryDate?.asInstantUTC,
+                            totalClicks = it.totalClicks,
+                            lastClick = it.lastRedirect?.asInstantUTC,
                         )
                     },
                 hasNext = data.hasNext,
@@ -43,6 +45,9 @@ fun Route.urlsAnalyticRouting() {
             )
         )
     }
+
+    // todo:
+    // endpoint /overview to fetch overview, such as total links, total clicks etc.
 
     get("/{shortCode}") {
         val startDate =
