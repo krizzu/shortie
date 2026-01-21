@@ -4,7 +4,10 @@ import { useQuery } from "@tanstack/react-query"
 import { dateToUtcDateString } from "@/lib/utils.ts"
 import { Error } from "@/components/Error.tsx"
 import { Loading } from "@/components/Loading.tsx"
-import { ClicksOverTimeChart } from "@/routes/_authorized/dashboard.analytics/-components/ClicksOverTimeChart.tsx"
+import {
+  ClicksOverTimeChart,
+  ClicksOverTimeSummary,
+} from "@/routes/_authorized/dashboard.analytics/-components/ClicksOverTimeChart.tsx"
 import { LinkSummaryCard } from "./-components/LinkSummaryCard"
 import { DatePickerWithRange } from "@/routes/_authorized/dashboard.analytics/-components/DateRangePicker.tsx"
 import type { ShortieLinkAnalytic } from "@/types/Link.ts"
@@ -86,11 +89,18 @@ function RouteComponent() {
         />
       </div>
 
-      <LinkSummaryCard
-        loading={query.isLoading}
-        updating={query.isFetching}
-        link={query.data}
-      />
+      <div className="grid grid-rows-2 gap-4">
+        <ClicksOverTimeSummary
+          linkClicks={chartData}
+          loading={query.isLoading}
+          updating={query.isFetching}
+        />
+        <LinkSummaryCard
+          loading={query.isLoading}
+          updating={query.isFetching}
+          link={query.data}
+        />
+      </div>
 
       <ClicksOverTimeChart
         linkClicks={chartData}

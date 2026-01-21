@@ -24,7 +24,7 @@ export function LinkSummaryCard({
   return (
     <Card className="@container/card">
       <CardContent className="mx-auto my-auto">
-        <CardDescription className="text-center">Total clicks</CardDescription>
+        <CardDescription className="text-center">Total clicks overall</CardDescription>
         <CardTitle
           className={cn(
             "text-center text-6xl font-semibold",
