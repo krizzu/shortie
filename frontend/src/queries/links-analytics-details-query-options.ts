@@ -1,6 +1,14 @@
 import { queryOptions } from "@tanstack/react-query"
 import { fetcher } from "@/services/fetcher.ts"
-import type { ShortieLinkAnalytic } from "@/types/Link.ts"
+import type {
+  ShortieLinkAnalytic,
+  ShortieLinkAnalyticDetails,
+} from "@/types/Link.ts"
+
+type ShortieLinkAnalyticResponse = {
+  info: ShortieLinkAnalytic
+  details: Record<string, number>
+}
 
 export const linkAnalyticsQueryOptions = (
   shortCode: string,
@@ -11,15 +19,17 @@ export const linkAnalyticsQueryOptions = (
     queryKey: ["links", "analytics", { shortCode, startDate, endDate }],
     queryFn: async () => {
       const url = `/urls/analytics/${shortCode}?startDate=${startDate}&endDate=${endDate}`
-      const result = await fetcher<ShortieLinkAnalytic>(url, {
+      const apiResult = await fetcher<ShortieLinkAnalyticResponse>(url, {
         method: "GET",
       })
 
-      const data = result.data
+      const data = apiResult.data
 
-      return {
-        ...data,
+      const result: ShortieLinkAnalyticDetails = {
+        ...data.info,
         details: new Map(Object.entries(data.details)),
       }
+
+      return result
     },
   })

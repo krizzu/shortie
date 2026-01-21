@@ -1,5 +1,5 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router"
-import { linkAnalyticsQueryOptions } from "@/queries/links-analytics-query-options.ts"
+import { linkAnalyticsQueryOptions } from "@/queries/links-analytics-details-query-options.ts"
 import { useQuery } from "@tanstack/react-query"
 import { dateToUtcDateString } from "@/lib/utils.ts"
 import { Error } from "@/components/Error.tsx"
@@ -10,7 +10,7 @@ import {
 } from "@/routes/_authorized/dashboard.analytics/-components/ClicksOverTimeChart.tsx"
 import { LinkSummaryCard } from "./-components/LinkSummaryCard"
 import { DatePickerWithRange } from "@/routes/_authorized/dashboard.analytics/-components/DateRangePicker.tsx"
-import type { ShortieLinkAnalytic } from "@/types/Link.ts"
+import type { ShortieLinkAnalyticDetails } from "@/types/Link.ts"
 import { createDateRange } from "@/routes/_authorized/dashboard.analytics/-utils/createDateRange.ts"
 
 export const Route = createFileRoute(
@@ -115,7 +115,7 @@ function RouteComponent() {
 }
 
 function getChartData(
-  details: ShortieLinkAnalytic["details"] | undefined,
+  details: ShortieLinkAnalyticDetails["details"] | undefined,
   startDate: string,
   endDate: string
 ): { date: string; clicks: number }[] | undefined {

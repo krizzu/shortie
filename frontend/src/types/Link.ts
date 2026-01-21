@@ -8,5 +8,8 @@ export interface ShortieLink {
 export interface ShortieLinkAnalytic extends ShortieLink {
   totalClicks: number
   lastClick: string | null // iso 8601 utc datetime string
+}
+
+export interface ShortieLinkAnalyticDetails extends ShortieLinkAnalytic {
   details: Map<string, number> // iso 8601 utc date string mapping to number of clicks
 }

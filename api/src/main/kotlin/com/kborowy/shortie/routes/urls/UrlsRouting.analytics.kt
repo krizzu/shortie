@@ -20,6 +20,30 @@ fun Route.urlsAnalyticRouting() {
     val urls by inject<UrlsService>()
     val analytics by inject<AnalyticService>()
 
+    get("/overview") {
+        val limit = call.request.queryParameters["limit"]?.toIntOrNull() ?: 20
+        val cursor = call.request.queryParameters["cursor"]
+
+        val data =
+            urls.getShorties(limit, cursor) ?: throw BadRequestError("Could not decode cursor")
+
+        call.respond(
+            PaginatedShortieResponseDTO(
+                data =
+                    data.data.map {
+                        ShortieDTO(
+                            shortCode = it.shortCode.value,
+                            originalUrl = it.originalUrl.value,
+                            protected = it.protected,
+                            expiryDate = it.expiryDate?.asInstantUTC,
+                        )
+                    },
+                hasNext = data.hasNext,
+                nextCursor = data.nextCursor,
+            )
+        )
+    }
+
     get("/{shortCode}") {
         val startDate =
             parseDateParam("startDate", log)
@@ -32,14 +56,17 @@ fun Route.urlsAnalyticRouting() {
             urls.resolveShortCode(shortCode) ?: throw NotFoundHttpError("shortie not found")
 
         val details = analytics.getDetails(shortie, startDate, endDate)
-        call.respond<ShortieAnalyticsDTO>(
-            ShortieAnalyticsDTO(
-                shortCode = shortie.shortCode.value,
-                originalUrl = shortie.originalUrl.value,
-                protected = shortie.protected,
-                expiryDate = shortie.expiryDate?.asInstantUTC,
-                totalClicks = shortie.totalClicks,
-                lastClick = shortie.lastRedirect?.asInstantUTC,
+        call.respond<ShortieAnalyticsDetailsDTO>(
+            ShortieAnalyticsDetailsDTO(
+                info =
+                    ShortieAnalyticsDTO(
+                        shortCode = shortie.shortCode.value,
+                        originalUrl = shortie.originalUrl.value,
+                        protected = shortie.protected,
+                        expiryDate = shortie.expiryDate?.asInstantUTC,
+                        totalClicks = shortie.totalClicks,
+                        lastClick = shortie.lastRedirect?.asInstantUTC,
+                    ),
                 details = details?.clicksOverTime ?: mapOf(),
             )
         )
