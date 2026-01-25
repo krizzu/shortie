@@ -23,12 +23,22 @@ import com.kborowy.shortie.models.ShortCode
 import com.kborowy.shortie.models.ShortiePageCursor
 import com.kborowy.shortie.models.ShortieUrl
 import kotlinx.datetime.LocalDateTime
+import org.jetbrains.exposed.v1.core.Case
+import org.jetbrains.exposed.v1.core.Count
+import org.jetbrains.exposed.v1.core.LongColumnType
 import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.core.SortOrder
+import org.jetbrains.exposed.v1.core.Sum
+import org.jetbrains.exposed.v1.core.alias
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.greaterEq
 import org.jetbrains.exposed.v1.core.inList
+import org.jetbrains.exposed.v1.core.isNotNull
+import org.jetbrains.exposed.v1.core.isNull
 import org.jetbrains.exposed.v1.core.less
+import org.jetbrains.exposed.v1.core.lessEq
+import org.jetbrains.exposed.v1.core.longLiteral
 import org.jetbrains.exposed.v1.core.or
 import org.jetbrains.exposed.v1.core.plus
 import org.jetbrains.exposed.v1.jdbc.Database
@@ -59,6 +69,9 @@ interface UrlsRepository {
 
     /** Increments the click count by 1 and updates lastRedirect to now. */
     suspend fun incrementClickCount(code: ShortCode)
+
+    /** Reports number of active, expired and total links in system */
+    suspend fun getLinksTotals(expiryDate: LocalDateTime): ShortieUrlTotals
 }
 
 fun UrlsRepository(db: Database): UrlsRepository = RealUrlsRepository(db)
@@ -156,6 +169,45 @@ private class RealUrlsRepository(private val db: Database) : UrlsRepository {
             }
         }
     }
+
+    override suspend fun getLinksTotals(expiryDate: LocalDateTime): ShortieUrlTotals =
+        transaction(db) {
+            val totalAlias = Count(UrlsTable.id).alias("total")
+
+            val expiredAlias =
+                Sum(
+                        Case()
+                            .When(
+                                UrlsTable.expiryDate.isNotNull() and
+                                    (UrlsTable.expiryDate lessEq expiryDate),
+                                longLiteral(1),
+                            )
+                            .Else(longLiteral(0)),
+                        LongColumnType(),
+                    )
+                    .alias("expired")
+
+            val activeAlias =
+                Sum(
+                        Case()
+                            .When(
+                                UrlsTable.expiryDate.isNull() or
+                                    (UrlsTable.expiryDate greaterEq expiryDate),
+                                longLiteral(1),
+                            )
+                            .Else(longLiteral(0)),
+                        LongColumnType(),
+                    )
+                    .alias("active")
+
+            val result = UrlsTable.select(totalAlias, expiredAlias, activeAlias).single()
+
+            ShortieUrlTotals(
+                total = result[totalAlias],
+                active = result[activeAlias] ?: 0,
+                expired = result[expiredAlias] ?: 0,
+            )
+        }
 }
 
 private fun ResultRow.toShortieUrl(): ShortieUrl {

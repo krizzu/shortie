@@ -40,6 +40,12 @@ interface AnalyticService {
         start: LocalDate,
         end: LocalDate,
     ): ShortieAnalyticDetails?
+
+    /** return the accumulated data about links in system */
+    suspend fun totalOverview(): ShortieAnalyticOverview
+
+    /** returns a weekly overview, providing the end of week date */
+    suspend fun weeklyOverview(endWeek: LocalDate): ShortieAnalyticWeeklyOverview
 }
 
 fun AnalyticService(
@@ -81,5 +87,13 @@ private class RealAnalyticService(
             lastClick = totals.lastRedirect,
             clicksOverTime = detailsResults.await(),
         )
+    }
+
+    override suspend fun totalOverview(): ShortieAnalyticOverview {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun weeklyOverview(endWeek: LocalDate): ShortieAnalyticWeeklyOverview {
+        TODO("Not yet implemented")
     }
 }
