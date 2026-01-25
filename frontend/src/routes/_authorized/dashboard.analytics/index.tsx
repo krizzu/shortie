@@ -37,6 +37,6 @@ function RouteComponent() {
   const deps = Route.useLoaderDeps()
   const links = useQuery(linkAnalyticsQueryOptions(deps.page, deps.limit))
 
-  // todo: build page
+  // todo: build pageX
   return <div>{links.data?.data?.map((l) => l.shortCode)}</div>
 }
