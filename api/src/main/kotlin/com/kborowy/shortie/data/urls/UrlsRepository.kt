@@ -24,13 +24,13 @@ import com.kborowy.shortie.models.ShortiePageCursor
 import com.kborowy.shortie.models.ShortieUrl
 import kotlinx.datetime.LocalDateTime
 import org.jetbrains.exposed.v1.core.Case
-import org.jetbrains.exposed.v1.core.Count
 import org.jetbrains.exposed.v1.core.LongColumnType
 import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.Sum
 import org.jetbrains.exposed.v1.core.alias
 import org.jetbrains.exposed.v1.core.and
+import org.jetbrains.exposed.v1.core.count
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.greaterEq
 import org.jetbrains.exposed.v1.core.inList
@@ -41,6 +41,7 @@ import org.jetbrains.exposed.v1.core.lessEq
 import org.jetbrains.exposed.v1.core.longLiteral
 import org.jetbrains.exposed.v1.core.or
 import org.jetbrains.exposed.v1.core.plus
+import org.jetbrains.exposed.v1.core.sum
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.insertAndGetId
@@ -172,7 +173,7 @@ private class RealUrlsRepository(private val db: Database) : UrlsRepository {
 
     override suspend fun getLinksTotals(expiryDate: LocalDateTime): ShortieUrlTotals =
         transaction(db) {
-            val totalAlias = Count(UrlsTable.id).alias("total")
+            val totalAlias = UrlsTable.id.count().alias("totalLinks")
 
             val expiredAlias =
                 Sum(
@@ -200,12 +201,16 @@ private class RealUrlsRepository(private val db: Database) : UrlsRepository {
                     )
                     .alias("active")
 
-            val result = UrlsTable.select(totalAlias, expiredAlias, activeAlias).single()
+            val clicksAlias = UrlsTable.totalClicks.sum().alias("clicks")
+
+            val result =
+                UrlsTable.select(totalAlias, expiredAlias, activeAlias, clicksAlias).single()
 
             ShortieUrlTotals(
                 total = result[totalAlias],
                 active = result[activeAlias] ?: 0,
                 expired = result[expiredAlias] ?: 0,
+                clicks = result[clicksAlias] ?: 0,
             )
         }
 }

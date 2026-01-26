@@ -17,13 +17,13 @@ import org.jetbrains.exposed.v1.jdbc.upsert
 interface ClicksDailyRepository {
     suspend fun incrementCount(code: ShortCode, date: LocalDate, by: Int = 1)
 
-    suspend fun getCount(code: ShortCode, start: LocalDate, end: LocalDate): Map<LocalDate, Long>
+    suspend fun getDailyCount(code: ShortCode, start: LocalDate, end: LocalDate): Map<LocalDate, Long>
 }
 
 fun ClicksDailyRepository(db: Database): ClicksDailyRepository = RealClicksDailyRepository(db)
 
 private class RealClicksDailyRepository(private val db: Database) : ClicksDailyRepository {
-    override suspend fun getCount(
+    override suspend fun getDailyCount(
         code: ShortCode,
         start: LocalDate,
         end: LocalDate,

@@ -15,11 +15,12 @@ data class ShortieAnalyticWeeklyOverview(
     val startDate: LocalDate,
     val endDate: LocalDate,
     val totalClicks: Int,
-    val avgClicks: Float,
+    val avgClicksPerDay: Float,
 )
 
 data class ShortieAnalyticOverview(
-    val totalUrls: Int,
     val totalClicks: Int,
-    val avgClickPerDay: Float,
+    val totalLinks: Int,
+    val activeLinks: Int,
+    val expiredLinks: Int,
 )

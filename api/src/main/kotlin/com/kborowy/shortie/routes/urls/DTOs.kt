@@ -61,10 +61,11 @@ data class PaginatedShortieResponseDTO(
 )
 
 @Serializable
-data class PaginatedShortieAnalyticsResponseDTO(
-    val data: List<ShortieAnalyticsDTO>,
-    val hasNext: Boolean,
-    val nextCursor: String?,
+data class TotalOverviewResponseDTO(
+    val totalClicks: Int,
+    val totalLinks: Int,
+    val activeLinks: Int,
+    val expiredLinks: Int,
 )
 
 @Serializable data class DeleteShortiePayloadDTO(val shortCodes: List<String>)
