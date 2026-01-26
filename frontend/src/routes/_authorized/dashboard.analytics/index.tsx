@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router"
-import { linkAnalyticsQueryOptions } from "@/queries/links-analytics-query-options.ts"
 import { useQuery } from "@tanstack/react-query"
+import { linksQueryOptions } from "@/queries/links-query-options.ts"
+import { linkAnalyticsOverviewQueryOptions } from "@/queries/links-analytics-overview-query-options.ts"
+import { ValueSummaryCard } from "@/routes/_authorized/dashboard.analytics/-components/ValueSummaryCard.tsx"
 
 const DEFAULT_LIMIT = 20
 
@@ -26,8 +28,9 @@ export const Route = createFileRoute("/_authorized/dashboard/analytics/")({
 
   loader: ({ context, deps }) => {
     context.queryClient.ensureQueryData(
-      linkAnalyticsQueryOptions(deps.page, deps.limit)
+      linksQueryOptions(deps.page, deps.limit)
     )
+    context.queryClient.ensureQueryData(linkAnalyticsOverviewQueryOptions())
   },
 
   component: RouteComponent,
@@ -35,8 +38,37 @@ export const Route = createFileRoute("/_authorized/dashboard/analytics/")({
 
 function RouteComponent() {
   const deps = Route.useLoaderDeps()
-  const links = useQuery(linkAnalyticsQueryOptions(deps.page, deps.limit))
+  const links = useQuery(linksQueryOptions(deps.page, deps.limit))
+  const overview = useQuery(linkAnalyticsOverviewQueryOptions())
 
-  // todo: build pageX
-  return <div>{links.data?.data?.map((l) => l.shortCode)}</div>
+  return (
+    <div>
+      <div className="grid grid-cols-4 gap-x-4">
+        <ValueSummaryCard
+          value={overview.data?.totalLinks}
+          name="total links"
+          loading={overview.isLoading}
+          updating={overview.isFetching}
+        />
+        <ValueSummaryCard
+          value={overview.data?.totalClicks}
+          name="total clicks"
+          loading={overview.isLoading}
+          updating={overview.isFetching}
+        />
+        <ValueSummaryCard
+          value={overview.data?.activeLinks}
+          name="active links"
+          loading={overview.isLoading}
+          updating={overview.isFetching}
+        />
+        <ValueSummaryCard
+          value={overview.data?.expiredLinks}
+          name="expired links"
+          loading={overview.isLoading}
+          updating={overview.isFetching}
+        />
+      </div>
+    </div>
+  )
 }

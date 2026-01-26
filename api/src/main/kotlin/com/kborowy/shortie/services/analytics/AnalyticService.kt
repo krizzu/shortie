@@ -95,7 +95,7 @@ private class RealAnalyticService(
             totalClicks = links.clicks.toInt(),
             totalLinks = links.total.toInt(),
             activeLinks = links.active.toInt(),
-            expiredLinks = links.active.toInt(),
+            expiredLinks = links.expired.toInt(),
         )
     }
 }
