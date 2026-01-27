@@ -18,10 +18,16 @@ package com.kborowy.shortie.data.urls
 import com.kborowy.shortie.models.ShortiePageCursor
 import com.kborowy.shortie.models.ShortieUrl
 
-data class ShortieUrlPaginated(
+data class ShortieUrlPaginatedCursor(
     val data: List<ShortieUrl>,
     val hasNext: Boolean,
     val nextCursor: ShortiePageCursor?,
+)
+
+data class ShortieUrlPaginatedOffset(
+    val data: List<ShortieUrl>,
+    val hasNext: Boolean,
+    val nextPage: Int?,
 )
 
 data class ShortieUrlTotals(val expired: Long, val active: Long, val total: Long, val clicks: Long)

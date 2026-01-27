@@ -5,7 +5,8 @@ export interface ShortieLink {
   expiryDate?: string // iso 8601 utc datetime string
 }
 
-export interface ShortieLinkAnalytic extends ShortieLink {
+export interface ShortieLinkAnalytic {
+  shortCode: string
   totalClicks: number
   lastClick: string | null // iso 8601 utc datetime string
 }

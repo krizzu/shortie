@@ -20,6 +20,26 @@ fun Route.urlsAnalyticRouting() {
     val urls by inject<UrlsService>()
     val analytics by inject<AnalyticService>()
 
+    get("/links") {
+        val limit = call.parameters["limit"]?.toIntOrNull() ?: 20
+        val page = call.parameters["page"]?.toIntOrNull()
+        val result = analytics.getLinksPaginated(limit, page)
+        call.respond(
+            PaginatedOffsetShortieResponseDTO(
+                hasNext = result.hasNext,
+                nextPage = result.nextPage,
+                data =
+                    result.links.map {
+                        ShortieAnalyticsDTO(
+                            shortCode = it.shortCode.value,
+                            totalClicks = it.totalClicks,
+                            lastClick = it.lastClick?.asInstantUTC,
+                        )
+                    },
+            )
+        )
+    }
+
     get("/overview") {
         val overview = analytics.totalOverview()
 
@@ -50,9 +70,6 @@ fun Route.urlsAnalyticRouting() {
                 info =
                     ShortieAnalyticsDTO(
                         shortCode = shortie.shortCode.value,
-                        originalUrl = shortie.originalUrl.value,
-                        protected = shortie.protected,
-                        expiryDate = shortie.expiryDate?.asInstantUTC,
                         totalClicks = shortie.totalClicks,
                         lastClick = shortie.lastRedirect?.asInstantUTC,
                     ),

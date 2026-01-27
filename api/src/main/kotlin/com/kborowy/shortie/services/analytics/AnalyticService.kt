@@ -45,6 +45,8 @@ interface AnalyticService {
 
     /** return the accumulated data about links in system */
     suspend fun totalOverview(): ShortieAnalyticOverview
+
+    suspend fun getLinksPaginated(limit: Int, page: Int?): PaginatedShortieAnalyticLink
 }
 
 fun AnalyticService(
@@ -96,6 +98,22 @@ private class RealAnalyticService(
             totalLinks = links.total.toInt(),
             activeLinks = links.active.toInt(),
             expiredLinks = links.expired.toInt(),
+        )
+    }
+
+    override suspend fun getLinksPaginated(limit: Int, page: Int?): PaginatedShortieAnalyticLink {
+        val result = urlRepo.getPageOffset(limit = limit, page = page, clicksOrderDesc = true)
+        return PaginatedShortieAnalyticLink(
+            hasNext = result.hasNext,
+            nextPage = result.nextPage,
+            links =
+                result.data.map {
+                    ShortieAnalyticLink(
+                        shortCode = it.shortCode,
+                        totalClicks = it.totalClicks,
+                        lastClick = it.lastRedirect,
+                    )
+                },
         )
     }
 }
