@@ -20,6 +20,19 @@ fun Route.urlsAnalyticRouting() {
     val urls by inject<UrlsService>()
     val analytics by inject<AnalyticService>()
 
+    get("/overview") {
+        val overview = analytics.totalOverview()
+
+        call.respond(
+            TotalOverviewResponseDTO(
+                totalLinks = overview.totalLinks,
+                activeLinks = overview.activeLinks,
+                expiredLinks = overview.expiredLinks,
+                totalClicks = overview.totalClicks,
+            )
+        )
+    }
+
     get("/{shortCode}") {
         val startDate =
             parseDateParam("startDate", log)
@@ -32,14 +45,17 @@ fun Route.urlsAnalyticRouting() {
             urls.resolveShortCode(shortCode) ?: throw NotFoundHttpError("shortie not found")
 
         val details = analytics.getDetails(shortie, startDate, endDate)
-        call.respond<ShortieAnalyticsDTO>(
-            ShortieAnalyticsDTO(
-                shortCode = shortie.shortCode.value,
-                originalUrl = shortie.originalUrl.value,
-                protected = shortie.protected,
-                expiryDate = shortie.expiryDate?.asInstantUTC,
-                totalClicks = shortie.totalClicks,
-                lastClick = shortie.lastRedirect?.asInstantUTC,
+        call.respond<ShortieAnalyticsDetailsDTO>(
+            ShortieAnalyticsDetailsDTO(
+                info =
+                    ShortieAnalyticsDTO(
+                        shortCode = shortie.shortCode.value,
+                        originalUrl = shortie.originalUrl.value,
+                        protected = shortie.protected,
+                        expiryDate = shortie.expiryDate?.asInstantUTC,
+                        totalClicks = shortie.totalClicks,
+                        lastClick = shortie.lastRedirect?.asInstantUTC,
+                    ),
                 details = details?.clicksOverTime ?: mapOf(),
             )
         )

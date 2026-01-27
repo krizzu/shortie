@@ -1,13 +1,16 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router"
-import { linkAnalyticsQueryOptions } from "@/queries/links-analytics-query-options.ts"
+import { linkAnalyticsDetailsQueryOptions } from "@/queries/links-analytics-details-query-options.ts"
 import { useQuery } from "@tanstack/react-query"
 import { dateToUtcDateString } from "@/lib/utils.ts"
 import { Error } from "@/components/Error.tsx"
 import { Loading } from "@/components/Loading.tsx"
-import { ClicksOverTimeChart } from "@/routes/_authorized/dashboard.analytics/-components/ClicksOverTimeChart.tsx"
+import {
+  ClicksOverTimeChart,
+  ClicksOverTimeSummary,
+} from "@/routes/_authorized/dashboard.analytics/-components/ClicksOverTimeChart.tsx"
 import { LinkSummaryCard } from "./-components/LinkSummaryCard"
 import { DatePickerWithRange } from "@/routes/_authorized/dashboard.analytics/-components/DateRangePicker.tsx"
-import type { ShortieLinkAnalytic } from "@/types/Link.ts"
+import type { ShortieLinkAnalyticDetails } from "@/types/Link.ts"
 import { createDateRange } from "@/routes/_authorized/dashboard.analytics/-utils/createDateRange.ts"
 
 export const Route = createFileRoute(
@@ -32,7 +35,7 @@ export const Route = createFileRoute(
 
   loader: ({ params, context, deps }) => {
     context.queryClient.ensureQueryData(
-      linkAnalyticsQueryOptions(params.shortCode, deps.startDate, deps.endDate)
+      linkAnalyticsDetailsQueryOptions(params.shortCode, deps.startDate, deps.endDate)
     )
   },
 
@@ -45,7 +48,7 @@ function RouteComponent() {
   const navigate = Route.useNavigate()
   const router = useRouter()
   const query = useQuery(
-    linkAnalyticsQueryOptions(shortCode, startDate, endDate)
+    linkAnalyticsDetailsQueryOptions(shortCode, startDate, endDate)
   )
 
   function updateDates(dates: { from: Date; to: Date }) {
@@ -86,11 +89,18 @@ function RouteComponent() {
         />
       </div>
 
-      <LinkSummaryCard
-        loading={query.isLoading}
-        updating={query.isFetching}
-        link={query.data}
-      />
+      <div className="grid grid-rows-2 gap-4">
+        <ClicksOverTimeSummary
+          linkClicks={chartData}
+          loading={query.isLoading}
+          updating={query.isFetching}
+        />
+        <LinkSummaryCard
+          loading={query.isLoading}
+          updating={query.isFetching}
+          link={query.data}
+        />
+      </div>
 
       <ClicksOverTimeChart
         linkClicks={chartData}
@@ -105,7 +115,7 @@ function RouteComponent() {
 }
 
 function getChartData(
-  details: ShortieLinkAnalytic["details"] | undefined,
+  details: ShortieLinkAnalyticDetails["details"] | undefined,
   startDate: string,
   endDate: string
 ): { date: string; clicks: number }[] | undefined {

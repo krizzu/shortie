@@ -17,7 +17,6 @@ package com.kborowy.shortie.routes.urls
 
 import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -46,6 +45,11 @@ data class ShortieAnalyticsDTO(
     val expiryDate: Instant?,
     val totalClicks: Long,
     val lastClick: Instant?, // utc datetime, iso format
+)
+
+@Serializable
+data class ShortieAnalyticsDetailsDTO(
+    val info: ShortieAnalyticsDTO,
     val details: Map<LocalDate, Long>,
 )
 
@@ -54,6 +58,14 @@ data class PaginatedShortieResponseDTO(
     val data: List<ShortieDTO>,
     val hasNext: Boolean,
     val nextCursor: String?,
+)
+
+@Serializable
+data class TotalOverviewResponseDTO(
+    val totalClicks: Int,
+    val totalLinks: Int,
+    val activeLinks: Int,
+    val expiredLinks: Int,
 )
 
 @Serializable data class DeleteShortiePayloadDTO(val shortCodes: List<String>)

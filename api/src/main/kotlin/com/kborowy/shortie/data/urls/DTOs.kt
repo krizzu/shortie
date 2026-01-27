@@ -23,3 +23,5 @@ data class ShortieUrlPaginated(
     val hasNext: Boolean,
     val nextCursor: ShortiePageCursor?,
 )
+
+data class ShortieUrlTotals(val expired: Long, val active: Long, val total: Long, val clicks: Long)

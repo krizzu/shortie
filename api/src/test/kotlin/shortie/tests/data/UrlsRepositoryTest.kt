@@ -16,11 +16,15 @@
 package shortie.tests.data
 
 import com.kborowy.shortie.data.GlobalClockProvider
+import com.kborowy.shortie.data.urls.ShortieUrlTotals
 import com.kborowy.shortie.data.urls.UrlsRepository
+import com.kborowy.shortie.extensions.asInstantUTC
 import com.kborowy.shortie.extensions.now
+import com.kborowy.shortie.extensions.toLocalDateTimeUTC
 import com.kborowy.shortie.models.OriginalUrl
 import com.kborowy.shortie.models.ShortCode
 import com.kborowy.shortie.models.ShortieUrl
+import kotlin.random.Random
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -28,7 +32,9 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Instant
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDateTime
 import shortie.tests.DatabaseUtils
@@ -84,7 +90,7 @@ class UrlsRepositoryTest {
     @Test
     fun `paginated results sizes and limits`() = runTest {
         val urls = mutableListOf<ShortieUrl>()
-        for (i in 0 ..< 10) {
+        for (i in 0..<10) {
             val url = OriginalUrl("https://www.$i.com")
             val code = coder.generateShortCode(i.toLong())
             urls.add(repo.insert(url, code))
@@ -144,4 +150,46 @@ class UrlsRepositoryTest {
         assertEquals(urls.last(), result.data.first())
         assertEquals(urls.first(), result.data.last())
     }
+
+    @Test
+    fun `collects total overview`() = runTest {
+        val clock = FakeClock()
+        GlobalClockProvider.replaceClock(clock)
+
+        val expired = Random.nextLong(2, 10)
+        val active = Random.nextLong(2, 10)
+        val total = expired + active
+
+        clock.backward(3.days)
+        for (i in 1..expired) {
+            val url = OriginalUrl("https://www.example${i}.com")
+            val code = ShortCode(value = "aDs3s${i}")
+            repo.insert(
+                url = url,
+                code = code,
+                expiry = LocalDateTime.now.asInstantUTC.plus(1.days).toLocalDateTimeUTC,
+            )
+        }
+
+        for (i in 1..active) {
+
+            val expiry: LocalDateTime? =
+                if (i % 2 == 0L) Instant.now.plus(6.days).toLocalDateTimeUTC else null
+
+            repo.insert(
+                url = OriginalUrl("https://www.example-active-${i}.com"),
+                code = ShortCode(value = "active-${i}"),
+                expiry = expiry,
+            )
+        }
+
+        clock.reset()
+        val result = repo.getLinksTotals(LocalDateTime.now)
+        assertEquals(ShortieUrlTotals(total = total, expired = expired, active = active), result)
+        // make sure this make sense
+        assertEquals(result.expired + result.active, result.total)
+    }
+
 }
+
+

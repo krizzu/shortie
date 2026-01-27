@@ -2,24 +2,28 @@ import { queryOptions } from "@tanstack/react-query"
 import { fetcher } from "@/services/fetcher.ts"
 import type { ShortieLinkAnalytic } from "@/types/Link.ts"
 
+export type ResponsePaginatedLinksAnalytics = {
+  hasNext: boolean
+  nextCursor: string | null
+  data: Array<ShortieLinkAnalytic>
+}
+
 export const linkAnalyticsQueryOptions = (
-  shortCode: string,
-  startDate: string, // iso date string
-  endDate: string // iso date string
+  cursor: string | undefined,
+  limit: number | undefined = 20
 ) =>
   queryOptions({
-    queryKey: ["links", "analytics", { shortCode, startDate, endDate }],
+    queryKey: ["links", "analytics", { cursor, limit }],
     queryFn: async () => {
-      const url = `/urls/analytics/${shortCode}?startDate=${startDate}&endDate=${endDate}`
-      const result = await fetcher<ShortieLinkAnalytic>(url, {
+      let url = `/urls/analytics?limit=${limit ?? 20}`
+      if (cursor) {
+        url += `&cursor=${encodeURIComponent(cursor)}`
+      }
+
+      const apiResult = await fetcher<ResponsePaginatedLinksAnalytics>(url, {
         method: "GET",
       })
 
-      const data = result.data
-
-      return {
-        ...data,
-        details: new Map(Object.entries(data.details)),
-      }
+      return apiResult.data
     },
   })

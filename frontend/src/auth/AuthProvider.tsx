@@ -5,7 +5,8 @@ import {
   onTokenRemoved,
   saveTokens,
 } from "../services/auth-tokens.ts"
-import { fetcher } from "../services/fetcher.ts"
+import { fetcher, HttpError } from "../services/fetcher.ts"
+import { toast } from "sonner"
 
 export interface AuthState {
   authenticated: boolean
@@ -28,8 +29,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         logout()
       }
-    } catch {
-      logout()
+    } catch (e: unknown) {
+      if (e instanceof HttpError) {
+        if (e.unauthorized) {
+          logout()
+        } else {
+          toast.error(`Auth check failed (${e.statusCode} - ${e.status})`)
+        }
+      } else {
+        toast.error(`Unknown error while contacting API: ${e}`)
+      }
     } finally {
       setIsLoading(false)
     }

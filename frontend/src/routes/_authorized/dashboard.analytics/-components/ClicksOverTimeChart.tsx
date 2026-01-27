@@ -13,6 +13,9 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 import { Spinner } from "@/components/ui/spinner.tsx"
+import { cn } from "@/lib/utils.ts"
+
+type LinksClick = { date: string; clicks: number }
 
 export function ClicksOverTimeChart({
   linkClicks,
@@ -24,7 +27,7 @@ export function ClicksOverTimeChart({
   dateDataKey = "date",
   clicksDataKey = "clicks",
 }: {
-  linkClicks: { date: string; clicks: number }[] | undefined
+  linkClicks: LinksClick[] | undefined
   dateDataKey?: string
   clicksDataKey?: string
   loading: boolean
@@ -33,8 +36,6 @@ export function ClicksOverTimeChart({
   endDate: string
   className?: string
 }) {
-  // const chartData = getChartData(linkDetails)
-
   return (
     <Card className={className}>
       <CardHeader>
@@ -74,6 +75,45 @@ export function ClicksOverTimeChart({
             )}
           </ChartContainer>
         )}
+      </CardContent>
+    </Card>
+  )
+}
+
+export function ClicksOverTimeSummary({
+  linkClicks,
+  loading,
+  updating,
+}: {
+  linkClicks: LinksClick[] | undefined
+  loading: boolean
+  updating: boolean
+}) {
+  const total = linkClicks?.reduce((acc, curr) => {
+    return acc + curr.clicks
+  }, 0)
+
+
+  return (
+    <Card className="@container/card">
+      <CardContent className="mx-auto my-auto">
+        <CardDescription className="text-center">
+          Total clicks in period
+        </CardDescription>
+        <CardTitle
+          className={cn(
+            "text-center text-6xl font-semibold",
+            updating ? "opacity-50" : ""
+          )}
+        >
+          {!total && loading ? <Spinner /> : (total ?? "no-data")}
+        </CardTitle>
+      </CardContent>
+      <CardContent>
+        <CardDescription className="text-center">Total days</CardDescription>
+        <CardDescription className="text-center text-gray-950">
+          {linkClicks?.length ?? "no-data"}
+        </CardDescription>
       </CardContent>
     </Card>
   )

@@ -4,7 +4,7 @@ import {
   CardDescription,
   CardTitle,
 } from "@/components/ui/card.tsx"
-import type { ShortieLinkAnalytic } from "@/types/Link.ts"
+import type { ShortieLinkAnalyticDetails } from "@/types/Link.ts"
 import { Spinner } from "@/components/ui/spinner.tsx"
 import { cn } from "@/lib/utils.ts"
 
@@ -13,7 +13,7 @@ export function LinkSummaryCard({
   loading,
   updating,
 }: {
-  link: ShortieLinkAnalytic | undefined
+  link: ShortieLinkAnalyticDetails | undefined
   loading: boolean
   updating: boolean
 }) {
@@ -24,7 +24,7 @@ export function LinkSummaryCard({
   return (
     <Card className="@container/card">
       <CardContent className="mx-auto my-auto">
-        <CardDescription className="text-center">Total clicks</CardDescription>
+        <CardDescription className="text-center">Total clicks overall</CardDescription>
         <CardTitle
           className={cn(
             "text-center text-6xl font-semibold",

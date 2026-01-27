@@ -10,3 +10,17 @@ data class ShortieAnalyticDetails(
     val lastClick: LocalDateTime?, // null means never clicked
     val clicksOverTime: Map<LocalDate, Long>,
 )
+
+data class ShortieAnalyticWeeklyOverview(
+    val startDate: LocalDate,
+    val endDate: LocalDate,
+    val totalClicks: Int,
+    val avgClicksPerDay: Float,
+)
+
+data class ShortieAnalyticOverview(
+    val totalClicks: Int,
+    val totalLinks: Int,
+    val activeLinks: Int,
+    val expiredLinks: Int,
+)
