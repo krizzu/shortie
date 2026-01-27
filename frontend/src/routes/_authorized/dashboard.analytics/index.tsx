@@ -4,13 +4,15 @@ import { linkAnalyticsOverviewQueryOptions } from "@/queries/links-analytics-ove
 import { ValueSummaryCard } from "@/routes/_authorized/dashboard.analytics/-components/ValueSummaryCard.tsx"
 import { linkAnalyticsQueryOptions } from "@/queries/links-analytics-query-options.ts"
 import { AnalyticLinksList } from "@/routes/_authorized/dashboard.analytics/-components/AnalyticLinksList.tsx"
+import { DropdownSelection } from "@/routes/_authorized/dashboard.analytics/-components/DropdownSelection.tsx"
 
-const DEFAULT_LIMIT = 20
+const DEFAULT_LIMIT = 10
+const AVAILABLE_LIMITS = [1, 5, 10, 20, 30, 50]
 
 export const Route = createFileRoute("/_authorized/dashboard/analytics/")({
   validateSearch: (
     raw
-  ): { limit?: number; page?: number; previous?: string[] } => {
+  ): { limit: number; page?: number; previous?: string[] } => {
     return {
       limit: isNaN(Number(raw["limit"])) ? DEFAULT_LIMIT : Number(raw["limit"]),
       page: isNaN(Number(raw["page"])) ? undefined : Number(raw["page"]),
@@ -40,6 +42,10 @@ function RouteComponent() {
   const overview = useQuery(linkAnalyticsOverviewQueryOptions())
   const navigate = Route.useNavigate()
 
+  function updateLimit(limit: number) {
+    navigate({ search: (curr) => ({ ...curr, limit }) })
+  }
+
   function viewLinkDetails(shortCode: string) {
     navigate({
       to: "/dashboard/analytics/$shortCode",
@@ -48,7 +54,7 @@ function RouteComponent() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-8">
       <div className="grid grid-cols-4 gap-x-4">
         <ValueSummaryCard
           value={overview.data?.totalLinks}
@@ -76,13 +82,28 @@ function RouteComponent() {
         />
       </div>
       <div className="grid grid-cols-1 xl:grid-cols-2">
-        <AnalyticLinksList
-          loading={links.isLoading}
-          data={links.data?.data ?? []}
-          onViewDetails={(link) => viewLinkDetails(link.shortCode)}
-          className="xl:col-span-2"
-        />
+        <div className="space-y-2">
+          <DropdownSelection
+            selected={toValue(deps.limit)}
+            label="per page"
+            onSelect={(v) => updateLimit(Number(v.value))}
+            available={AVAILABLE_LIMITS.map(toValue)}
+          />
+          <AnalyticLinksList
+            loading={links.isLoading}
+            data={links.data?.data ?? []}
+            onViewDetails={(link) => viewLinkDetails(link.shortCode)}
+            className="xl:col-span-2"
+          />
+        </div>
       </div>
     </div>
   )
+}
+
+function toValue(value: number): { value: string; name: string } {
+  return {
+    value: String(value),
+    name: String(value),
+  }
 }
