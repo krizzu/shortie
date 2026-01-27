@@ -87,7 +87,7 @@ export function LinksList({
         <Table className="rounded-2xl border bg-background">
           <TableHeader>
             <TableRow>
-              <TableHead>Code</TableHead>
+              <TableHead>Short URL</TableHead>
               <TableHead>Original URL</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Expires</TableHead>
