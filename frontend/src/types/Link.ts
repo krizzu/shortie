@@ -12,5 +12,8 @@ export interface ShortieLinkAnalytic {
 }
 
 export interface ShortieLinkAnalyticDetails extends ShortieLinkAnalytic {
-  details: Map<string, number> // iso 8601 utc date string mapping to number of clicks
+  details: {
+    totalClicksInPeriod: number
+    clicksPerDate: Map<string, number> // iso 8601 utc date string mapping to number of clicks
+  }
 }

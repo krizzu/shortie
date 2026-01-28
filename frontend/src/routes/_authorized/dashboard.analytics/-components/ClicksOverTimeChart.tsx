@@ -81,19 +81,16 @@ export function ClicksOverTimeChart({
 }
 
 export function ClicksOverTimeSummary({
+  clicksInPeriod,
   linkClicks,
   loading,
   updating,
 }: {
+  clicksInPeriod: number | undefined
   linkClicks: LinksClick[] | undefined
   loading: boolean
   updating: boolean
 }) {
-  const total = linkClicks?.reduce((acc, curr) => {
-    return acc + curr.clicks
-  }, 0)
-
-
   return (
     <Card className="@container/card">
       <CardContent className="mx-auto my-auto">
@@ -106,7 +103,11 @@ export function ClicksOverTimeSummary({
             updating ? "opacity-50" : ""
           )}
         >
-          {!total && loading ? <Spinner /> : (total ?? "no-data")}
+          {!clicksInPeriod && loading ? (
+            <Spinner />
+          ) : (
+            (clicksInPeriod ?? "no-data")
+          )}
         </CardTitle>
       </CardContent>
       <CardContent>

@@ -45,12 +45,10 @@ data class ShortieAnalyticsDTO(
 )
 
 @Serializable
-data class ShortieAnalyticsDetailsDTO(
-    val info: ShortieAnalyticsDTO,
-    val details: Map<LocalDate, Long>,
-)
+data class AnalyticPeriodDTO(val totalClicksInPeriod: Long, val clicksPerDate: Map<LocalDate, Long>)
 
-
+@Serializable
+data class ShortieAnalyticsDetailsDTO(val info: ShortieAnalyticsDTO, val details: AnalyticPeriodDTO)
 
 @Serializable
 data class PaginatedCursorShortieResponseDTO(

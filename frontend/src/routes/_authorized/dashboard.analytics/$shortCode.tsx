@@ -35,7 +35,11 @@ export const Route = createFileRoute(
 
   loader: ({ params, context, deps }) => {
     context.queryClient.ensureQueryData(
-      linkAnalyticsDetailsQueryOptions(params.shortCode, deps.startDate, deps.endDate)
+      linkAnalyticsDetailsQueryOptions(
+        params.shortCode,
+        deps.startDate,
+        deps.endDate
+      )
     )
   },
 
@@ -91,6 +95,7 @@ function RouteComponent() {
 
       <div className="grid grid-rows-2 gap-4">
         <ClicksOverTimeSummary
+          clicksInPeriod={query.data?.details.totalClicksInPeriod}
           linkClicks={chartData}
           loading={query.isLoading}
           updating={query.isFetching}
@@ -122,11 +127,12 @@ function getChartData(
   if (!details) {
     return undefined
   }
+  const content = details.clicksPerDate
   const data: { date: string; clicks: number }[] = []
   const range = createDateRange(startDate, endDate)
 
   for (const date of range) {
-    data.push({ date, clicks: details.get(date) ?? 0 })
+    data.push({ date, clicks: content.get(date) ?? 0 })
   }
 
   return data

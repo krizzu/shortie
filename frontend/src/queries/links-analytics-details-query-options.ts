@@ -7,7 +7,10 @@ import type {
 
 type ShortieLinkAnalyticResponse = {
   info: ShortieLinkAnalytic
-  details: Record<string, number>
+  details: {
+    totalClicksInPeriod: number
+    clicksPerDate: Record<string, number>
+  }
 }
 
 export const linkAnalyticsDetailsQueryOptions = (
@@ -27,7 +30,10 @@ export const linkAnalyticsDetailsQueryOptions = (
 
       const result: ShortieLinkAnalyticDetails = {
         ...data.info,
-        details: new Map(Object.entries(data.details)),
+        details: {
+          ...data.details,
+          clicksPerDate: new Map(Object.entries(data.details.clicksPerDate)),
+        },
       }
 
       return result

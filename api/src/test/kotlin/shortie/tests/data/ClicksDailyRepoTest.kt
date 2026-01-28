@@ -45,11 +45,11 @@ class ClicksDailyRepoTest {
         clickRepo.incrementCount(code, today)
         clickRepo.incrementCount(code, today)
         clickRepo.incrementCount(code, today)
-        var result = clickRepo.getDailyCount(code, today, today)
+        var result = clickRepo.getShortieDetailsForDuration(code, today, today)
         assertEquals(1, result.size)
         assertEquals(3, result[today])
         clickRepo.incrementCount(code, today, 5)
-        result = clickRepo.getDailyCount(code, today, today)
+        result = clickRepo.getShortieDetailsForDuration(code, today, today)
         assertEquals(8, result[today])
     }
 
@@ -71,12 +71,12 @@ class ClicksDailyRepoTest {
         clickRepo.incrementCount(code, day3, 30)
         clickRepo.incrementCount(code, day4, 125)
 
-        var result = clickRepo.getDailyCount(code, start = day1, end = day2)
+        var result = clickRepo.getShortieDetailsForDuration(code, start = day1, end = day2)
         assertEquals(2, result.size)
         assertEquals(100, result[day1])
         assertEquals(20, result[day2])
 
-        result = clickRepo.getDailyCount(code, start = day2, end = day4)
+        result = clickRepo.getShortieDetailsForDuration(code, start = day2, end = day4)
         assertEquals(3, result.size)
         assertEquals(175, result.toList().sumOf { it.second })
     }

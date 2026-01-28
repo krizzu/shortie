@@ -17,17 +17,43 @@ import org.jetbrains.exposed.v1.jdbc.upsert
 interface ClicksDailyRepository {
     suspend fun incrementCount(code: ShortCode, date: LocalDate, by: Int = 1)
 
-    suspend fun getDailyCount(code: ShortCode, start: LocalDate, end: LocalDate): Map<LocalDate, Long>
+    suspend fun getDetailsForDuration(start: LocalDate, end: LocalDate): ClickDetails
+
+    suspend fun getShortieDetailsForDuration(
+        code: ShortCode,
+        start: LocalDate,
+        end: LocalDate,
+    ): ClickDetails
 }
 
 fun ClicksDailyRepository(db: Database): ClicksDailyRepository = RealClicksDailyRepository(db)
 
 private class RealClicksDailyRepository(private val db: Database) : ClicksDailyRepository {
-    override suspend fun getDailyCount(
+
+    override suspend fun getDetailsForDuration(start: LocalDate, end: LocalDate): ClickDetails =
+        transaction(db) {
+            val result =
+                ClicksDailyTable.selectAll()
+                    .where { ClicksDailyTable.clickDate greaterEq start }
+                    .andWhere { ClicksDailyTable.clickDate lessEq end }
+                    .toList()
+
+            val byDate =
+                result.associate {
+                    it[ClicksDailyTable.clickDate] to it[ClicksDailyTable.clickCount]
+                }
+
+            ClickDetails(
+                totalClicks = result.sumOf { it[ClicksDailyTable.clickCount] },
+                clicksByDate = byDate,
+            )
+        }
+
+    override suspend fun getShortieDetailsForDuration(
         code: ShortCode,
         start: LocalDate,
         end: LocalDate,
-    ): Map<LocalDate, Long> =
+    ): ClickDetails =
         transaction(db) {
             val result =
                 ClicksDailyTable.selectAll()
@@ -36,7 +62,13 @@ private class RealClicksDailyRepository(private val db: Database) : ClicksDailyR
                     .andWhere { ClicksDailyTable.clickDate lessEq end }
                     .toList()
 
-            result.associate { it[ClicksDailyTable.clickDate] to it[ClicksDailyTable.clickCount] }
+            ClickDetails(
+                totalClicks = result.sumOf { it[ClicksDailyTable.clickCount] },
+                clicksByDate =
+                    result.associate {
+                        it[ClicksDailyTable.clickDate] to it[ClicksDailyTable.clickCount]
+                    },
+            )
         }
 
     override suspend fun incrementCount(code: ShortCode, date: LocalDate, by: Int) {

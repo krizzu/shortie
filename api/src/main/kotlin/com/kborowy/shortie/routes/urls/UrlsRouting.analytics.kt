@@ -3,13 +3,19 @@ package com.kborowy.shortie.routes.urls
 import com.kborowy.shortie.errors.BadRequestError
 import com.kborowy.shortie.errors.NotFoundHttpError
 import com.kborowy.shortie.extensions.asInstantUTC
+import com.kborowy.shortie.extensions.today
 import com.kborowy.shortie.services.analytics.AnalyticService
 import com.kborowy.shortie.services.urls.UrlsService
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
 import io.ktor.server.response.respond
+import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.RoutingContext
 import io.ktor.server.routing.get
+import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.minus
 import org.koin.ktor.ext.inject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -40,6 +46,18 @@ fun Route.urlsAnalyticRouting() {
         )
     }
 
+    get("/weekly") {
+        val startDate = LocalDate.today.minus(DatePeriod(days = 7))
+        val endDate = LocalDate.today
+        val details = analytics.getDetails(startDate, endDate)
+        call.respond(
+            AnalyticPeriodDTO(
+                totalClicksInPeriod = details.totalClicksInPeriod,
+                clicksPerDate = details.clicksPerDay,
+            )
+        )
+    }
+
     get("/overview") {
         val overview = analytics.totalOverview()
 
@@ -64,7 +82,13 @@ fun Route.urlsAnalyticRouting() {
         val shortie =
             urls.resolveShortCode(shortCode) ?: throw NotFoundHttpError("shortie not found")
 
-        val details = analytics.getDetails(shortie, startDate, endDate)
+        val details =
+            analytics.getDetailsForCode(shortie, startDate, endDate)
+                ?: return@get call.respondText(
+                    "null",
+                    ContentType.Application.Json,
+                    HttpStatusCode.OK,
+                )
         call.respond<ShortieAnalyticsDetailsDTO>(
             ShortieAnalyticsDetailsDTO(
                 info =
@@ -73,7 +97,11 @@ fun Route.urlsAnalyticRouting() {
                         totalClicks = shortie.totalClicks,
                         lastClick = shortie.lastRedirect?.asInstantUTC,
                     ),
-                details = details?.clicksOverTime ?: mapOf(),
+                details =
+                    AnalyticPeriodDTO(
+                        totalClicksInPeriod = details.details.totalClicksInPeriod,
+                        clicksPerDate = details.details.clicksPerDay,
+                    ),
             )
         )
     }
