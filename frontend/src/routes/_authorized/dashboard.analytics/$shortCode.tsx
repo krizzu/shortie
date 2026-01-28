@@ -10,8 +10,6 @@ import {
 } from "@/routes/_authorized/dashboard.analytics/-components/ClicksOverTimeChart.tsx"
 import { LinkSummaryCard } from "./-components/LinkSummaryCard"
 import { DatePickerWithRange } from "@/routes/_authorized/dashboard.analytics/-components/DateRangePicker.tsx"
-import type { ShortieLinkAnalyticDetails } from "@/types/Link.ts"
-import { createDateRange } from "@/routes/_authorized/dashboard.analytics/-utils/createDateRange.ts"
 
 export const Route = createFileRoute(
   "/_authorized/dashboard/analytics/$shortCode"
@@ -35,7 +33,11 @@ export const Route = createFileRoute(
 
   loader: ({ params, context, deps }) => {
     context.queryClient.ensureQueryData(
-      linkAnalyticsDetailsQueryOptions(params.shortCode, deps.startDate, deps.endDate)
+      linkAnalyticsDetailsQueryOptions(
+        params.shortCode,
+        deps.startDate,
+        deps.endDate
+      )
     )
   },
 
@@ -76,10 +78,6 @@ function RouteComponent() {
     )
   }
 
-  const chartData = query.data
-    ? getChartData(query.data.details, startDate, endDate)
-    : undefined
-
   return (
     <div className="grid grid-cols-4 gap-x-4 gap-y-4">
       <div className="col-span-4">
@@ -91,7 +89,9 @@ function RouteComponent() {
 
       <div className="grid grid-rows-2 gap-4">
         <ClicksOverTimeSummary
-          linkClicks={chartData}
+          data={query.data?.details}
+          startDate={startDate}
+          endDate={endDate}
           loading={query.isLoading}
           updating={query.isFetching}
         />
@@ -103,7 +103,7 @@ function RouteComponent() {
       </div>
 
       <ClicksOverTimeChart
-        linkClicks={chartData}
+        data={query.data?.details}
         loading={query.isLoading}
         updating={query.isFetching}
         startDate={startDate}
@@ -112,22 +112,4 @@ function RouteComponent() {
       />
     </div>
   )
-}
-
-function getChartData(
-  details: ShortieLinkAnalyticDetails["details"] | undefined,
-  startDate: string,
-  endDate: string
-): { date: string; clicks: number }[] | undefined {
-  if (!details) {
-    return undefined
-  }
-  const data: { date: string; clicks: number }[] = []
-  const range = createDateRange(startDate, endDate)
-
-  for (const date of range) {
-    data.push({ date, clicks: details.get(date) ?? 0 })
-  }
-
-  return data
 }

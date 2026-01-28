@@ -145,7 +145,7 @@ private class RealUrlsService(
             }
 
         try {
-            val result = repo.getPage(limit, cursor)
+            val result = repo.getPageCursor(limit, cursor)
             return ShortieUrlPaginatedEncoded(
                 data = result.data,
                 hasNext = result.hasNext,

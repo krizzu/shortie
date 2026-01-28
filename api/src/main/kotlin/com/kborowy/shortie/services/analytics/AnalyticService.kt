@@ -36,15 +36,19 @@ interface AnalyticService {
     /** Increments total clicks and last redirected date */
     fun incrementClick(shortie: ShortieUrl)
 
+    suspend fun getDetails(start: LocalDate, end: LocalDate): AnalyticPeriodSummary
+
     /** gathers analytics data for given shortie returns null if not found */
-    suspend fun getDetails(
+    suspend fun getDetailsForCode(
         shortie: ShortieUrl,
         start: LocalDate,
         end: LocalDate,
     ): ShortieAnalyticDetails?
 
     /** return the accumulated data about links in system */
-    suspend fun totalOverview(): ShortieAnalyticOverview
+    suspend fun totalOverview(): AnalyticTotalOverview
+
+    suspend fun getLinksPaginated(limit: Int, page: Int?): PaginatedShortieAnalyticLink
 }
 
 fun AnalyticService(
@@ -70,32 +74,68 @@ private class RealAnalyticService(
         }
     }
 
-    override suspend fun getDetails(
+    override suspend fun getDetails(start: LocalDate, end: LocalDate): AnalyticPeriodSummary {
+        val result = dailyRepo.getDetailsForDuration(start, end)
+
+        return AnalyticPeriodSummary(
+            totalClicksInPeriod = result.totalClicks,
+            clicksPerDay = result.clicksByDate,
+        )
+    }
+
+    override suspend fun getDetailsForCode(
         shortie: ShortieUrl,
         start: LocalDate,
         end: LocalDate,
     ): ShortieAnalyticDetails? = coroutineScope {
         val totalResults = async { urlRepo.get(shortie.shortCode) }
-        val detailsResults = async { dailyRepo.getDailyCount(shortie.shortCode, start, end) }
+        val detailsResults = async {
+            dailyRepo.getShortieDetailsForDuration(shortie.shortCode, start, end)
+        }
 
         val totals = totalResults.await() ?: return@coroutineScope null
+        val clicksByDate = detailsResults.await()
 
-        ShortieAnalyticDetails(
-            shortCode = totals.shortCode,
-            totalClicks = totals.totalClicks,
-            lastClick = totals.lastRedirect,
-            clicksOverTime = detailsResults.await(),
-        )
+        val shortie =
+            ShortieAnalyticLink(
+                shortCode = totals.shortCode,
+                totalClicks = totals.totalClicks,
+                lastClick = totals.lastRedirect,
+            )
+
+        val details =
+            AnalyticPeriodSummary(
+                totalClicksInPeriod = clicksByDate.totalClicks,
+                clicksPerDay = clicksByDate.clicksByDate,
+            )
+
+        ShortieAnalyticDetails(shortie, details)
     }
 
-    override suspend fun totalOverview(): ShortieAnalyticOverview {
+    override suspend fun totalOverview(): AnalyticTotalOverview {
         val links = urlRepo.getLinksTotals(LocalDateTime.now)
 
-        return ShortieAnalyticOverview(
+        return AnalyticTotalOverview(
             totalClicks = links.clicks.toInt(),
             totalLinks = links.total.toInt(),
             activeLinks = links.active.toInt(),
             expiredLinks = links.expired.toInt(),
+        )
+    }
+
+    override suspend fun getLinksPaginated(limit: Int, page: Int?): PaginatedShortieAnalyticLink {
+        val result = urlRepo.getPageOffset(limit = limit, page = page, clicksOrderDesc = true)
+        return PaginatedShortieAnalyticLink(
+            hasNext = result.hasNext,
+            nextPage = result.nextPage,
+            links =
+                result.data.map {
+                    ShortieAnalyticLink(
+                        shortCode = it.shortCode,
+                        totalClicks = it.totalClicks,
+                        lastClick = it.lastRedirect,
+                    )
+                },
         )
     }
 }

@@ -75,7 +75,7 @@ fun Application.urlsRouting() {
                             ?: throw BadRequestError("Could not decode cursor")
 
                     call.respond(
-                        PaginatedShortieResponseDTO(
+                        PaginatedCursorShortieResponseDTO(
                             data =
                                 data.data.map {
                                     ShortieDTO(

@@ -97,7 +97,7 @@ class UrlsRepositoryTest {
         }
 
         urls.reverse() // reverse to test input
-        var result = repo.getPage(5)
+        var result = repo.getPageCursor(5)
         assertEquals(5, result.data.size)
         assertTrue(result.hasNext)
         assertNotNull(result.nextCursor)
@@ -107,7 +107,7 @@ class UrlsRepositoryTest {
         assertEquals(urls[4], result.data.last())
 
         // get next batch
-        result = repo.getPage(3, nextCursor = result.nextCursor)
+        result = repo.getPageCursor(3, nextCursor = result.nextCursor)
         assertEquals(3, result.data.size)
         assertTrue(result.hasNext)
         assertNotNull(result.nextCursor)
@@ -117,7 +117,7 @@ class UrlsRepositoryTest {
         assertEquals(urls[7], result.data.last())
 
         // get last batch
-        result = repo.getPage(5, nextCursor = result.nextCursor)
+        result = repo.getPageCursor(5, nextCursor = result.nextCursor)
         assertEquals(2, result.data.size)
         assertFalse(result.hasNext)
         assertNull(result.nextCursor)
@@ -141,7 +141,7 @@ class UrlsRepositoryTest {
             clock.forward(1.seconds)
         }
 
-        val result = repo.getPage()
+        val result = repo.getPageCursor()
         assertEquals(max, result.data.size)
         assertFalse(result.hasNext)
         assertNull(result.nextCursor)

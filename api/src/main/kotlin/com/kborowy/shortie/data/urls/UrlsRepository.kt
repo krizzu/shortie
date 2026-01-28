@@ -66,7 +66,16 @@ interface UrlsRepository {
 
     suspend fun getHashForCode(shortCode: ShortCode): String?
 
-    suspend fun getPage(limit: Int = 25, nextCursor: ShortiePageCursor? = null): ShortieUrlPaginated
+    suspend fun getPageCursor(
+        limit: Int = 25,
+        nextCursor: ShortiePageCursor? = null,
+    ): ShortieUrlPaginatedCursor
+
+    suspend fun getPageOffset(
+        limit: Int = 25,
+        clicksOrderDesc: Boolean? = null,
+        page: Int? = null,
+    ): ShortieUrlPaginatedOffset
 
     /** Increments the click count by 1 and updates lastRedirect to now. */
     suspend fun incrementClickCount(code: ShortCode)
@@ -125,7 +134,10 @@ private class RealUrlsRepository(private val db: Database) : UrlsRepository {
                 ?.getOrNull(UrlsTable.passwordHash)
         }
 
-    override suspend fun getPage(limit: Int, nextCursor: ShortiePageCursor?): ShortieUrlPaginated {
+    override suspend fun getPageCursor(
+        limit: Int,
+        nextCursor: ShortiePageCursor?,
+    ): ShortieUrlPaginatedCursor {
 
         return transaction(db) {
             val rows =
@@ -158,7 +170,7 @@ private class RealUrlsRepository(private val db: Database) : UrlsRepository {
                 }
 
             val shortUrls = items.map(ResultRow::toShortieUrl)
-            ShortieUrlPaginated(shortUrls, hasNext = hasMore, next)
+            ShortieUrlPaginatedCursor(shortUrls, hasNext = hasMore, next)
         }
     }
 
@@ -170,6 +182,35 @@ private class RealUrlsRepository(private val db: Database) : UrlsRepository {
             }
         }
     }
+
+    override suspend fun getPageOffset(
+        limit: Int,
+        clicksOrderDesc: Boolean?,
+        page: Int?,
+    ): ShortieUrlPaginatedOffset =
+        transaction(db) {
+            val query = UrlsTable.selectAll().limit(limit + 1)
+            if (page != null) {
+                query.offset((page * limit).toLong())
+            }
+            if (clicksOrderDesc != null) {
+                query.orderBy(
+                    UrlsTable.totalClicks,
+                    if (clicksOrderDesc) SortOrder.DESC else SortOrder.ASC,
+                )
+            }
+
+            val result = query.toList()
+            val rows = result.take(limit)
+            val hasMore = result.size > limit
+            val nextPage = if (page != null) page + 1 else 1 // assuming we start at page 0
+            val shortUrls = rows.map(ResultRow::toShortieUrl)
+            ShortieUrlPaginatedOffset(
+                hasNext = hasMore,
+                nextPage = if (hasMore) nextPage else null,
+                data = shortUrls,
+            )
+        }
 
     override suspend fun getLinksTotals(expiryDate: LocalDateTime): ShortieUrlTotals =
         transaction(db) {

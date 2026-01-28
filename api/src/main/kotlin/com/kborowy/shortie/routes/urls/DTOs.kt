@@ -40,21 +40,23 @@ data class ShortieDTO(
 @Serializable
 data class ShortieAnalyticsDTO(
     val shortCode: String,
-    val originalUrl: String,
-    val protected: Boolean,
-    val expiryDate: Instant?,
     val totalClicks: Long,
     val lastClick: Instant?, // utc datetime, iso format
 )
 
 @Serializable
-data class ShortieAnalyticsDetailsDTO(
-    val info: ShortieAnalyticsDTO,
-    val details: Map<LocalDate, Long>,
+data class AnalyticPeriodDTO(
+    val totalClicksInPeriod: Long,
+    val clicksPerDate: Map<LocalDate, Long>,
+    val startDate: LocalDate,
+    val endDate: LocalDate,
 )
 
 @Serializable
-data class PaginatedShortieResponseDTO(
+data class ShortieAnalyticsDetailsDTO(val info: ShortieAnalyticsDTO, val details: AnalyticPeriodDTO)
+
+@Serializable
+data class PaginatedCursorShortieResponseDTO(
     val data: List<ShortieDTO>,
     val hasNext: Boolean,
     val nextCursor: String?,
@@ -66,6 +68,13 @@ data class TotalOverviewResponseDTO(
     val totalLinks: Int,
     val activeLinks: Int,
     val expiredLinks: Int,
+)
+
+@Serializable
+data class PaginatedOffsetShortieResponseDTO(
+    val data: List<ShortieAnalyticsDTO>,
+    val hasNext: Boolean,
+    val nextPage: Int?,
 )
 
 @Serializable data class DeleteShortiePayloadDTO(val shortCodes: List<String>)
