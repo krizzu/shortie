@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { cn } from "@/lib/utils"
 
 type Value = {
   name: string
@@ -20,6 +21,7 @@ type Props = {
   label: string
   onSelect: (value: Value) => void
   available: Value[]
+  className?: string
 }
 
 export function DropdownSelection({
@@ -28,6 +30,7 @@ export function DropdownSelection({
   label,
   placeholder,
   available,
+  className,
 }: Props) {
   function valueChange(value: string) {
     const index = available.findIndex((v) => v.value === value)
@@ -38,13 +41,16 @@ export function DropdownSelection({
   }
 
   return (
-    <Field orientation="horizontal" className="flex gap-x-1 items-center">
+    <Field
+      orientation="horizontal"
+      className={cn("flex w-fit gap-x-1 items-center", className)}
+    >
       <FieldLabel className="flex-none!" htmlFor={`select-${label}`}>
         {label}
       </FieldLabel>
 
       <Select value={selected?.value} onValueChange={valueChange}>
-        <SelectTrigger id={`select-${label}`} className="w-full max-w-48">
+        <SelectTrigger id={`select-${label}`}>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>

@@ -7,14 +7,13 @@ import { AnalyticLinksList } from "@/routes/_authorized/dashboard.analytics/-com
 import { DropdownSelection } from "@/routes/_authorized/dashboard.analytics/-components/DropdownSelection.tsx"
 import { WeeklyLinearChart } from "@/routes/_authorized/dashboard.analytics/-components/WeeklyLinearChart.tsx"
 import { linksAnalyticsWeeklyQueryOptions } from "@/queries/links-analytics-weekly-query-options.ts"
+import { PagePagination } from "@/routes/_authorized/dashboard.analytics/-components/PagePagination.tsx"
 
 const DEFAULT_LIMIT = 10
-const AVAILABLE_LIMITS = [5, 10, 20]
+const AVAILABLE_LIMITS = [5, 10, 15, 20]
 
 export const Route = createFileRoute("/_authorized/dashboard/analytics/")({
-  validateSearch: (
-    raw
-  ): { limit: number; page?: number; previous?: string[] } => {
+  validateSearch: (raw): { limit: number; page?: number } => {
     return {
       limit: isNaN(Number(raw["limit"])) ? DEFAULT_LIMIT : Number(raw["limit"]),
       page: isNaN(Number(raw["page"])) ? undefined : Number(raw["page"]),
@@ -47,7 +46,8 @@ function RouteComponent() {
   const navigate = Route.useNavigate()
 
   function updateLimit(limit: number) {
-    navigate({ search: (curr) => ({ ...curr, limit }) })
+    // reset page as well, so pagination is not broken
+    navigate({ search: (curr) => ({ ...curr, limit, page: undefined }) })
   }
 
   function viewLinkDetails(shortCode: string) {
@@ -57,8 +57,25 @@ function RouteComponent() {
     })
   }
 
+  const currentPage = deps.page ?? 0
+  const nextPage = links.data?.nextPage ?? null
+  function goToNextPage() {
+    if (nextPage !== null) {
+      navigate({ search: (s) => ({ ...s, page: nextPage }) })
+    }
+  }
+
+  function goToPreviousPage() {
+    const previous = currentPage - 1
+    if (previous <= 0) {
+      navigate({ search: (s) => ({ ...s, page: undefined }) })
+    } else {
+      navigate({ search: (s) => ({ ...s, page: previous }) })
+    }
+  }
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 mb-4">
       <div className="grid grid-cols-4 gap-x-4">
         <ValueSummaryCard
           value={overview.data?.totalLinks}
@@ -92,12 +109,23 @@ function RouteComponent() {
           updating={weekly.isFetching}
         />
         <div className="space-y-2">
-          <DropdownSelection
-            selected={toValue(deps.limit)}
-            label="per page"
-            onSelect={(v) => updateLimit(Number(v.value))}
-            available={AVAILABLE_LIMITS.map(toValue)}
-          />
+          <div className="flex items-center gap-x-4">
+            <DropdownSelection
+              selected={toValue(deps.limit)}
+              label="per page"
+              onSelect={(v) => updateLimit(Number(v.value))}
+              available={AVAILABLE_LIMITS.map(toValue)}
+            />
+            {!nextPage && currentPage === 0 ? null : (
+              <PagePagination
+                currentPage={currentPage}
+                hasPreviousPage={currentPage > 0}
+                hasNextPage={!!nextPage}
+                onNextPage={goToNextPage}
+                onPreviousPage={goToPreviousPage}
+              />
+            )}
+          </div>
           <AnalyticLinksList
             loading={links.isLoading}
             data={links.data?.data ?? []}
