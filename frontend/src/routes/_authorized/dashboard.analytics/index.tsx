@@ -5,9 +5,11 @@ import { ValueSummaryCard } from "@/routes/_authorized/dashboard.analytics/-comp
 import { linkAnalyticsQueryOptions } from "@/queries/links-analytics-query-options.ts"
 import { AnalyticLinksList } from "@/routes/_authorized/dashboard.analytics/-components/AnalyticLinksList.tsx"
 import { DropdownSelection } from "@/routes/_authorized/dashboard.analytics/-components/DropdownSelection.tsx"
+import { WeeklyLinearChart } from "@/routes/_authorized/dashboard.analytics/-components/WeeklyLinearChart.tsx"
+import { linksAnalyticsWeeklyQueryOptions } from "@/queries/links-analytics-weekly-query-options.ts"
 
 const DEFAULT_LIMIT = 10
-const AVAILABLE_LIMITS = [1, 5, 10, 20, 30, 50]
+const AVAILABLE_LIMITS = [5, 10, 20]
 
 export const Route = createFileRoute("/_authorized/dashboard/analytics/")({
   validateSearch: (
@@ -31,6 +33,7 @@ export const Route = createFileRoute("/_authorized/dashboard/analytics/")({
       linkAnalyticsQueryOptions(deps.page, deps.limit)
     )
     context.queryClient.ensureQueryData(linkAnalyticsOverviewQueryOptions())
+    context.queryClient.ensureQueryData(linksAnalyticsWeeklyQueryOptions())
   },
 
   component: RouteComponent,
@@ -40,6 +43,7 @@ function RouteComponent() {
   const deps = Route.useLoaderDeps()
   const links = useQuery(linkAnalyticsQueryOptions(deps.page, deps.limit))
   const overview = useQuery(linkAnalyticsOverviewQueryOptions())
+  const weekly = useQuery(linksAnalyticsWeeklyQueryOptions())
   const navigate = Route.useNavigate()
 
   function updateLimit(limit: number) {
@@ -81,7 +85,12 @@ function RouteComponent() {
           updating={overview.isFetching}
         />
       </div>
-      <div className="grid grid-cols-1 xl:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+        <WeeklyLinearChart
+          data={weekly.data}
+          loading={weekly.isLoading}
+          updating={weekly.isFetching}
+        />
         <div className="space-y-2">
           <DropdownSelection
             selected={toValue(deps.limit)}

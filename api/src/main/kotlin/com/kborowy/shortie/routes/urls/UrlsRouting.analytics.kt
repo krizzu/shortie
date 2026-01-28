@@ -54,6 +54,8 @@ fun Route.urlsAnalyticRouting() {
             AnalyticPeriodDTO(
                 totalClicksInPeriod = details.totalClicksInPeriod,
                 clicksPerDate = details.clicksPerDay,
+                startDate = startDate,
+                endDate = endDate,
             )
         )
     }
@@ -101,6 +103,8 @@ fun Route.urlsAnalyticRouting() {
                     AnalyticPeriodDTO(
                         totalClicksInPeriod = details.details.totalClicksInPeriod,
                         clicksPerDate = details.details.clicksPerDay,
+                        startDate = startDate,
+                        endDate = endDate,
                     ),
             )
         )

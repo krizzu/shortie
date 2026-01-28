@@ -11,9 +11,13 @@ export interface ShortieLinkAnalytic {
   lastClick: string | null // iso 8601 utc datetime string
 }
 
+export interface ShortieAnalyticPeriodDetails {
+  startDate: string // iso 8601 utc date
+  endDate: string // iso 8601 utc date
+  totalClicksInPeriod: number
+  clicksPerDate: { date: string; clicks: number }[] // list of iso 8601 utc date string mapping to number of clicks
+}
+
 export interface ShortieLinkAnalyticDetails extends ShortieLinkAnalytic {
-  details: {
-    totalClicksInPeriod: number
-    clicksPerDate: Map<string, number> // iso 8601 utc date string mapping to number of clicks
-  }
+  details: ShortieAnalyticPeriodDetails
 }

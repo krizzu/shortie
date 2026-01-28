@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
+import { CartesianGrid, Line, LineChart, XAxis } from "recharts"
 import {
   type ChartConfig,
   ChartContainer,
@@ -13,31 +13,28 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 import { Spinner } from "@/components/ui/spinner.tsx"
-import { cn } from "@/lib/utils.ts"
 import type { ShortieAnalyticPeriodDetails } from "@/types/Link.ts"
 import { createDateRange } from "@/routes/_authorized/dashboard.analytics/-utils/createDateRange.ts"
 
-export function ClicksOverTimeChart({
+export function WeeklyLinearChart({
   data,
   loading,
   updating,
-  startDate,
-  endDate,
   className,
 }: {
   data: ShortieAnalyticPeriodDetails | undefined
   loading: boolean
   updating: boolean
-  startDate: string
-  endDate: string
   className?: string
 }) {
-  const chartData = getChartData(data, startDate, endDate)
+  const startDate = data?.startDate
+  const endDate = data?.endDate
+  const chartData = getChartData(data)
 
   return (
     <Card className={className}>
       <CardHeader>
-        <CardTitle>Clicks over time</CardTitle>
+        <CardTitle>Weekly overview</CardTitle>
         <CardDescription>
           {startDate} - {endDate}
         </CardDescription>
@@ -50,18 +47,35 @@ export function ClicksOverTimeChart({
         ) : (
           <ChartContainer config={chartConfig}>
             {chartData ? (
-              <BarChart accessibilityLayer data={chartData}>
+              <LineChart
+                accessibilityLayer
+                data={chartData}
+                margin={{
+                  left: 10,
+                  right: 10,
+                  top: 10,
+                  bottom: 10,
+                }}
+              >
                 <CartesianGrid vertical={false} />
                 <XAxis
                   dataKey="date"
                   tickLine={false}
-                  tickMargin={10}
                   axisLine={false}
-                  tickFormatter={(value) => value}
+                  tickMargin={1}
                 />
-                <ChartTooltip cursor={true} content={<ChartTooltipContent />} />
-                <Bar dataKey="clicks" fill="var(--color-chart-1)" radius={8} />
-              </BarChart>
+                <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent hideLabel />}
+                />
+                <Line
+                  dataKey="clicks"
+                  type="linear"
+                  stroke="var(--color-desktop)"
+                  strokeWidth={2}
+                  dot={true}
+                />
+              </LineChart>
             ) : (
               <div className="flex justify-center h-24 items-center">
                 <h3 className="text-red-500 text-2xl">no data</h3>
@@ -74,62 +88,15 @@ export function ClicksOverTimeChart({
   )
 }
 
-export function ClicksOverTimeSummary({
-  data,
-  startDate,
-  endDate,
-  loading,
-  updating,
-}: {
-  data: ShortieAnalyticPeriodDetails | undefined
-  startDate: string
-  endDate: string
-  loading: boolean
-  updating: boolean
-}) {
-  const clicksInPeriod = data?.totalClicksInPeriod
-  const totalDays = createDateRange(startDate, endDate)?.length
-
-  return (
-    <Card className="@container/card">
-      <CardContent className="mx-auto my-auto">
-        <CardDescription className="text-center">
-          Total clicks in period
-        </CardDescription>
-        <CardTitle
-          className={cn(
-            "text-center text-6xl font-semibold",
-            updating ? "opacity-50" : ""
-          )}
-        >
-          {!clicksInPeriod && loading ? (
-            <Spinner />
-          ) : (
-            (clicksInPeriod ?? "no-data")
-          )}
-        </CardTitle>
-      </CardContent>
-      <CardContent>
-        <CardDescription className="text-center">Total days</CardDescription>
-        <CardDescription className="text-center text-gray-950">
-          {totalDays ?? "no-data"}
-        </CardDescription>
-      </CardContent>
-    </Card>
-  )
-}
-
 function getChartData(
-  details: ShortieAnalyticPeriodDetails | undefined,
-  startDate: string,
-  endDate: string
+  details: ShortieAnalyticPeriodDetails | undefined
 ): { date: string; clicks: number }[] | undefined {
   if (!details) {
     return undefined
   }
   const content = details.clicksPerDate
   const data: { date: string; clicks: number }[] = []
-  const range = createDateRange(startDate, endDate)
+  const range = createDateRange(details.startDate, details.endDate)
 
   for (const date of range) {
     data.push({
