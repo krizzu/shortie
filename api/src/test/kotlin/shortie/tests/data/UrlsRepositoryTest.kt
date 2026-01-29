@@ -90,7 +90,7 @@ class UrlsRepositoryTest {
     @Test
     fun `paginated results sizes and limits`() = runTest {
         val urls = mutableListOf<ShortieUrl>()
-        for (i in 0..<10) {
+        for (i in 0 ..< 10) {
             val url = OriginalUrl("https://www.$i.com")
             val code = coder.generateShortCode(i.toLong())
             urls.add(repo.insert(url, code))
@@ -189,7 +189,4 @@ class UrlsRepositoryTest {
         // make sure this make sense
         assertEquals(result.expired + result.active, result.total)
     }
-
 }
-
-
