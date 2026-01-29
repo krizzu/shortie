@@ -54,7 +54,7 @@ services:
       interval: 1s
 
   shortie:
-    image: krizzu/shortie:dev # or other tag
+    image: krizzu/shortie:latest
     container_name: app
     restart: unless-stopped
     ports:
