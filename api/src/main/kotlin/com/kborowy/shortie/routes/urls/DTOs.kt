@@ -54,7 +54,10 @@ data class AnalyticPeriodDTO(
 )
 
 @Serializable
-data class ShortieAnalyticsDetailsDTO(val info: ShortieAnalyticsDTO, val details: AnalyticPeriodDTO)
+data class ShortieAnalyticsDetailsDTO(
+    val info: ShortieAnalyticsDTO,
+    val details: AnalyticPeriodDTO
+)
 
 @Serializable
 data class PaginatedCursorShortieResponseDTO(
