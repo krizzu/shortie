@@ -11,7 +11,12 @@ import {
 import { Badge } from "@/components/ui/badge.tsx"
 import { cn } from "@/lib/utils.ts"
 import type { ShortieLink } from "@/types/Link.ts"
-import { LucideChartColumnIncreasing, LucideTrash, Plus } from "lucide-react"
+import {
+  LucideChartColumnIncreasing,
+  LucideEdit2,
+  LucideTrash,
+  Plus,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Pagination,
@@ -33,6 +38,7 @@ type Props = {
   fetchNextPage: (() => void) | null
   goToPreviousPage: (() => void) | null
   goToCodeAnalytics: (code: ShortieLink) => void
+  goToEdit: (link: ShortieLink) => void
 }
 
 export function LinksList({
@@ -41,6 +47,7 @@ export function LinksList({
   loading,
   fetchNextPage,
   onDeleteLink,
+  goToEdit,
   goToCodeAnalytics,
   goToPreviousPage,
 }: Props) {
@@ -160,6 +167,13 @@ export function LinksList({
                         )}
                       </TableCell>
                       <TableCell className="h-6 space-x-2">
+                        <Button
+                          onClick={() => goToEdit(link)}
+                          variant="secondary"
+                          className="rounded-2xl"
+                        >
+                          <LucideEdit2 />
+                        </Button>
                         <Button
                           onClick={() => goToCodeAnalytics(link)}
                           variant="secondary"

@@ -18,7 +18,6 @@ package com.kborowy.shortie.routes.urls
 import com.kborowy.shortie.models.ActionIntent
 import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -81,8 +80,8 @@ data class PaginatedOffsetShortieResponseDTO(
 
 @Serializable
 data class UpdateShortieDTO(
-    val password: ActionIntent<String>,
-    val expiryDate: ActionIntent<LocalDateTime>,
+    val password: ActionIntent<String> = ActionIntent.Ignore,
+    val expiryDate: ActionIntent<Instant> = ActionIntent.Ignore,
 )
 
 @Serializable data class DeleteShortiePayloadDTO(val shortCodes: List<String>)

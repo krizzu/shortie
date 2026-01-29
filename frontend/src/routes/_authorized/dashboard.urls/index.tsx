@@ -54,6 +54,13 @@ function LinksPage() {
     navigate({ to: "/dashboard/urls/create" })
   }
 
+  function navigateToEdit(shortie: ShortieLink) {
+    navigate({
+      to: "/dashboard/urls/edit/$shortCode",
+      params: { shortCode: shortie.shortCode },
+    })
+  }
+
   function navigateToCodeAnalytics(shortie: ShortieLink) {
     navigate({
       to: "/dashboard/analytics/$shortCode",
@@ -125,6 +132,7 @@ function LinksPage() {
       }
       onCreateLink={navigateToCreate}
       onDeleteLink={deleteLink}
+      goToEdit={navigateToEdit}
       goToCodeAnalytics={navigateToCodeAnalytics}
     />
   )

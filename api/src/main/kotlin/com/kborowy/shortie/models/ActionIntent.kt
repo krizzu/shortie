@@ -1,6 +1,7 @@
 package com.kborowy.shortie.models
 
 import com.kborowy.shortie.utils.ActionIntentSerializer
+import kotlinx.serialization.KeepGeneratedSerializer
 import kotlinx.serialization.Serializable
 
 /**

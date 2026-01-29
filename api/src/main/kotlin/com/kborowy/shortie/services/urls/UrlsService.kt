@@ -23,6 +23,7 @@ import com.kborowy.shortie.errors.AliasTooLongError
 import com.kborowy.shortie.errors.ExpiryInPastError
 import com.kborowy.shortie.errors.UnexpectedAppError
 import com.kborowy.shortie.extensions.isInPast
+import com.kborowy.shortie.extensions.toLocalDateTimeUTC
 import com.kborowy.shortie.models.ActionIntent
 import com.kborowy.shortie.models.OriginalUrl
 import com.kborowy.shortie.models.ShortCode
@@ -55,7 +56,7 @@ interface UrlsService {
 
     suspend fun updateShortie(
         code: ShortCode,
-        expiryIntent: ActionIntent<LocalDateTime>,
+        expiryIntent: ActionIntent<Instant>,
         passwordIntent: ActionIntent<String>,
     ): ShortieUrl?
 
@@ -168,11 +169,11 @@ private class RealUrlsService(
 
     override suspend fun updateShortie(
         code: ShortCode,
-        expiryIntent: ActionIntent<LocalDateTime>,
+        expiryIntent: ActionIntent<Instant>,
         passwordIntent: ActionIntent<String>,
     ): ShortieUrl? {
         log.info(
-            "Updating shortie (password=${passwordIntent.actionName}, expiry=(${expiryIntent.actionName}),"
+            "Updating shortie (password=${passwordIntent.actionName}, expiry=${expiryIntent.actionName}),"
         )
         val shortie = repo.get(shortCode = code) ?: return null
 
@@ -181,11 +182,13 @@ private class RealUrlsService(
                 when (expiryIntent) {
                     is ActionIntent.Set -> expiryIntent.value
                     else -> null
-                }?.also {
-                    if (it.isInPast) {
+                }?.let {
+                    val date = it.toLocalDateTimeUTC
+                    if (date.isInPast) {
                         log.warn("provided expiry date is in past (provided=$it)")
                         throw ExpiryInPastError("expiry date cannot be in the past (provided=$it)")
                     }
+                    date
                 }
 
             repo.updateExpiry(shortie.shortCode, expiry = expiry)
