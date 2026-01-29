@@ -16,6 +16,7 @@
 package com.kborowy.shortie.routes.urls
 
 import com.kborowy.shortie.errors.BadRequestError
+import com.kborowy.shortie.errors.NotFoundHttpError
 import com.kborowy.shortie.extensions.asInstantUTC
 import com.kborowy.shortie.extensions.receiveOrThrow
 import com.kborowy.shortie.models.OriginalUrl
@@ -23,9 +24,11 @@ import com.kborowy.shortie.models.ShortCode
 import com.kborowy.shortie.plugins.withAdminAuth
 import com.kborowy.shortie.services.urls.UrlsService
 import io.ktor.server.application.Application
+import io.ktor.server.request.receiveNullable
 import io.ktor.server.response.respond
 import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
+import io.ktor.server.routing.patch
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
@@ -87,6 +90,30 @@ fun Application.urlsRouting() {
                                 },
                             hasNext = data.hasNext,
                             nextCursor = data.nextCursor,
+                        )
+                    )
+                }
+
+                patch("/{shortCode}") {
+                    val code =
+                        call.parameters["shortCode"]
+                            ?: throw BadRequestError("shortCode not provided")
+                    val payload =
+                        call.receiveNullable<UpdateShortieDTO>()
+                            ?: throw BadRequestError("missing body")
+                    val result =
+                        service.updateShortie(
+                            ShortCode(code),
+                            passwordIntent = payload.password,
+                            expiryIntent = payload.expiryDate,
+                        ) ?: throw NotFoundHttpError("shortie not found")
+
+                    call.respond(
+                        ShortieDTO(
+                            shortCode = result.shortCode.value,
+                            originalUrl = result.originalUrl.value,
+                            protected = result.protected,
+                            expiryDate = result.expiryDate?.asInstantUTC,
                         )
                     )
                 }
