@@ -23,6 +23,8 @@ import com.kborowy.shortie.errors.AliasTooLongError
 import com.kborowy.shortie.errors.ExpiryInPastError
 import com.kborowy.shortie.errors.UnexpectedAppError
 import com.kborowy.shortie.extensions.isInPast
+import com.kborowy.shortie.extensions.toLocalDateTimeUTC
+import com.kborowy.shortie.models.ActionIntent
 import com.kborowy.shortie.models.OriginalUrl
 import com.kborowy.shortie.models.ShortCode
 import com.kborowy.shortie.models.ShortiePageCursor
@@ -51,6 +53,12 @@ interface UrlsService {
         alias: String? = null,
         password: String? = null,
     ): ShortieUrl
+
+    suspend fun updateShortie(
+        code: ShortCode,
+        expiryIntent: ActionIntent<Instant>,
+        passwordIntent: ActionIntent<String>,
+    ): ShortieUrl?
 
     suspend fun resolveShortCode(code: ShortCode): ShortieUrl?
 
@@ -157,6 +165,48 @@ private class RealUrlsService(
             log.error("cannot get paginated result (limit=$limit, nextCursor=$nextCursor)", e)
             return null
         }
+    }
+
+    override suspend fun updateShortie(
+        code: ShortCode,
+        expiryIntent: ActionIntent<Instant>,
+        passwordIntent: ActionIntent<String>,
+    ): ShortieUrl? {
+        log.info(
+            "Updating shortie (password=${passwordIntent.actionName}, expiry=${expiryIntent.actionName}),"
+        )
+        val shortie = repo.get(shortCode = code) ?: return null
+
+        if (expiryIntent !is ActionIntent.Ignore) {
+            val expiry =
+                when (expiryIntent) {
+                    is ActionIntent.Set -> expiryIntent.value
+                    else -> null
+                }?.let {
+                    val date = it.toLocalDateTimeUTC
+                    if (date.isInPast) {
+                        log.warn("provided expiry date is in past (provided=$it)")
+                        throw ExpiryInPastError("expiry date cannot be in the past (provided=$it)")
+                    }
+                    date
+                }
+
+            repo.updateExpiry(shortie.shortCode, expiry = expiry)
+            log.info("updated expiry date")
+        }
+
+        if (passwordIntent !is ActionIntent.Ignore) {
+            val newPassword =
+                when (passwordIntent) {
+                    is ActionIntent.Set -> passwordIntent.value.let { PasswordHasher.hash(it) }
+                    else -> null
+                }
+
+            repo.updatePassword(shortie.shortCode, newPassword)
+            log.info("updated password")
+        }
+
+        return repo.get(shortCode = code)
     }
 
     override suspend fun removeShorties(code: List<ShortCode>): Int {

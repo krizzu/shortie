@@ -62,6 +62,10 @@ interface UrlsRepository {
 
     suspend fun remove(shortCodes: List<ShortCode>): Int
 
+    suspend fun updatePassword(shortCode: ShortCode, password: String?)
+
+    suspend fun updateExpiry(shortCode: ShortCode, expiry: LocalDateTime?)
+
     suspend fun get(shortCode: ShortCode): ShortieUrl?
 
     suspend fun getHashForCode(shortCode: ShortCode): String?
@@ -254,6 +258,22 @@ private class RealUrlsRepository(private val db: Database) : UrlsRepository {
                 clicks = result[clicksAlias] ?: 0,
             )
         }
+
+    override suspend fun updatePassword(shortCode: ShortCode, password: String?) {
+        transaction(db) {
+            UrlsTable.update(where = { UrlsTable.shortCode eq shortCode.value }) {
+                it[UrlsTable.passwordHash] = password
+            }
+        }
+    }
+
+    override suspend fun updateExpiry(shortCode: ShortCode, expiry: LocalDateTime?) {
+        transaction(db) {
+            UrlsTable.update(where = { UrlsTable.shortCode eq shortCode.value }) {
+                it[UrlsTable.expiryDate] = expiry
+            }
+        }
+    }
 }
 
 private fun ResultRow.toShortieUrl(): ShortieUrl {
