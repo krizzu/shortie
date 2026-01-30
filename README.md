@@ -30,6 +30,22 @@
 - Modern admin dashboard with a easy UI
 - Docker friendly set up
 
+## Demo
+
+<p align="center">
+  <img src="assets/demo/1.png" width="45%" />
+  <img src="assets/demo/2.png" width="45%" />
+</p>
+
+<p align="center">
+  <img src="assets/demo/3.png" width="45%" />
+  <img src="assets/demo/4.png" width="45%" />
+</p>
+
+<p align="center">
+  <img src="assets/demo/5.png" width="45%" />
+</p>
+
 ## Getting started
 
 Copy content from `.env-example` file into `.env`.
@@ -77,6 +93,10 @@ services:
 volumes:
   postgres_data:
 ```
+
+## Design
+
+Initial high level design: [Excalidraw](https://link.excalidraw.com/readonly/iBD1aaolO8ym9UeW3iP5)
 
 ## Tech stack
 
