@@ -24,7 +24,9 @@ export function LinkSummaryCard({
   return (
     <Card className="@container/card">
       <CardContent className="mx-auto my-auto">
-        <CardDescription className="text-center">Total clicks overall</CardDescription>
+        <CardDescription className="text-center">
+          Total clicks overall
+        </CardDescription>
         <CardTitle
           className={cn(
             "text-center text-6xl font-semibold",
@@ -45,5 +47,14 @@ export function LinkSummaryCard({
 }
 
 function formatDate(date: Date): string {
-  return `${date.toDateString()} ${date.getHours()}:${date.getMinutes()}`
+  let h: string | number = date.getHours()
+  let m: string | number = date.getMinutes()
+  if (h < 10) {
+    h = `0${h}`
+  }
+  if (m < 10) {
+    m = `0${m}`
+  }
+
+  return `${date.toDateString()} ${h}:${m}`
 }
