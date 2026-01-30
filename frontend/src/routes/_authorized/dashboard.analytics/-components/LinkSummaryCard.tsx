@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/card.tsx"
 import type { ShortieLinkAnalyticDetails } from "@/types/Link.ts"
 import { Spinner } from "@/components/ui/spinner.tsx"
-import { cn } from "@/lib/utils.ts"
+import { cn, formatNumber } from "@/lib/utils.ts"
 
 export function LinkSummaryCard({
   link,
@@ -33,7 +33,13 @@ export function LinkSummaryCard({
             updating ? "opacity-50" : ""
           )}
         >
-          {!link && loading ? <Spinner /> : (link?.totalClicks ?? "no data")}
+          {!link && loading ? (
+            <Spinner />
+          ) : link?.totalClicks ? (
+            formatNumber(link.totalClicks)
+          ) : (
+            "no data"
+          )}
         </CardTitle>
       </CardContent>
       <CardContent>
