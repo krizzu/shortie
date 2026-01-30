@@ -10,6 +10,7 @@ import {
 } from "@/routes/_authorized/dashboard.analytics/-components/ClicksOverTimeChart.tsx"
 import { LinkSummaryCard } from "./-components/LinkSummaryCard"
 import { DatePickerWithRange } from "@/routes/_authorized/dashboard.analytics/-components/DateRangePicker.tsx"
+import { EnvVars } from "@/services/env-vars.ts"
 
 export const Route = createFileRoute(
   "/_authorized/dashboard/analytics/$shortCode"
@@ -78,13 +79,22 @@ function RouteComponent() {
     )
   }
 
+  const url = EnvVars.redirectUrl(shortCode)
   return (
     <div className="grid grid-cols-4 gap-x-4 gap-y-4">
-      <div className="col-span-4">
+      <div className="col-span-4 flex items-center gap-12">
         <DatePickerWithRange
           initial={{ from: new Date(startDate), to: new Date(endDate) }}
           onDateSelected={updateDates}
         />
+        <div className="h-9 my-auto">
+          <a
+            href={url}
+            className="text-primary hover:underline text-base font-bold"
+          >
+            {url}
+          </a>
+        </div>
       </div>
 
       <div className="grid grid-rows-2 gap-4">
