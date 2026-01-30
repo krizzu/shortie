@@ -44,7 +44,7 @@ function LinksPage() {
 
   const hasPreviousPage = (search.previous?.length ?? 0) > 0
   const previousButtonActive: boolean =
-    hasPreviousPage || (!hasPreviousPage && search.page)
+    hasPreviousPage || (!hasPreviousPage && !!search.page)
 
   async function deleteLink(link: ShortieLink) {
     await deleteLinkMutation.mutateAsync(link.shortCode)
@@ -81,6 +81,10 @@ function LinksPage() {
         }
       },
     })
+  }
+
+  function setLimit(limit: number) {
+    navigate({ search: (curr) => ({ ...curr, limit }) })
   }
 
   function navigateToNextPage(page: string | undefined | null) {
@@ -131,6 +135,8 @@ function LinksPage() {
       onDeleteLink={deleteLink}
       goToEdit={navigateToEdit}
       goToCodeAnalytics={navigateToCodeAnalytics}
+      limit={search.limit}
+      setLimit={setLimit}
     />
   )
 }

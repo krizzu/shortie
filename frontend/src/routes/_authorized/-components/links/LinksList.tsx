@@ -29,6 +29,9 @@ import TableLoadingSkeleton from "@/routes/_authorized/-components/links/TableLo
 import { EnvVars } from "@/services/env-vars.ts"
 import { ConfirmationAlert } from "@/routes/_authorized/-components/dashboard/ConfirmationAlert.tsx"
 import { useState } from "react"
+import { DropdownSelection } from "@/routes/_authorized/-components/DropdownSelection.tsx"
+
+const AVAILABLE_LIMITS = [5, 10, 20, 30, 40, 50]
 
 type Props = {
   links: ShortieLink[]
@@ -41,6 +44,8 @@ type Props = {
   goToPreviousPage: () => void
   goToCodeAnalytics: (code: ShortieLink) => void
   goToEdit: (link: ShortieLink) => void
+  limit: number | undefined
+  setLimit: (limit: number) => void
 }
 
 export function LinksList({
@@ -54,6 +59,8 @@ export function LinksList({
   goToEdit,
   goToCodeAnalytics,
   goToPreviousPage,
+  limit,
+  setLimit,
 }: Props) {
   const [toDelete, setToDelete] = useState<ShortieLink | null>(null)
   const [deleting, setDeleting] = useState(false)
@@ -98,6 +105,15 @@ export function LinksList({
             </div>
           ) : null}
         </div>
+
+        {limit !== undefined ? (
+          <DropdownSelection
+            selected={toValue(limit)}
+            label="per page"
+            onSelect={(v) => setLimit(Number(v.value))}
+            available={AVAILABLE_LIMITS.map(toValue)}
+          />
+        ) : null}
       </div>
 
       <div>
@@ -238,7 +254,9 @@ function PageButton({
       <PaginationContent>
         <PaginationItem>
           <Element
-            className={disabled ? "opacity-50 cursor-default hover:bg-transparent" : ""}
+            className={
+              disabled ? "opacity-50 cursor-default hover:bg-transparent" : ""
+            }
             onClick={disabled ? undefined : onClick}
           />
         </PaginationItem>
@@ -251,4 +269,11 @@ function formatDate(utc: string) {
   return new Intl.DateTimeFormat(undefined, {
     dateStyle: "medium",
   }).format(new Date(utc))
+}
+
+function toValue(value: number): { value: string; name: string } {
+  return {
+    value: String(value),
+    name: String(value),
+  }
 }
