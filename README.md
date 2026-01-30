@@ -74,21 +74,18 @@ services:
     container_name: app
     restart: unless-stopped
     ports:
-      - "80:80" # api port
-      - "81:81" # dashboard port
+      - "4000:80" # api port
+      - "4001:81" # dashboard port
     depends_on:
       - db
     environment:
+      APP_API_PROXY_PORT: 4000 # keep this in sync with exposed api port for proper redirections
       APP_DB_URL: jdbc:postgresql://db:5432/${APP_DB_NAME}
       APP_DB_PASSWORD: ${APP_DB_PASSWORD}
       APP_DB_USER: ${APP_DB_USER}
       APP_ID_ALPHABET: ${APP_ID_ALPHABET}
       APP_AUTH_SECRET: ${APP_AUTH_SECRET}
       APP_ADMIN_PASSWORD: ${APP_ADMIN_PASSWORD}
-
-      # keep this in sync with exposed api port on host for proper redirections
-      # defaults to 80
-      #APP_API_PROXY_PORT: 4000
 
 volumes:
   postgres_data:
