@@ -33,10 +33,12 @@ import { useState } from "react"
 type Props = {
   links: ShortieLink[]
   loading: boolean
+  hasNextPage: boolean
+  hasPreviousPage: boolean
   onCreateLink: () => void
   onDeleteLink: (link: ShortieLink) => Promise<void>
-  fetchNextPage: (() => void) | null
-  goToPreviousPage: (() => void) | null
+  fetchNextPage: () => void
+  goToPreviousPage: () => void
   goToCodeAnalytics: (code: ShortieLink) => void
   goToEdit: (link: ShortieLink) => void
 }
@@ -46,6 +48,8 @@ export function LinksList({
   links,
   loading,
   fetchNextPage,
+  hasNextPage,
+  hasPreviousPage,
   onDeleteLink,
   goToEdit,
   goToCodeAnalytics,
@@ -76,15 +80,21 @@ export function LinksList({
         </Button>
 
         <div className="flex flex-row gap-x-6">
-          {goToPreviousPage ? (
-            <div>
-              <PageButton type="previous" onClick={goToPreviousPage} />
-            </div>
-          ) : null}
+          <div>
+            <PageButton
+              disabled={!hasPreviousPage}
+              type="previous"
+              onClick={goToPreviousPage}
+            />
+          </div>
 
           {fetchNextPage ? (
             <div>
-              <PageButton type="next" onClick={fetchNextPage} />
+              <PageButton
+                disabled={!hasNextPage}
+                type="next"
+                onClick={fetchNextPage}
+              />
             </div>
           ) : null}
         </div>
@@ -216,7 +226,9 @@ export function LinksList({
 function PageButton({
   onClick,
   type,
+  disabled,
 }: {
+  disabled: boolean
   type: "next" | "previous"
   onClick: () => void
 }) {
@@ -225,7 +237,10 @@ function PageButton({
     <Pagination>
       <PaginationContent>
         <PaginationItem>
-          <Element onClick={onClick} />
+          <Element
+            className={disabled ? "opacity-50 cursor-default hover:bg-transparent" : ""}
+            onClick={disabled ? undefined : onClick}
+          />
         </PaginationItem>
       </PaginationContent>
     </Pagination>
