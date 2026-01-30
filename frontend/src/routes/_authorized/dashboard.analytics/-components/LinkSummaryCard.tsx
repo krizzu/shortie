@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/card.tsx"
 import type { ShortieLinkAnalyticDetails } from "@/types/Link.ts"
 import { Spinner } from "@/components/ui/spinner.tsx"
-import { cn } from "@/lib/utils.ts"
+import { cn, formatNumber } from "@/lib/utils.ts"
 
 export function LinkSummaryCard({
   link,
@@ -24,14 +24,22 @@ export function LinkSummaryCard({
   return (
     <Card className="@container/card">
       <CardContent className="mx-auto my-auto">
-        <CardDescription className="text-center">Total clicks overall</CardDescription>
+        <CardDescription className="text-center">
+          Total clicks overall
+        </CardDescription>
         <CardTitle
           className={cn(
             "text-center text-6xl font-semibold",
             updating ? "opacity-50" : ""
           )}
         >
-          {!link && loading ? <Spinner /> : (link?.totalClicks ?? "no data")}
+          {!link && loading ? (
+            <Spinner />
+          ) : link?.totalClicks ? (
+            formatNumber(link.totalClicks)
+          ) : (
+            "no data"
+          )}
         </CardTitle>
       </CardContent>
       <CardContent>
@@ -45,5 +53,14 @@ export function LinkSummaryCard({
 }
 
 function formatDate(date: Date): string {
-  return `${date.toDateString()} ${date.getHours()}:${date.getMinutes()}`
+  let h: string | number = date.getHours()
+  let m: string | number = date.getMinutes()
+  if (h < 10) {
+    h = `0${h}`
+  }
+  if (m < 10) {
+    m = `0${m}`
+  }
+
+  return `${date.toDateString()} ${h}:${m}`
 }

@@ -1,10 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
-import { Link as LinkIcon } from "lucide-react"
+import { ChartBarIcon, Link as LinkIcon } from "lucide-react"
 import { Link, type LinkProps } from "@tanstack/react-router"
 
 const iconMap = {
   links: LinkIcon,
+  analytics: ChartBarIcon
 }
 
 interface DashboardWidgetProps {

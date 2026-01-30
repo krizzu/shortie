@@ -1,21 +1,26 @@
-import { Card, CardContent, CardDescription, CardTitle, } from "@/components/ui/card.tsx"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardTitle,
+} from "@/components/ui/card.tsx"
 import { Spinner } from "@/components/ui/spinner.tsx"
-import { cn } from "@/lib/utils.ts"
+import { cn, formatNumber } from "@/lib/utils.ts"
 
 export function ValueSummaryCard({
   value,
   name,
   loading,
   updating,
-  className
+  className,
 }: {
-  value: number | undefined,
+  value: number | undefined
   name: string
   loading: boolean
   updating: boolean
   className?: string
 }) {
-  const valueText = value !== undefined ? value : "no data"
+  const valueText = value !== undefined ? formatNumber(value) : "no data"
 
   return (
     <Card className={cn("@container/card", className)}>
@@ -33,4 +38,3 @@ export function ValueSummaryCard({
     </Card>
   )
 }
-

@@ -29,16 +29,23 @@ import TableLoadingSkeleton from "@/routes/_authorized/-components/links/TableLo
 import { EnvVars } from "@/services/env-vars.ts"
 import { ConfirmationAlert } from "@/routes/_authorized/-components/dashboard/ConfirmationAlert.tsx"
 import { useState } from "react"
+import { DropdownSelection } from "@/routes/_authorized/-components/DropdownSelection.tsx"
+
+const AVAILABLE_LIMITS = [5, 10, 20, 30, 40, 50]
 
 type Props = {
   links: ShortieLink[]
   loading: boolean
+  hasNextPage: boolean
+  hasPreviousPage: boolean
   onCreateLink: () => void
   onDeleteLink: (link: ShortieLink) => Promise<void>
-  fetchNextPage: (() => void) | null
-  goToPreviousPage: (() => void) | null
+  fetchNextPage: () => void
+  goToPreviousPage: () => void
   goToCodeAnalytics: (code: ShortieLink) => void
   goToEdit: (link: ShortieLink) => void
+  limit: number | undefined
+  setLimit: (limit: number) => void
 }
 
 export function LinksList({
@@ -46,10 +53,14 @@ export function LinksList({
   links,
   loading,
   fetchNextPage,
+  hasNextPage,
+  hasPreviousPage,
   onDeleteLink,
   goToEdit,
   goToCodeAnalytics,
   goToPreviousPage,
+  limit,
+  setLimit,
 }: Props) {
   const [toDelete, setToDelete] = useState<ShortieLink | null>(null)
   const [deleting, setDeleting] = useState(false)
@@ -76,18 +87,33 @@ export function LinksList({
         </Button>
 
         <div className="flex flex-row gap-x-6">
-          {goToPreviousPage ? (
-            <div>
-              <PageButton type="previous" onClick={goToPreviousPage} />
-            </div>
-          ) : null}
+          <div>
+            <PageButton
+              disabled={!hasPreviousPage}
+              type="previous"
+              onClick={goToPreviousPage}
+            />
+          </div>
 
           {fetchNextPage ? (
             <div>
-              <PageButton type="next" onClick={fetchNextPage} />
+              <PageButton
+                disabled={!hasNextPage}
+                type="next"
+                onClick={fetchNextPage}
+              />
             </div>
           ) : null}
         </div>
+
+        {limit !== undefined ? (
+          <DropdownSelection
+            selected={toValue(limit)}
+            label="per page"
+            onSelect={(v) => setLimit(Number(v.value))}
+            available={AVAILABLE_LIMITS.map(toValue)}
+          />
+        ) : null}
       </div>
 
       <div>
@@ -216,7 +242,9 @@ export function LinksList({
 function PageButton({
   onClick,
   type,
+  disabled,
 }: {
+  disabled: boolean
   type: "next" | "previous"
   onClick: () => void
 }) {
@@ -225,7 +253,12 @@ function PageButton({
     <Pagination>
       <PaginationContent>
         <PaginationItem>
-          <Element onClick={onClick} />
+          <Element
+            className={
+              disabled ? "opacity-50 cursor-default hover:bg-transparent" : ""
+            }
+            onClick={disabled ? undefined : onClick}
+          />
         </PaginationItem>
       </PaginationContent>
     </Pagination>
@@ -236,4 +269,11 @@ function formatDate(utc: string) {
   return new Intl.DateTimeFormat(undefined, {
     dateStyle: "medium",
   }).format(new Date(utc))
+}
+
+function toValue(value: number): { value: string; name: string } {
+  return {
+    value: String(value),
+    name: String(value),
+  }
 }

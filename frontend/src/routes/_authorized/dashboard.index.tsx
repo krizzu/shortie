@@ -10,15 +10,19 @@ export const Route = createFileRoute("/_authorized/dashboard/")({
 
 function DashboardIndex() {
   return (
-    <div className="grid grid-cols-4">
-      <div className="">
-        <DashboardWidget
-          title="URLs"
-          icon="links"
-          description="Manage links"
-          linkTo={"/dashboard/urls"}
-        />
-      </div>
+    <div className="grid grid-cols-4 gap-4">
+      <DashboardWidget
+        title="URLs"
+        icon="links"
+        description="Manage links"
+        linkTo={"/dashboard/urls"}
+      />
+      <DashboardWidget
+        title="Analytics"
+        icon="analytics"
+        description="See analytic data"
+        linkTo={"/dashboard/analytics"}
+      />
     </div>
   )
 }

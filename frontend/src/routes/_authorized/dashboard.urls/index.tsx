@@ -43,8 +43,8 @@ function LinksPage() {
   const deleteLinkMutation = useMutation(deleteLinkMutationOptions)
 
   const hasPreviousPage = (search.previous?.length ?? 0) > 0
-  const previousButtonActive =
-    hasPreviousPage || (!hasPreviousPage && search.page)
+  const previousButtonActive: boolean =
+    hasPreviousPage || (!hasPreviousPage && !!search.page)
 
   async function deleteLink(link: ShortieLink) {
     await deleteLinkMutation.mutateAsync(link.shortCode)
@@ -83,7 +83,14 @@ function LinksPage() {
     })
   }
 
-  function navigateToNextPage(page: string) {
+  function setLimit(limit: number) {
+    navigate({ search: (curr) => ({ ...curr, limit }) })
+  }
+
+  function navigateToNextPage(page: string | undefined | null) {
+    if (!page) {
+      return
+    }
     navigate({
       to: "/dashboard/urls",
       search: (cur) => {
@@ -116,24 +123,20 @@ function LinksPage() {
     <LinksList
       links={data?.data ?? []}
       loading={linksQuery.isLoading}
-      fetchNextPage={
-        data?.nextCursor
-          ? () => {
-              navigateToNextPage(data.nextCursor!)
-            }
-          : null
-      }
-      goToPreviousPage={
-        previousButtonActive
-          ? () => {
-              navigateToPreviousPage()
-            }
-          : null
-      }
+      hasNextPage={!!data?.nextCursor}
+      fetchNextPage={() => {
+        navigateToNextPage(data?.nextCursor)
+      }}
+      hasPreviousPage={previousButtonActive}
+      goToPreviousPage={() => {
+        navigateToPreviousPage()
+      }}
       onCreateLink={navigateToCreate}
       onDeleteLink={deleteLink}
       goToEdit={navigateToEdit}
       goToCodeAnalytics={navigateToCodeAnalytics}
+      limit={search.limit}
+      setLimit={setLimit}
     />
   )
 }
